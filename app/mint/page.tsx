@@ -31,6 +31,7 @@ import {
   useSendTransaction,
   useSwitchChain,
   useWaitForTransactionReceipt,
+  useWalletClient,
   useWriteContract,
 } from "wagmi";
 
@@ -51,6 +52,7 @@ const MintPage = () => {
   //Account Hooks
   const {user, linkWallet, login, ready, authenticated, linkEmail} = usePrivy();
   const {address, isConnected} = useAccount();
+  const {data: signer} = useWalletClient();
   const chainId = useChainId();
   const {switchChain} = useSwitchChain();
   const {sendTransaction, data, isPending, error, status} =
@@ -72,8 +74,8 @@ const MintPage = () => {
   };
 
   const deposit = async () => {
-    if (!user?.email || !address) return;
-
+    if (!user?.email || !address || !signer) return;
+    console.log("chainId", chainId);
     if (chainId !== 84532) {
       toast({
         title: "Please switch to the Base Sepolia",
@@ -106,6 +108,7 @@ const MintPage = () => {
         (process.env.NEXT_PUBLIC_FUNDS_OWNER as `0x${string}`) ||
         "0xdF515f14270b2d48e52Ec1d34c1aB0D1889ca88A",
       value: parseEther(price.toString()),
+      chainId: 84532,
     });
   };
 
@@ -223,6 +226,15 @@ const MintPage = () => {
 
     fetchUser();
   }, [user]);
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Failed to deposit funds",
+        description: "Please try again",
+      });
+    }
+  }, [error, status]);
   useEffect(() => {
     const fetchValues = async () => {
       const response = await axios.get("/api/value");
