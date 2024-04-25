@@ -101,8 +101,8 @@ const MintPage = () => {
       }
     );
 
-    if (!response.data.ethereum) return;
     const price = 10 / response.data.ethereum.usd;
+    console.log(parseEther(price.toString()));
     sendTransaction({
       to:
         (process.env.NEXT_PUBLIC_FUNDS_OWNER as `0x${string}`) ||
