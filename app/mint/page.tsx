@@ -353,6 +353,14 @@ const MintPage = () => {
                       mint={mintValue}
                     />
                   )}
+
+                {searchValue.length === 0 && (
+                  <div className="flex justify-center items-center p-4">
+                    <span className="font-semibold  text-gray-300 text-lg">
+                      Type out your values and mint them
+                    </span>{" "}
+                  </div>
+                )}
               </section>
             ) : (
               <section className="md:w-[900px] pl-4 h-14  flex flex-row justify-between items-center hover:bg-gray-300/20 hover:cursor-pointer rounded-sm mt-4">

@@ -33,7 +33,7 @@ export default function ValuesWordCloud() {
 
   return (
     <div className="h-[250px] w-[96%] m-auto flex justify-center">
-      <ReactWordcloud words={words} size={[600, 250]} minSize={"100px"} />
+      <ReactWordcloud words={words} />
     </div>
   );
 }
