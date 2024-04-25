@@ -63,12 +63,13 @@ export async function POST(req: NextRequest) {
 export async function GET(req: any) {
   const searchParams = req.nextUrl.searchParams;
   const email = searchParams.get("email");
-
   try {
     await mongoose.connect(process.env.MONGODB_URI || "");
+
     if (email) {
-      const user = await User.findOne({email: email});
-      if (user.length === 0) {
+      const user = await User.findOne({email});
+
+      if (!user) {
         return NextResponse.json({error: "User not found", status: 404});
       }
 

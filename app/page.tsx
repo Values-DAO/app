@@ -2,9 +2,38 @@
 import {Button} from "@/components/ui/button";
 import MintPage from "./mint/page";
 import {usePrivy} from "@privy-io/react-auth";
+import {useEffect} from "react";
 
 export default function Home() {
-  const {authenticated, login, ready} = usePrivy();
+  const {authenticated, login, ready, user} = usePrivy();
+
+  useEffect(() => {
+    if (!user?.email?.address) return;
+
+    const isUserExist = async () => {
+      if (authenticated) {
+        const existingUser = await fetch(
+          `/api/user?email=${user?.email?.address}`
+        );
+        const data = await existingUser.json();
+
+        if (data.status === 404) {
+          await fetch(`/api/user`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: user?.email?.address,
+              wallets: [],
+              method: "create_user",
+            }),
+          });
+        }
+      }
+    };
+    isUserExist();
+  }, [user?.email?.address, authenticated]);
   return (
     <>
       {authenticated ? (

@@ -254,39 +254,37 @@ const MintPage = () => {
     <div className="flex justify-center">
       <div className="flex flex-col md:w-[900px] w-[98vw] max-w-[90%] m-auto">
         <ValuesWordCloud />
-        {userData && (
-          <div className="flex flex-row justify-between items-center ">
-            <p className="p-4">Balance: ${userData.balance ?? 0}</p>
-            <div>
-              {isConnected ? (
-                <Button
-                  onClick={deposit}
-                  disabled={isPending || isLoading}
-                  className=""
-                  variant={"link"}
-                >
-                  {isPending ? (
-                    <div className="flex flex-row justify-center items-center gap-2">
-                      <span>Sign in wallet</span>
-                      <div className="animate-spin rounded-full h-6 w-6 border-4 border-dashed border-white"></div>
-                    </div>
-                  ) : isLoading ? (
-                    <div className="flex flex-row justify-center items-center gap-2">
-                      <span>Loading</span>
-                      <div className="animate-spin rounded-full h-6 w-6 border-4 border-dashed border-white"></div>
-                    </div>
-                  ) : (
-                    <p> Deposit ($1 = 1 Value)</p>
-                  )}
-                </Button>
-              ) : (
-                <Button variant="default" onClick={linkWallet}>
-                  Connect Wallet to deposit
-                </Button>
-              )}
-            </div>
+        <div className="flex flex-row justify-between items-center ">
+          <p className="p-4">Balance: ${userData?.balance ?? 0}</p>
+          <div>
+            {isConnected ? (
+              <Button
+                onClick={deposit}
+                disabled={isPending || isLoading}
+                className=""
+                variant={"link"}
+              >
+                {isPending ? (
+                  <div className="flex flex-row justify-center items-center gap-2">
+                    <span>Sign in wallet</span>
+                    <div className="animate-spin rounded-full h-6 w-6 border-4 border-dashed border-white"></div>
+                  </div>
+                ) : isLoading ? (
+                  <div className="flex flex-row justify-center items-center gap-2">
+                    <span>Loading</span>
+                    <div className="animate-spin rounded-full h-6 w-6 border-4 border-dashed border-white"></div>
+                  </div>
+                ) : (
+                  <p> Deposit ($1 = 1 Value)</p>
+                )}
+              </Button>
+            ) : (
+              <Button variant="default" onClick={linkWallet}>
+                Connect Wallet to deposit
+              </Button>
+            )}
           </div>
-        )}
+        </div>
         <div className="relative ">
           <Input
             placeholder="Search for values"
