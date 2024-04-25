@@ -9,10 +9,10 @@ import {http} from "wagmi";
 export const config = createConfig({
   chains: [mainnet, base, baseSepolia, polygon],
   transports: {
-    [mainnet.id]: http(process.env.NEXT_PUBLIC_ETH_MAINNET_RPC || ""),
-    [base.id]: http(process.env.NEXT_PUBLIC_BASE_RPC || ""),
-    [baseSepolia.id]: http(process.env.NEXT_PUBLIC_BASE_SEPOLIA_RPC || ""),
-    [polygon.id]: http(process.env.NEXT_PUBLIC_POLYGON_RPC || ""),
+    [mainnet.id]: http(),
+    [base.id]: http(),
+    [baseSepolia.id]: http(),
+    [polygon.id]: http(),
   },
 });
 
