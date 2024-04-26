@@ -1,9 +1,10 @@
 "use client";
 import {Button} from "@/components/ui/button";
-import MintPage from "./mint/page";
+
 import {usePrivy} from "@privy-io/react-auth";
 import {useEffect, useState} from "react";
 import {IUser} from "@/models/user";
+import MintPage from "@/components/mint-page";
 
 export default function Home() {
   const {authenticated, login, ready, user} = usePrivy();

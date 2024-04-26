@@ -37,9 +37,9 @@ const Navbar = () => {
         <Button variant={"link"} className="text-md" asChild>
           <Link href={"/community"}>Communities</Link>
         </Button>
-        <Button variant={"link"} className="text-md" asChild>
+        {/* <Button variant={"link"} className="text-md" asChild>
           <Link href={"/mint"}>Mint a Value</Link>
-        </Button>
+        </Button> */}
 
         {ready && authenticated ? (
           <Button variant={"default"} onClick={logout}>
@@ -68,9 +68,9 @@ const Navbar = () => {
             <DropdownMenuItem asChild className="cursor-pointer">
               <Link href={"/community"}>Communities</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild className="cursor-pointer">
+            {/* <DropdownMenuItem asChild className="cursor-pointer">
               <Link href={"/mint"}>Mint a Value</Link>
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
 
             {authenticated && user && (
               <DropdownMenuItem
