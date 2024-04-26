@@ -10,6 +10,11 @@ const Footer = () => {
           <Link href="https://discord.gg/bdGJsAh2" target="_blank">
             Join Discord
           </Link>
+        </Button>{" "}
+        <Button variant="link" className="md:text-md" asChild>
+          <Link href="https://twitter.com/valuesdao_" target="_blank">
+            Twitter
+          </Link>
         </Button>
         <Button variant="link" asChild className="md:text-md">
           <Link href="https://t.me/PareenL" target="_blank">
@@ -17,8 +22,8 @@ const Footer = () => {
           </Link>
         </Button>
         <Button variant="link" className="md:text-md" asChild>
-          <Link href="http://twitter.com/valuesdao_" target="_blank">
-            Follow on Twitter
+          <Link href="https://warpcast.com/~/channel/valuesdao" target="_blank">
+            Follow on Warpcast
           </Link>
         </Button>
       </div>

@@ -27,6 +27,7 @@ export default function Home() {
               email: user?.email?.address,
               wallets: [],
               method: "create_user",
+              balance: 5,
             }),
           });
         }

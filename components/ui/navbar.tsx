@@ -35,6 +35,9 @@ const Navbar = () => {
           <Link href={"/profile"}>Profile</Link>
         </Button>
         <Button variant={"link"} className="text-md" asChild>
+          <Link href={"/community"}>Communities</Link>
+        </Button>
+        <Button variant={"link"} className="text-md" asChild>
           <Link href={"/mint"}>Mint a Value</Link>
         </Button>
 
@@ -53,9 +56,9 @@ const Navbar = () => {
           className="absolute top-5 right-4 flex flex-row gap-2 items-center md:hidden"
           asChild
         >
-          <Button variant={"outline"} size={"icon"}>
-            <EllipsisVertical />
-          </Button>
+          <div className="p-2 border-[2px] border-gray-500/45 rounded-md">
+            <EllipsisVertical size={"30px"} />
+          </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="mr-4">
           <DropdownMenuItem asChild className="cursor-pointer">
@@ -63,6 +66,9 @@ const Navbar = () => {
           </DropdownMenuItem>
           <DropdownMenuItem asChild className="cursor-pointer">
             <Link href={"/profile"}>Profile</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild className="cursor-pointer">
+            <Link href={"/community"}>Communities</Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild className="cursor-pointer">
             <Link href={"/mint"}>Mint a Value</Link>

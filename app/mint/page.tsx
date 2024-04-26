@@ -75,7 +75,7 @@ const MintPage = () => {
 
   const deposit = async () => {
     if (!user?.email || !address || !signer) return;
-    console.log("chainId", chainId);
+
     if (chainId !== 84532) {
       toast({
         title: "Please switch to the Base Sepolia",
@@ -102,7 +102,7 @@ const MintPage = () => {
     );
 
     const price = 10 / response.data.ethereum.usd;
-    console.log(parseEther(price.toString()));
+
     sendTransaction({
       to:
         (process.env.NEXT_PUBLIC_FUNDS_OWNER as `0x${string}`) ||
@@ -150,7 +150,13 @@ const MintPage = () => {
             email: user?.email?.address,
           });
 
+          await axios.post("/api/value", {
+            value: key,
+            email: user?.email?.address,
+          });
+
           fetchUser();
+          fetchValues();
           toast({
             title: "We just dropped few NFTs to your wallet",
             description: "View them in your wallet",
@@ -191,6 +197,7 @@ const MintPage = () => {
         description: "You don't have enough funds to mint this value",
       });
     }
+    setSearchValue("");
   };
   // filter values upon search by user and set it in a state to display in UI
   const hasMintedValue = async (value: string) => {
@@ -217,6 +224,12 @@ const MintPage = () => {
     );
     setFilteredData(filteredData);
   };
+  const fetchValues = async () => {
+    const response = await axios.get("/api/value");
+
+    if (response.data) setAvailableValues(response.data);
+  };
+
   useEffect(() => {
     fetchData();
   }, [searchValue, userData]);
@@ -236,12 +249,6 @@ const MintPage = () => {
     }
   }, [error, status]);
   useEffect(() => {
-    const fetchValues = async () => {
-      const response = await axios.get("/api/value");
-
-      if (response.data) setAvailableValues(response.data);
-    };
-
     fetchValues();
   }, []);
 
@@ -265,7 +272,7 @@ const MintPage = () => {
   return (
     <div className="flex justify-center">
       <div className="flex flex-col md:w-[900px] w-[98vw] max-w-[90%] m-auto">
-        <ValuesWordCloud />
+        <ValuesWordCloud refresh={availableValues} />
         <div className="flex flex-row justify-between items-center ">
           <p className="p-4">Balance: ${userData?.balance ?? 0}</p>
           <div>
@@ -415,7 +422,7 @@ const MintPage = () => {
                 <AlertDialogAction
                   onClick={() => {
                     window.open(
-                      `https://twitter.com/intent/tweet?text=${valueMinted.value}.%20iykyk`,
+                      `https://twitter.com/intent/tweet?url=https%3A%2F%2Fapp.valuesdao.io&text=I%20just%20minted%20my%20values.%20are%20you%20aligned%20with%20me%2C%20anon%3F%20check%20on%20Values%20DAO.`,
                       "_blank"
                     );
                   }}

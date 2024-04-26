@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
     const {name, value, email} = await req.json();
     if (value && email) {
       const existingValue = await Value.findOne({name: value});
-      console.log(existingValue);
+
       if (existingValue) {
         if (existingValue.minters.includes(email)) {
           return NextResponse.json({status: 200, value: existingValue});
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
       });
     }
   } catch (error) {
-    console.log(error);
+    return NextResponse.json({status: 500, error});
   }
 }
 
@@ -39,9 +39,8 @@ export async function GET(req: NextRequest) {
   try {
     await mongoose.connect(process.env.MONGODB_URI || "");
     const values = await Value.find({}, {__v: 0, _id: 0, "value._id": 0});
-    console.log(values);
+
     const formattedValues = values.reduce((acc, item) => {
-      console.log(item);
       acc[item.name] = {
         minters: item.minters,
         cid: item.value.cid,

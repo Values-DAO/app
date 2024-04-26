@@ -24,7 +24,7 @@ const ProfilePage = () => {
       method: "GET",
     });
     const data = await response.json();
-    console.log(data);
+
     setValues(data.user.mintedValues);
   };
   useEffect(() => {

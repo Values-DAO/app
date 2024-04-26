@@ -19,7 +19,7 @@ const Projects = async () => {
   await mongoose.connect(process.env.MONGODB_URI || "");
 
   const projects = await Project.find({}, {__v: 0, _id: 0});
-  console.log(projects);
+
   return (
     <div className="p-4">
       <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl my-2 pl-1">

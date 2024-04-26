@@ -5,14 +5,15 @@ interface Word {
   text: string;
   value: number;
 }
-
-export default function ValuesWordCloud() {
+interface WordCloudProps {
+  refresh: any;
+}
+const ValuesWordCloud: React.FC<WordCloudProps> = ({refresh}) => {
   const [words, setWords] = useState<Word[]>([]);
   const fetchWords = async () => {
     const response = await fetch("/api/value");
     const data = await response.json();
     if (data) {
-      console.log(data);
       const words: Word[] = [];
 
       for (const key in data) {
@@ -22,18 +23,19 @@ export default function ValuesWordCloud() {
           words.push({text, value});
         }
       }
-      console.log(words);
+
       setWords(words);
     }
   };
 
   useEffect(() => {
     fetchWords();
-  }, []);
+  }, [refresh]);
 
   return (
     <div className="h-[250px] w-[96%] m-auto flex justify-center">
       <ReactWordcloud words={words} />
     </div>
   );
-}
+};
+export default ValuesWordCloud;

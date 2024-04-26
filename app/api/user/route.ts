@@ -24,6 +24,7 @@ export async function POST(req: NextRequest) {
         email,
         username,
         wallets,
+        balance,
       });
       return NextResponse.json(user);
     }

@@ -27,7 +27,6 @@ export async function POST(req: NextRequest) {
         },
       }
     );
-    console.log(pinataResponse.data);
 
     return NextResponse.json({
       status: 200,
