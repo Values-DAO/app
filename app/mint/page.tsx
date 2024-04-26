@@ -34,9 +34,11 @@ import {
   useWalletClient,
   useWriteContract,
 } from "wagmi";
-
-const MintPage = () => {
-  const [userData, setUserData] = useState<IUser>({} as IUser);
+interface IMintPageProps {
+  userInfo?: IUser;
+}
+const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
+  const [userData, setUserData] = useState<IUser>(userInfo || ({} as IUser));
   const [availableValues, setAvailableValues] = useState<IValuesData>(
     {} as IValuesData
   );
@@ -69,8 +71,8 @@ const MintPage = () => {
       },
     });
     const data = await response.json();
-
-    setUserData(data.user);
+    if (data.user) setUserData(data.user);
+    console.log(data);
   };
 
   const deposit = async () => {
@@ -238,7 +240,7 @@ const MintPage = () => {
     if (!user?.email?.address) return;
 
     fetchUser();
-  }, [user]);
+  }, [user, user?.email?.address]);
 
   useEffect(() => {
     if (error) {
@@ -250,7 +252,7 @@ const MintPage = () => {
   }, [error, status]);
   useEffect(() => {
     fetchValues();
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     const updateUserbalance = async () => {
