@@ -34,7 +34,7 @@ export default function Home() {
       }
     };
     isUserExist();
-  }, [user?.email?.address, authenticated]);
+  }, [user?.email?.address, authenticated, user]);
   return (
     <>
       {authenticated ? (

@@ -380,11 +380,15 @@ const MintPage = () => {
                 )}
               </section>
             ) : (
-              <section className="md:w-[900px] pl-4 h-14  flex flex-row justify-between items-center hover:bg-gray-300/20 hover:cursor-pointer rounded-sm mt-4">
+              <section className="w-full h-14 px-3 flex items-center hover:bg-gray-300/20 hover:cursor-pointer rounded-sm">
                 <span className="font-semibold  text-gray-300 text-lg">
                   Link an email to proceed
                 </span>{" "}
-                <Button variant="default" onClick={linkEmail}>
+                <Button
+                  variant="default"
+                  onClick={linkEmail}
+                  className="ml-auto h-8 w-32"
+                >
                   Link Email
                 </Button>
               </section>

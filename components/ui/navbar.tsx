@@ -21,13 +21,13 @@ const Navbar = () => {
         <Image
           src={"/logo.png"}
           alt="logo"
-          width={120}
-          height={80}
-          className="w-full h-[80px] cursor-pointer"
+          width={300}
+          height={150}
+          className="w-[220px] h-[100px] md:h-[80px] cursor-pointer"
         />
       </Link>
 
-      <div className="hidden md:flex flex-row gap-4">
+      <div className="hidden md:flex flex-row gap-4 mt-[-12px]">
         <Button variant={"link"} className="text-md" asChild>
           <Link href={"/"}>Home</Link>
         </Button>
@@ -51,7 +51,7 @@ const Navbar = () => {
           </Button>
         )}
       </div>
-      <div className=" flex flex-row gap-2 items-center md:hidden">
+      <div className=" flex flex-row gap-2  md:hidden mt-[-12px]">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <div className="p-2 border-[2px] border-gray-500/45 rounded-md">
