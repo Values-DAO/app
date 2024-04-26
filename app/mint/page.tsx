@@ -298,7 +298,7 @@ const MintPage = () => {
                 )}
               </Button>
             ) : (
-              <Button variant="default" onClick={linkWallet}>
+              <Button variant="link" onClick={linkWallet}>
                 Connect Wallet to deposit
               </Button>
             )}

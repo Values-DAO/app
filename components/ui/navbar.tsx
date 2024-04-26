@@ -23,7 +23,7 @@ const Navbar = () => {
           alt="logo"
           width={120}
           height={80}
-          className="w-full h-[60px] md:h-[80px] cursor-pointer"
+          className="w-full h-[80px] cursor-pointer"
         />
       </Link>
 
