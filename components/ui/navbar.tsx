@@ -16,14 +16,14 @@ import {usePrivy} from "@privy-io/react-auth";
 const Navbar = () => {
   const {ready, authenticated, user, logout, login} = usePrivy();
   return (
-    <div className="flex flex-row justify-between  p-6 relative">
+    <div className="flex flex-row justify-between items-center  p-4 md:p-6 relative">
       <Link href="/">
         <Image
           src={"/logo.png"}
           alt="logo"
-          width={80}
+          width={120}
           height={80}
-          className="w-[80px] h-[80px] "
+          className="w-full h-[60px] md:h-[80px] cursor-pointer"
         />
       </Link>
 
@@ -51,39 +51,38 @@ const Navbar = () => {
           </Button>
         )}
       </div>
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          className="absolute top-5 right-4 flex flex-row gap-2 items-center md:hidden"
-          asChild
-        >
-          <div className="p-2 border-[2px] border-gray-500/45 rounded-md">
-            <EllipsisVertical size={"30px"} />
-          </div>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="mr-4">
-          <DropdownMenuItem asChild className="cursor-pointer">
-            <Link href={"/"}>Home</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild className="cursor-pointer">
-            <Link href={"/profile"}>Profile</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild className="cursor-pointer">
-            <Link href={"/community"}>Communities</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild className="cursor-pointer">
-            <Link href={"/mint"}>Mint a Value</Link>
-          </DropdownMenuItem>
-
-          {authenticated && user && (
-            <DropdownMenuItem
-              className="cursor-pointer"
-              onClick={() => logout()}
-            >
-              Logout
+      <div className=" flex flex-row gap-2 items-center md:hidden">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <div className="p-2 border-[2px] border-gray-500/45 rounded-md">
+              <EllipsisVertical size={"25px"} />
+            </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="mr-4">
+            <DropdownMenuItem asChild className="cursor-pointer">
+              <Link href={"/"}>Home</Link>
             </DropdownMenuItem>
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu>
+            <DropdownMenuItem asChild className="cursor-pointer">
+              <Link href={"/profile"}>Profile</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild className="cursor-pointer">
+              <Link href={"/community"}>Communities</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild className="cursor-pointer">
+              <Link href={"/mint"}>Mint a Value</Link>
+            </DropdownMenuItem>
+
+            {authenticated && user && (
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => logout()}
+              >
+                Logout
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </div>
   );
 };
