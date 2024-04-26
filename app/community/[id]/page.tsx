@@ -21,6 +21,7 @@ import {privateKeyToAccount} from "viem/accounts";
 import {toast} from "@/components/ui/use-toast";
 import {usePrivy} from "@privy-io/react-auth";
 import {NFT_CONTRACT_ABI, NFT_CONTRACT_ADDRESS} from "@/lib/constants";
+import {Separator} from "@/components/ui/separator";
 
 interface pageProps {
   params: {id: string};
@@ -136,29 +137,38 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
     <main className="p-4 overflow-y-auto">
       {project && (
         <section className="flex flex-col items-center md:items-start md:flex-row gap-4">
-          <Image
-            src={project.coverImage}
-            alt={project.name}
-            width={500}
-            height={500}
-            className="rounded-lg mb-2 w-full md:w-96 md:h-96"
-          />
-          <div className="w-full">
+          <div className="w-[90vw] m-auto">
             <span>#{project.id}</span>
-            <h2 className="scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0">
+            <h2 className="scroll-m-20 pb-2 text-xl font-medium tracking-tight first:mt-0">
               {project?.name}
             </h2>
+            <Separator />
 
-            <div className="flex flex-wrap flex-row my-2 gap-2">
+            <p className="text-2xl font-semibold tracking-tight mt-8">
+              Values{" "}
+            </p>
+            <p className="my-2 text-muted-foreground">
+              Connect your wallet if you hold this NFT, and mint your values for
+              free
+            </p>
+            <div className="flex flex-wrap flex-row gap-2 my-4 font-medium">
               {project?.values.map((value, index) => (
-                <Badge key={index} variant={"default"} className="rounded-sm">
+                <Badge
+                  key={index}
+                  variant={"default"}
+                  className="rounded-sm text-[18px] "
+                >
                   {value}
                 </Badge>
               ))}
             </div>
 
             {user?.email?.address && !address && (
-              <Button variant="default" onClick={linkWallet}>
+              <Button
+                variant="secondary"
+                onClick={linkWallet}
+                className="w-full"
+              >
                 Connect Wallet
               </Button>
             )}
@@ -175,7 +185,11 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
                 </Button>
               )
             ) : (
-              <Button variant="default" onClick={linkEmail}>
+              <Button
+                variant="secondary"
+                onClick={linkEmail}
+                className="w-full"
+              >
                 Link Email
               </Button>
             )}
