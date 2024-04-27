@@ -12,7 +12,7 @@ export async function generateImage(
     if (!value || !prompt) return null;
     const response = await openai.images.generate({
       model: "dall-e-3",
-      prompt: `I NEED to test how the tool works with extremely simple prompts. DO NOT add any detail, just use it AS-IS: generate an image that represents ${value} in a colorful pencil drawing using only yellow color in one human face. ${value} here means ${prompt}. Use only Yellow Color.`,
+      prompt: `I NEED to test how the tool works with extremely simple prompts. DO NOT add any detail, just use it AS-IS: generate an image that represents ${value} in a colorful sketch using only yellow color in one human face that depicts the ${value}. ${value} here means ${prompt}. Use only Yellow Color.`,
       n: 1,
       size: "1024x1024",
     });

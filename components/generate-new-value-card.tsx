@@ -4,6 +4,7 @@ import React from "react";
 import {Card} from "./ui/card";
 import {Button} from "./ui/button";
 import {Textarea} from "./ui/textarea";
+import {toast} from "./ui/use-toast";
 
 interface GenerateNewValueCardProps {
   value: string;
@@ -30,6 +31,14 @@ const GenerateNewValueCard: React.FC<GenerateNewValueCardProps> = ({
       text: "Generating image...",
     });
     const image = await generateImage(value, valuePrompt);
+    if (image === null) {
+      setLoading({loading: false, text: ""});
+      toast({
+        title: "There was an error generating the image",
+        description: "Please try again later",
+      });
+      return;
+    }
     const uploadImageToIPFS = await axios.post(
       "/api/pin",
 
@@ -38,11 +47,14 @@ const GenerateNewValueCard: React.FC<GenerateNewValueCardProps> = ({
         name: value,
       }
     );
-    if (uploadImageToIPFS.data.status === 200)
+
+    if (uploadImageToIPFS.data.status === 200) {
       setGeneratedImage(
         `https://gateway.pinata.cloud/ipfs/${uploadImageToIPFS.data.cid}`
       );
-    else setGeneratedImage(image);
+    } else {
+      setGeneratedImage(image);
+    }
     setLoading({
       loading: false,
       text: "",

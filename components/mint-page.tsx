@@ -115,7 +115,7 @@ const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
   };
 
   const mintValue = async ({value, key}: {value: any; key: string}) => {
-    if (!value || !key || !user?.email?.address) return;
+    if (!value || !key || !user?.email?.address || !address) return;
 
     if (userData?.balance > 0) {
       setLoading((prevLoading) => ({
@@ -339,7 +339,7 @@ const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
                               className="ml-auto h-8 w-32"
                               disabled={value.hasMintedValue || loading[key]}
                               onClick={() => {
-                                mintValue({value, key});
+                                mintValue({value: value.value, key});
                               }}
                             >
                               {loading[key] ? (

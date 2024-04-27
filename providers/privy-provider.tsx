@@ -11,7 +11,7 @@ export const config = createConfig({
   transports: {
     [mainnet.id]: http(),
     [base.id]: http(),
-    [baseSepolia.id]: http(),
+    [baseSepolia.id]: http(process.env.NEXT_PUBLIC_BASE_SEPOLIA_RPC || ""),
     [polygon.id]: http(),
   },
 });
