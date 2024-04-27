@@ -72,12 +72,13 @@ const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
     });
     const data = await response.json();
     if (data.user) setUserData(data.user);
-    console.log(data);
   };
 
   const deposit = async () => {
     if (!user?.email || !address || !signer) return;
-
+    if (!isConnected) {
+      console.log("Please connect your wallet");
+    }
     if (chainId !== 84532) {
       toast({
         title: "Please switch to the Base Sepolia",
@@ -111,11 +112,19 @@ const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
         "0xdF515f14270b2d48e52Ec1d34c1aB0D1889ca88A",
       value: parseEther(price.toString()),
       chainId: 84532,
+      account: signer.account,
     });
   };
 
   const mintValue = async ({value, key}: {value: any; key: string}) => {
     if (!value || !key || !user?.email?.address || !address) return;
+    if (!isConnected) {
+      toast({
+        title: "Please connect your wallet",
+        description: "To mint values, connect a wallet first",
+      });
+      return;
+    }
 
     if (userData?.balance > 0) {
       setLoading((prevLoading) => ({
@@ -167,12 +176,12 @@ const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
                 altText="opensea"
                 onClick={() => {
                   window.open(
-                    `https://testnets.opensea.io/collection/iykyk-values-1`,
+                    `${process.env.NEXT_PUBLIC_BASESCAN_URL}/tx/${hash}`,
                     "_blank"
                   );
                 }}
               >
-                OpenSea
+                Basescan
               </ToastAction>
             ),
           });
@@ -244,10 +253,23 @@ const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
 
   useEffect(() => {
     if (error) {
-      toast({
-        title: "Failed to deposit funds",
-        description: "Please try again",
-      });
+      console.log("Error", error);
+      if (error.message === "User denied transaction signature") {
+        toast({
+          title: "Transaction cancelled",
+          description: "Please try again",
+        });
+      } else if (error.message.includes("insufficient funds")) {
+        toast({
+          title: "Insufficient funds",
+          description: "Please deposit funds to mint",
+        });
+      } else {
+        toast({
+          title: "Failed to deposit funds",
+          description: "Please try again",
+        });
+      }
     }
   }, [error, status]);
   useEffect(() => {
@@ -271,6 +293,7 @@ const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
     };
     updateUserbalance();
   }, [depositSuccess]);
+
   return (
     <div className="flex justify-center">
       <div className="flex flex-col md:w-[900px] w-[98vw] max-w-[90%] m-auto">

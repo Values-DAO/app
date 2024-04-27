@@ -5,6 +5,8 @@ import {Card} from "./ui/card";
 import {Button} from "./ui/button";
 import {Textarea} from "./ui/textarea";
 import {toast} from "./ui/use-toast";
+import {generateDescription} from "@/lib/generate-description";
+import {useAccount} from "wagmi";
 
 interface GenerateNewValueCardProps {
   value: string;
@@ -25,6 +27,7 @@ const GenerateNewValueCard: React.FC<GenerateNewValueCardProps> = ({
     loading: false,
     text: "",
   });
+  const {isConnected} = useAccount();
   const generateImageFromOpenAI = async () => {
     setLoading({
       loading: true,
@@ -62,18 +65,25 @@ const GenerateNewValueCard: React.FC<GenerateNewValueCardProps> = ({
   };
 
   const mintValue = async () => {
+    if (!isConnected) {
+      toast({
+        title: "Please connect your wallet",
+        description: "You need to connect your wallet to mint a value",
+      });
+      return;
+    }
     setLoading({
       loading: true,
       text: "Prep'ing...",
     });
-
+    const description = await generateDescription(value);
     try {
       const response = await axios.post(
         "https://api.pinata.cloud/pinning/pinJSONToIPFS",
         {
           pinataContent: {
             name: value,
-            description: valuePrompt,
+            description: description ?? "",
             image: generatedImage,
           },
         },
@@ -92,14 +102,14 @@ const GenerateNewValueCard: React.FC<GenerateNewValueCardProps> = ({
         value: {
           metadata: {
             name: value,
-            description: valuePrompt,
+            description: description ?? "",
             image: generatedImage,
           },
           cid: `https://gateway.pinata.cloud/ipfs/${response.data.IpfsHash}`,
         },
         hasMintedValue: false,
       };
-      const addNewvalue = await axios.post("/api/value", {
+      await axios.post("/api/value", {
         name: valueObject.value.metadata.name,
         value: valueObject.value,
       });
