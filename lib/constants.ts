@@ -1,5 +1,5 @@
 export const NFT_CONTRACT_ADDRESS =
-  "0x354E0e6648f7FdB01932ab1133326f931A69C548";
+  "0x74325B5f97BFBeb2BD34092E070e1246386b55d1";
 export const NFT_CONTRACT_ABI = [
   {
     inputs: [
@@ -298,6 +298,24 @@ export const NFT_CONTRACT_ABI = [
       },
     ],
     stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "to",
+        type: "address",
+      },
+      {
+        internalType: "string[]",
+        name: "uris",
+        type: "string[]",
+      },
+    ],
+    name: "batchMint",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
