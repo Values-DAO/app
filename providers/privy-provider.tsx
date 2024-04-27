@@ -3,16 +3,17 @@
 import {PrivyProvider} from "@privy-io/react-auth";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {createConfig, WagmiProvider} from "@privy-io/wagmi";
-import {mainnet, base, baseSepolia, polygon} from "viem/chains";
+import {mainnet, base, baseSepolia, polygon, optimism} from "viem/chains";
 import {http} from "wagmi";
 
 export const config = createConfig({
-  chains: [mainnet, base, baseSepolia, polygon],
+  chains: [mainnet, base, baseSepolia, polygon, optimism],
   transports: {
     [mainnet.id]: http(),
     [base.id]: http(),
     [baseSepolia.id]: http(process.env.NEXT_PUBLIC_BASE_SEPOLIA_RPC || ""),
     [polygon.id]: http(),
+    [optimism.id]: http(),
   },
 });
 

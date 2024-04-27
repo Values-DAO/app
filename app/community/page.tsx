@@ -25,7 +25,7 @@ const Projects = async () => {
   return (
     <div className="p-4">
       <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl my-2 pl-1">
-        Projects
+        Communities
       </h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         {projects &&
@@ -36,6 +36,11 @@ const Projects = async () => {
               className="m-2 flex flex-col justify-between"
             >
               <CardHeader>
+                {" "}
+                <div className="flex flex-row items-center gap-2 h-6 mb-2 font-medium">
+                  {project.name}
+                  {project.verified && <VerifiedIcon size={20} />}
+                </div>
                 <Image
                   src={project.coverImage}
                   alt={project.name}
@@ -44,15 +49,9 @@ const Projects = async () => {
                   className="rounded-lg mb-2 w-full h-36 object-cover"
                 />
                 <CardTitle className=" flex flex-col gap-2">
-                  <div className="flex flex-row items-center gap-2 h-6 font-medium">
-                    {project.name}
-                    {project.verified && <VerifiedIcon size={20} />}
-                  </div>
                   <Separator />
 
-                  <p className="text-lg font-semibold tracking-tight">
-                    Values{" "}
-                  </p>
+                  <p className="text-xl font-bold tracking-tight">Values </p>
                   <div className="flex flex-wrap flex-row gap-2 font-medium">
                     {project?.values.map((value: string, index: number) => (
                       <Badge
@@ -97,14 +96,13 @@ const Projects = async () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {" "}
                 <Button className="w-full" variant={"secondary"} asChild>
                   <Link
                     href={`/community/${project.name.replace(/ /g, "-")}-${
                       project.id
                     }`}
                   >
-                    View Project
+                    View Community
                   </Link>
                 </Button>
               </CardContent>

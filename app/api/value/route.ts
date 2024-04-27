@@ -7,9 +7,19 @@ export async function POST(req: NextRequest) {
     await mongoose.connect(process.env.MONGODB_URI || "");
     const {name, value, email} = await req.json();
     if (value && email) {
-      const existingValue = await Value.findOne({name: value});
+      if (Array.isArray(value)) {
+        for (const v of value) {
+          const existingValue = await Value.findOne({name: v});
+          if (existingValue.minters.includes(email)) {
+            continue;
+          }
+          existingValue.minters.push(email);
+          await existingValue.save();
+        }
+        return NextResponse.json({status: 200});
+      } else {
+        const existingValue = await Value.findOne({name: value});
 
-      if (existingValue) {
         if (existingValue.minters.includes(email)) {
           return NextResponse.json({status: 200, value: existingValue});
         }

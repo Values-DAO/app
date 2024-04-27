@@ -22,6 +22,7 @@ import {toast} from "@/components/ui/use-toast";
 import {usePrivy} from "@privy-io/react-auth";
 import {NFT_CONTRACT_ABI, NFT_CONTRACT_ADDRESS} from "@/lib/constants";
 import {Separator} from "@/components/ui/separator";
+import {getChainName} from "@/lib/utils";
 
 interface pageProps {
   params: {id: string};
@@ -33,15 +34,12 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
   const {disconnect} = useDisconnect();
   const {writeContractAsync, isError, failureReason} = useWriteContract();
   const [project, setProject] = useState<IProject | null>(null);
-  const [tokenBalance, setTokenBalance] = useState<number>(0);
+
   const [valuesFromDB, setValuesFromDB] = useState<any>([]);
 
   const [loader, setLoader] = useState(false);
   const id = params.id.split("-").pop();
 
-  console.log(
-    `checking balance of ${address} in ${project?.contractAddress} chainId: ${project?.chainId}`
-  );
   const {data: userBalanceOfToken} = useReadContract({
     abi: erc20Abi,
     address: project?.contractAddress! as `0x${string}`,
@@ -49,7 +47,7 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
     args: [address!],
     chainId: Number(project?.chainId!),
   });
-  console.log(userBalanceOfToken);
+
   useEffect(() => {
     const fetchProjectData = async () => {
       const projectData = await axios.get(`/api/project?id=${id}`);
@@ -61,71 +59,62 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
   useEffect(() => {
     const fetchValuesFromDB = async () => {
       const values = await axios.get(`/api/value`);
-      console.log(values.data);
+
       setValuesFromDB(values.data);
     };
     fetchValuesFromDB();
   }, []);
-  useEffect(() => {
-    if (userBalanceOfToken) {
-      console.log(project?.contractAddress);
-      setTokenBalance(Number(userBalanceOfToken));
-    }
-  }, [userBalanceOfToken]);
 
   const mintValues = async () => {
     setLoader(true);
-    let valuesMintedCount = 0;
+
+    const cidsToMint = [];
+    const valuesMinted = [];
     if (project?.values)
       for (const value of project?.values) {
         const existingValue = valuesFromDB[value.toLowerCase()];
 
         if (existingValue) {
           if (existingValue.minters?.includes(user?.email?.address)) {
+            console.log("Already minted");
             continue;
           }
-          const hash = await writeContractAsync({
-            abi: NFT_CONTRACT_ABI,
-            address: NFT_CONTRACT_ADDRESS,
-            functionName: "safeMint",
-            args: [address, existingValue.cid],
-            account: privateKeyToAccount(
-              process.env.NEXT_PUBLIC_PK as `0x${string}`
-            ),
-            chainId: 84532,
-          });
-          while (!hash) {
-            if (isError) {
-              console.log("Error", failureReason);
-              continue;
-            }
 
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-          }
-
-          const updatedUser = await axios.post("/api/update", {
-            mintedValues: {
-              value: value.toLowerCase(),
-              txHash: hash,
-            },
-            email: user?.email?.address,
-          });
-
-          const addUserToMintersList = await axios.post("/api/value", {
-            email: user?.email?.address,
-            value: value.toLowerCase(),
-          });
-          valuesMintedCount++;
+          cidsToMint.push(existingValue.cid);
+          valuesMinted.push(value.toLowerCase());
         }
       }
-    if (valuesMintedCount > 0) {
+    const hash = await writeContractAsync({
+      abi: NFT_CONTRACT_ABI,
+      address: NFT_CONTRACT_ADDRESS,
+      functionName: "batchMint",
+      args: [address, cidsToMint],
+      account: privateKeyToAccount(
+        process.env.NEXT_PUBLIC_ADMIN_WALLET_PRIVATE_KEY as `0x${string}`
+      ),
+      chainId: 84532,
+    });
+
+    await axios.post("/api/user", {
+      method: "update",
+      mintedValues: valuesMinted.map((value) => {
+        return {value: value, txHash: hash};
+      }),
+      email: user?.email?.address,
+    });
+
+    await axios.post("/api/value", {
+      email: user?.email?.address,
+      value: valuesMinted,
+    });
+    if (hash) {
       toast({
         title: "We just dropped Value NFTs to your wallet",
         description: "View them in your wallet",
       });
     } else {
       toast({
-        title: "You already hold these Value NFTs in your wallet",
+        title: "You already hold these Values",
         description: "View them in your wallet",
       });
     }
@@ -144,12 +133,13 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
             </h2>
             <Separator />
 
-            <p className="text-2xl font-semibold tracking-tight mt-8">
+            <p className="text-3xl font-semibold tracking-tight mt-8">
               Values{" "}
             </p>
             <p className="my-2 text-muted-foreground">
-              Connect your wallet if you hold this NFT, and mint your values for
-              free
+              If you hold a token/ NFT from this project in{" "}
+              {getChainName(Number(project?.chainId))} chain, you can mint
+              values for free.
             </p>
             <div className="flex flex-wrap flex-row gap-2 my-4 font-medium">
               {project?.values.map((value, index) => (
@@ -175,11 +165,12 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
 
             {user?.email?.address ? (
               address &&
-              tokenBalance > 0 && (
+              Number(userBalanceOfToken) > 0 && (
                 <Button
                   className="mt-4 w-full"
-                  disabled={tokenBalance < 1 || loader}
+                  disabled={Number(userBalanceOfToken) <= 0 || loader}
                   onClick={mintValues}
+                  variant="secondary"
                 >
                   {loader ? "Minting..." : "Mint Values"}
                 </Button>
@@ -194,32 +185,31 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
               </Button>
             )}
 
-            {user && address && tokenBalance < 1 && (
-              <Alert className="my-2">
+            {user && address && Number(userBalanceOfToken) <= 0 && (
+              <Alert className="my-8">
                 <WandSparklesIcon className="h-4 w-4" />
-                <AlertTitle>
+                <AlertTitle className="leading-2">
                   You don&apos;t hold any{" "}
                   {project.category === "NFT" ? "NFT" : "tokens"} from this
-                  project.
+                  project. You can connect a different wallet if you have it
+                  there.
                 </AlertTitle>
                 <AlertDescription>
-                  You can connect a different wallet if you have it there.
+                  <Button
+                    className="mt-2 w-full md:w-64"
+                    variant="secondary"
+                    onClick={() => disconnect()}
+                  >
+                    Disconnect Wallet
+                  </Button>
                 </AlertDescription>
-
-                <Button
-                  className="mt-2 w-full"
-                  variant="secondary"
-                  onClick={() => disconnect()}
-                >
-                  Disconnect Wallet
-                </Button>
               </Alert>
             )}
-            {user && address && tokenBalance > 0 && (
-              <Alert className="my-2">
+            {user && address && Number(userBalanceOfToken) > 0 && (
+              <Alert className="my-8">
                 <RocketIcon className="h-4 w-4" />
                 <AlertTitle>
-                  You hold {tokenBalance.toString()}{" "}
+                  You hold {Number(userBalanceOfToken).toFixed()}{" "}
                   {project.category === "NFT" ? "NFT" : "tokens"} from this
                   project.
                 </AlertTitle>

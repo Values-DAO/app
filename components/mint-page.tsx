@@ -63,6 +63,8 @@ const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
   const {isSuccess: depositSuccess, isLoading} = useWaitForTransactionReceipt({
     hash: data,
   });
+  const [showGenerateNewValueCard, setShowGenerateNewValueCard] =
+    useState(false);
   const fetchUser = async () => {
     const response = await fetch(`/api/user?email=${user?.email?.address}`, {
       method: "GET",
@@ -118,6 +120,7 @@ const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
 
   const mintValue = async ({value, key}: {value: any; key: string}) => {
     if (!value || !key || !user?.email?.address || !address) return;
+    console.log("Minting value", value, key);
     if (!isConnected) {
       toast({
         title: "Please connect your wallet",
@@ -345,7 +348,8 @@ const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
           <>
             {user?.email?.address ? (
               <section>
-                {searchValue.length > 0 &&
+                {!showGenerateNewValueCard &&
+                  searchValue.length > 0 &&
                   filteredData &&
                   Object.entries(filteredData).map(
                     ([key, value]: [any, any]) => {
@@ -387,9 +391,28 @@ const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
                       );
                     }
                   )}
+                {!showGenerateNewValueCard &&
+                  searchValue.length > 0 &&
+                  Object.entries(filteredData).length !== 0 && (
+                    <div className="w-full h-14 px-3 flex items-center hover:bg-gray-300/20 hover:cursor-pointer rounded-sm">
+                      <span className=" text-gray-300 text-md">
+                        Not finding what you are looking for?
+                      </span>{" "}
+                      <Button
+                        variant="default"
+                        onClick={() => {
+                          setShowGenerateNewValueCard(true);
+                        }}
+                        className="ml-auto h-8 w-32"
+                      >
+                        Mint your value
+                      </Button>
+                    </div>
+                  )}
 
                 {searchValue.length > 0 &&
-                  Object.entries(filteredData).length === 0 && (
+                  (showGenerateNewValueCard ||
+                    Object.entries(filteredData).length === 0) && (
                     <GenerateNewValueCard
                       value={searchValue}
                       mint={mintValue}
