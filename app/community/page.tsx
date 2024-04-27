@@ -62,36 +62,6 @@ const Projects = async () => {
                         {value}
                       </Badge>
                     ))}
-                    <Badge
-                      variant={"default"}
-                      className="rounded-sm text-[18px]"
-                    >
-                      Random
-                    </Badge>{" "}
-                    <Badge
-                      variant={"default"}
-                      className="rounded-sm text-[18px]"
-                    >
-                      Random
-                    </Badge>{" "}
-                    <Badge
-                      variant={"default"}
-                      className="rounded-sm text-[18px]"
-                    >
-                      Random
-                    </Badge>{" "}
-                    <Badge
-                      variant={"default"}
-                      className="rounded-sm text-[18px]"
-                    >
-                      Random
-                    </Badge>{" "}
-                    <Badge
-                      variant={"default"}
-                      className="rounded-sm text-[18px]"
-                    >
-                      Random
-                    </Badge>{" "}
                   </div>
                 </CardTitle>
               </CardHeader>
