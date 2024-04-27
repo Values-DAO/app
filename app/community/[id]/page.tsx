@@ -23,6 +23,7 @@ import {usePrivy} from "@privy-io/react-auth";
 import {NFT_CONTRACT_ABI, NFT_CONTRACT_ADDRESS} from "@/lib/constants";
 import {Separator} from "@/components/ui/separator";
 import {getChainName} from "@/lib/utils";
+import {Skeleton} from "@/components/ui/skeleton";
 
 interface pageProps {
   params: {id: string};
@@ -50,8 +51,10 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
 
   useEffect(() => {
     const fetchProjectData = async () => {
+      setLoader(true);
       const projectData = await axios.get(`/api/project?id=${id}`);
       if (projectData.data.status === 200) setProject(projectData.data.project);
+      setLoader(false);
     };
     fetchProjectData();
   }, []);
@@ -220,6 +223,14 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
             )}
           </div>
         </section>
+      )}
+
+      {loader && !project && (
+        <div className="w-[90vw] m-auto flex flex-col gap-4">
+          <Skeleton className="w-full h-[320px] rounded-md" />
+          <Skeleton className="w-full m-auto h-[30px] rounded-md" />
+          <Skeleton className="w-full m-auto h-[30px] rounded-md" />
+        </div>
       )}
     </main>
   );
