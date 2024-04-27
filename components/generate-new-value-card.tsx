@@ -7,6 +7,7 @@ import {Textarea} from "./ui/textarea";
 import {toast} from "./ui/use-toast";
 import {generateDescription} from "@/lib/generate-description";
 import {useAccount} from "wagmi";
+import {usePrivy} from "@privy-io/react-auth";
 
 interface GenerateNewValueCardProps {
   value: string;
@@ -28,6 +29,7 @@ const GenerateNewValueCard: React.FC<GenerateNewValueCardProps> = ({
     text: "",
   });
   const {isConnected} = useAccount();
+  const {ready, linkWallet} = usePrivy();
   const generateImageFromOpenAI = async () => {
     setLoading({
       loading: true,
@@ -140,13 +142,25 @@ const GenerateNewValueCard: React.FC<GenerateNewValueCardProps> = ({
         onChange={(e) => setValuePrompt(e.target.value)}
       />
       {generatedImage !== null ? (
-        <Button
-          className="mt-4 w-full cursor-pointer"
-          onClick={mintValue}
-          disabled={loading.loading}
-        >
-          {loading.loading ? loading.text : "Mint Value"}
-        </Button>
+        <>
+          {isConnected ? (
+            <Button
+              className="mt-4 w-full cursor-pointer"
+              onClick={mintValue}
+              disabled={loading.loading}
+            >
+              {loading.loading ? loading.text : "Mint Value"}
+            </Button>
+          ) : (
+            <Button
+              className="mt-4 w-full cursor-pointer"
+              onClick={linkWallet}
+              disabled={!ready}
+            >
+              Connect Wallet
+            </Button>
+          )}
+        </>
       ) : (
         <Button
           className="mt-4 w-full cursor-pointer"
