@@ -13,7 +13,7 @@ import {
   useWriteContract,
 } from "wagmi";
 
-import {erc20Abi, erc721Abi} from "viem";
+import {erc20Abi} from "viem";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 import {RocketIcon, WandSparklesIcon} from "lucide-react";
 
@@ -30,7 +30,7 @@ interface pageProps {
 }
 
 const ProjectsPage: React.FC<pageProps> = ({params}) => {
-  const {user, linkWallet, linkEmail} = usePrivy();
+  const {user, login, linkWallet, linkEmail} = usePrivy();
   const {address} = useAccount();
   const {disconnect} = useDisconnect();
   const {writeContractAsync, isError, failureReason} = useWriteContract();
@@ -166,7 +166,7 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
               </Button>
             )}
 
-            {user?.email?.address ? (
+            {user?.email?.address &&
               address &&
               Number(userBalanceOfToken) > 0 && (
                 <Button
@@ -177,14 +177,21 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
                 >
                   {loader ? "Minting..." : "Mint Values"}
                 </Button>
-              )
-            ) : (
+              )}
+
+            {user && !user?.email?.address && (
               <Button
                 variant="secondary"
                 onClick={linkEmail}
                 className="w-full"
               >
                 Link Email
+              </Button>
+            )}
+
+            {!user && (
+              <Button variant="secondary" onClick={login} className="w-full">
+                Login
               </Button>
             )}
 
