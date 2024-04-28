@@ -88,16 +88,17 @@ const InviteCodeModal: React.FC<InviteCodeModalProps> = ({setVerified}) => {
         Post a tweet if you don&apos;t have an invite code. We have limited
         spots but if you&apos;re ||aligned, we or one of our partner communities
         will give you an invite
-      </blockquote>{" "}
-      <Button className="flex flex-row w-full">
-        <Link
-          href={
-            "https://twitter.com/intent/tweet?url=https%3A%2F%2Fapp.valuesdao.io%2F&text=brb%20checking%20how%20%7C%7Caligned%20my%20twitter%20friends%20are%20%20any%20%7C%7Caligned%20friends%20on%20my%20timeline%20have%20an%20invite%20to%20ValuesDAO%3F"
-          }
-          target="_blank"
-        >
-          Tweet{" "}
-        </Link>
+      </blockquote>
+      <Button
+        className="flex flex-row w-full"
+        onClick={() => {
+          window.open(
+            "https://twitter.com/intent/tweet?url=https%3A%2F%2Fapp.valuesdao.io%2F&text=brb%20checking%20how%20%7C%7Caligned%20my%20twitter%20friends%20are%20%20any%20%7C%7Caligned%20friends%20on%20my%20timeline%20have%20an%20invite%20to%20ValuesDAO%3F",
+            "_blank"
+          );
+        }}
+      >
+        Tweet
         <Twitter strokeWidth={0} fill="#1DA1F2" className="h-6 w-6 ml-2" />
       </Button>
     </div>
