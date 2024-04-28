@@ -1,4 +1,5 @@
 import mongoose, {Schema, models} from "mongoose";
+
 export type IUser = {
   name: string;
   username: string;
@@ -7,7 +8,12 @@ export type IUser = {
   wallets: string[];
   mintedValues: {value: string; txHash: string}[];
   balance: number;
+  invitedBy?: string;
+  isVerified?: boolean;
+  totalInvites?: number;
+  inviteCodes?: {code: string; claimedBy: string; claimed: boolean}[];
 };
+
 const userSchema = new Schema(
   {
     name: {
@@ -36,13 +42,40 @@ const userSchema = new Schema(
       type: Number,
       default: 0,
     },
+    invitedBy: {
+      type: String,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    totalInvites: {
+      type: Number,
+      default: 0,
+    },
+    inviteCodes: {
+      type: [
+        {
+          code: String,
+          claimedBy: {
+            type: String,
+            required: false,
+          },
+          claimed: {
+            type: Boolean,
+            default: false,
+          },
+        },
+      ],
+      default: [],
+    },
   },
   {timestamps: true}
 );
-
 // Middleware to ensure uniqueness of wallets
-userSchema.pre("save", function (next) {
+userSchema.pre("save", async function (next) {
   const user = this;
+
   // Check for duplicates and remove them
   user.wallets = user.wallets.filter(
     (value, index, self) => self.indexOf(value) === index

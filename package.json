@@ -22,6 +22,7 @@
     "axios": "^1.6.8",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "input-otp": "^1.2.4",
     "lucide-react": "^0.373.0",
     "mongodb": "^6.5.0",
     "mongoose": "^8.3.2",
