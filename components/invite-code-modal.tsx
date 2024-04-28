@@ -1,13 +1,11 @@
 "use client";
 
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {InputOTP, InputOTPGroup, InputOTPSlot} from "@/components/ui/input-otp";
 import {usePrivy} from "@privy-io/react-auth";
 import {REGEXP_ONLY_DIGITS_AND_CHARS} from "input-otp";
 import {Button} from "./ui/button";
-import Link from "next/link";
 import {Twitter} from "lucide-react";
-import {toast} from "./ui/use-toast";
 import {Alert, AlertDescription, AlertTitle} from "./ui/alert";
 import {ExclamationTriangleIcon} from "@radix-ui/react-icons";
 interface InviteCodeModalProps {
@@ -17,22 +15,18 @@ const InviteCodeModal: React.FC<InviteCodeModalProps> = ({setVerified}) => {
   const [value, setValue] = useState("");
   const {user} = usePrivy();
   const [showInvalidCode, setShowInvalidCode] = useState(false);
-  useEffect(() => {
-    const isValid = async () => {
-      const response = await fetch(
-        `/api/validate-code?code=${value}&email=${user?.email?.address}`
-      );
-      const data = await response.json();
-      if (data.isValid) {
-        setVerified(true);
-      } else {
-        setShowInvalidCode(true);
-      }
-    };
-    if (value.length === 6) {
-      isValid();
+  const isValid = async () => {
+    const response = await fetch(
+      `/api/validate-code?code=${value}&email=${user?.email?.address}`
+    );
+    const data = await response.json();
+    if (data.isValid) {
+      setVerified(true);
+    } else {
+      setShowInvalidCode(true);
     }
-  }, [value]);
+  };
+
   return (
     <div className="flex flex-col items-center justify-center gap-4">
       <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight text-center">
@@ -43,10 +37,13 @@ const InviteCodeModal: React.FC<InviteCodeModalProps> = ({setVerified}) => {
         maxLength={6}
         value={value}
         pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
+        type="text"
+        inputMode="text"
         onChange={(value) => {
           setValue(value);
           setShowInvalidCode(false);
         }}
+        onComplete={isValid}
       >
         <InputOTPGroup>
           <InputOTPSlot
