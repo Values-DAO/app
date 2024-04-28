@@ -24,13 +24,14 @@ import {NFT_CONTRACT_ABI, NFT_CONTRACT_ADDRESS} from "@/lib/constants";
 import {Separator} from "@/components/ui/separator";
 import {getChainName} from "@/lib/utils";
 import {Skeleton} from "@/components/ui/skeleton";
+import InviteCodeModal from "@/components/invite-code-modal";
 
 interface pageProps {
   params: {id: string};
 }
 
 const ProjectsPage: React.FC<pageProps> = ({params}) => {
-  const {user, login, linkWallet, linkEmail} = usePrivy();
+  const {user, login, authenticated, linkWallet, linkEmail} = usePrivy();
   const {address} = useAccount();
   const {disconnect} = useDisconnect();
   const {writeContractAsync, isError, failureReason} = useWriteContract();
@@ -40,7 +41,7 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
 
   const [loader, setLoader] = useState(false);
   const id = params.id.split("-").pop();
-
+  const [isUserVerified, setIsUserVerified] = useState(false);
   const {data: userBalanceOfToken} = useReadContract({
     abi: erc20Abi,
     address: project?.contractAddress! as `0x${string}`,
@@ -67,7 +68,37 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
     };
     fetchValuesFromDB();
   }, []);
+  useEffect(() => {
+    if (!user?.email?.address) return;
 
+    const isUserExist = async () => {
+      if (authenticated) {
+        const existingUser = await fetch(
+          `/api/user?email=${user?.email?.address}`
+        );
+        const data = await existingUser.json();
+        console.log(data);
+        if (data?.user?.isVerified) {
+          setIsUserVerified(true);
+        }
+        if (data.status === 404) {
+          await fetch(`/api/user`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: user?.email?.address,
+              wallets: [],
+              method: "create_user",
+              balance: 5,
+            }),
+          });
+        }
+      }
+    };
+    isUserExist();
+  }, [user?.email?.address, authenticated, user]);
   const mintValues = async () => {
     setLoader(true);
 
@@ -126,120 +157,132 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
   };
 
   return (
-    <main className="p-4 overflow-y-auto">
-      {project && (
-        <section className="flex flex-col items-center md:items-start md:flex-row gap-4">
-          <div className="w-[90vw] m-auto">
-            <span>#{project.id}</span>
-            <h2 className="scroll-m-20 pb-2 text-xl font-medium tracking-tight first:mt-0">
-              {project?.name}
-            </h2>
-            <Separator />
+    <>
+      {isUserVerified ? (
+        <main className="p-4 overflow-y-auto">
+          {project && (
+            <section className="flex flex-col items-center md:items-start md:flex-row gap-4">
+              <div className="w-[90vw] m-auto">
+                <span>#{project.id}</span>
+                <h2 className="scroll-m-20 pb-2 text-xl font-medium tracking-tight first:mt-0">
+                  {project?.name}
+                </h2>
+                <Separator />
 
-            <p className="text-3xl font-semibold tracking-tight mt-8">
-              Values{" "}
-            </p>
-            <p className="my-2 text-muted-foreground">
-              If you hold a token/ NFT from this project in{" "}
-              {getChainName(Number(project?.chainId))} chain, you can mint
-              values for free.
-            </p>
-            <div className="flex flex-wrap flex-row gap-2 my-4 font-medium">
-              {project?.values.map((value, index) => (
-                <Badge
-                  key={index}
-                  variant={"default"}
-                  className="rounded-sm text-[18px] "
-                >
-                  {value}
-                </Badge>
-              ))}
-            </div>
+                <p className="text-3xl font-semibold tracking-tight mt-8">
+                  Values{" "}
+                </p>
+                <p className="my-2 text-muted-foreground">
+                  If you hold a token/ NFT from this project in{" "}
+                  {getChainName(Number(project?.chainId))} chain, you can mint
+                  values for free.
+                </p>
+                <div className="flex flex-wrap flex-row gap-2 my-4 font-medium">
+                  {project?.values.map((value, index) => (
+                    <Badge
+                      key={index}
+                      variant={"default"}
+                      className="rounded-sm text-[18px] "
+                    >
+                      {value}
+                    </Badge>
+                  ))}
+                </div>
 
-            {user?.email?.address && !address && (
-              <Button
-                variant="secondary"
-                onClick={linkWallet}
-                className="w-full"
-              >
-                Connect Wallet
-              </Button>
-            )}
-
-            {user?.email?.address &&
-              address &&
-              Number(userBalanceOfToken) > 0 && (
-                <Button
-                  className="mt-4 w-full"
-                  disabled={Number(userBalanceOfToken) <= 0 || loader}
-                  onClick={mintValues}
-                  variant="secondary"
-                >
-                  {loader ? "Minting..." : "Mint Values"}
-                </Button>
-              )}
-
-            {user && !user?.email?.address && (
-              <Button
-                variant="secondary"
-                onClick={linkEmail}
-                className="w-full"
-              >
-                Link Email
-              </Button>
-            )}
-
-            {!user && (
-              <Button variant="secondary" onClick={login} className="w-full">
-                Login
-              </Button>
-            )}
-
-            {user && address && Number(userBalanceOfToken) <= 0 && (
-              <Alert className="my-8">
-                <WandSparklesIcon className="h-4 w-4" />
-                <AlertTitle className="leading-2">
-                  You don&apos;t hold any{" "}
-                  {project.category === "NFT" ? "NFT" : "tokens"} from this
-                  project. You can connect a different wallet if you have it
-                  there.
-                </AlertTitle>
-                <AlertDescription>
+                {user?.email?.address && !address && (
                   <Button
-                    className="mt-2 w-full md:w-64"
                     variant="secondary"
-                    onClick={() => disconnect()}
+                    onClick={linkWallet}
+                    className="w-full"
                   >
-                    Disconnect Wallet
+                    Connect Wallet
                   </Button>
-                </AlertDescription>
-              </Alert>
-            )}
-            {user && address && Number(userBalanceOfToken) > 0 && (
-              <Alert className="my-8">
-                <RocketIcon className="h-4 w-4" />
-                <AlertTitle>
-                  You hold {Number(userBalanceOfToken).toFixed()}{" "}
-                  {project.category === "NFT" ? "NFT" : "tokens"} from this
-                  project.
-                </AlertTitle>
-                <AlertDescription>
-                  You can mint values for free.
-                </AlertDescription>
-              </Alert>
-            )}
-          </div>
-        </section>
-      )}
+                )}
 
-      {loader && !project && (
-        <div className="w-[90vw] m-auto flex flex-col gap-4">
-          <Skeleton className="w-full h-[320px] rounded-md" />
-          <Skeleton className="w-full m-auto h-[30px] rounded-md" />
-          <Skeleton className="w-full m-auto h-[30px] rounded-md" />
+                {user?.email?.address &&
+                  address &&
+                  Number(userBalanceOfToken) > 0 && (
+                    <Button
+                      className="mt-4 w-full"
+                      disabled={Number(userBalanceOfToken) <= 0 || loader}
+                      onClick={mintValues}
+                      variant="secondary"
+                    >
+                      {loader ? "Minting..." : "Mint Values"}
+                    </Button>
+                  )}
+
+                {user && !user?.email?.address && (
+                  <Button
+                    variant="secondary"
+                    onClick={linkEmail}
+                    className="w-full"
+                  >
+                    Link Email
+                  </Button>
+                )}
+
+                {!user && (
+                  <Button
+                    variant="secondary"
+                    onClick={login}
+                    className="w-full"
+                  >
+                    Login
+                  </Button>
+                )}
+
+                {user && address && Number(userBalanceOfToken) <= 0 && (
+                  <Alert className="my-8">
+                    <WandSparklesIcon className="h-4 w-4" />
+                    <AlertTitle className="leading-2">
+                      You don&apos;t hold any{" "}
+                      {project.category === "NFT" ? "NFT" : "tokens"} from this
+                      project. You can connect a different wallet if you have it
+                      there.
+                    </AlertTitle>
+                    <AlertDescription>
+                      <Button
+                        className="mt-2 w-full md:w-64"
+                        variant="secondary"
+                        onClick={() => disconnect()}
+                      >
+                        Disconnect Wallet
+                      </Button>
+                    </AlertDescription>
+                  </Alert>
+                )}
+                {user && address && Number(userBalanceOfToken) > 0 && (
+                  <Alert className="my-8">
+                    <RocketIcon className="h-4 w-4" />
+                    <AlertTitle>
+                      You hold {Number(userBalanceOfToken).toFixed()}{" "}
+                      {project.category === "NFT" ? "NFT" : "tokens"} from this
+                      project.
+                    </AlertTitle>
+                    <AlertDescription>
+                      You can mint values for free.
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </div>
+            </section>
+          )}
+
+          {loader && !project && (
+            <div className="w-[90vw] m-auto flex flex-col gap-4">
+              <Skeleton className="w-full h-[320px] rounded-md" />
+              <Skeleton className="w-full m-auto h-[30px] rounded-md" />
+              <Skeleton className="w-full m-auto h-[30px] rounded-md" />
+            </div>
+          )}
+        </main>
+      ) : (
+        <div className="flex flex-col items-center px-6 mt-[40%] md:mt-[15%]">
+          <InviteCodeModal setVerified={setIsUserVerified} />
         </div>
       )}
-    </main>
+    </>
   );
 };
 

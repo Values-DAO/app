@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import React from "react";
+import React, {useState, useEffect} from "react";
 
 import {Button} from "../ui/button";
 import Link from "next/link";
@@ -15,6 +15,7 @@ import {usePrivy} from "@privy-io/react-auth";
 
 const Navbar = () => {
   const {ready, authenticated, user, logout, login} = usePrivy();
+
   return (
     <div className="flex flex-row justify-between items-center  p-4 md:p-6 relative">
       <Link href="/">
@@ -37,6 +38,7 @@ const Navbar = () => {
         <Button variant={"link"} className="text-md" asChild>
           <Link href={"/community"}>Communities</Link>
         </Button>
+
         {/* <Button variant={"link"} className="text-md" asChild>
           <Link href={"/mint"}>Mint a Value</Link>
         </Button> */}
@@ -68,6 +70,7 @@ const Navbar = () => {
             <DropdownMenuItem asChild className="cursor-pointer">
               <Link href={"/community"}>Communities</Link>
             </DropdownMenuItem>
+
             {/* <DropdownMenuItem asChild className="cursor-pointer">
               <Link href={"/mint"}>Mint a Value</Link>
             </DropdownMenuItem> */}

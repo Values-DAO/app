@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import User from "@/models/user";
 import {NextRequest, NextResponse} from "next/server";
+import {generateInviteCodes} from "@/lib/generate-invite-code";
+import InviteCodes from "@/models/inviteCodes";
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,12 +22,28 @@ export async function POST(req: NextRequest) {
     }
 
     if (method === "create_user") {
+      const userExists = await User.findOne({email});
+      if (userExists) {
+        return NextResponse.json({error: "User already exists", status: 400});
+      }
+      const codes = generateInviteCodes();
       const user = await User.create({
         email,
         username,
         wallets,
         balance,
+        inviteCodes: codes.map((inviteCode) => ({
+          code: inviteCode,
+        })),
       });
+
+      const inviteCodesData = codes.map((inviteCode) => ({
+        code: inviteCode,
+        codeOwner: email,
+      }));
+
+      await InviteCodes.insertMany(inviteCodesData);
+
       return NextResponse.json(user);
     }
 

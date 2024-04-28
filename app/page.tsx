@@ -5,6 +5,7 @@ import {usePrivy} from "@privy-io/react-auth";
 import {useEffect, useState} from "react";
 import {IUser} from "@/models/user";
 import MintPage from "@/components/mint-page";
+import InviteCodeModal from "@/components/invite-code-modal";
 
 export default function Home() {
   const {authenticated, login, ready, user} = usePrivy();
@@ -13,7 +14,7 @@ export default function Home() {
     email: "",
     balance: 5,
   } as unknown as IUser);
-
+  const [verified, setVerified] = useState(false);
   useEffect(() => {
     if (!user?.email?.address) return;
 
@@ -23,7 +24,10 @@ export default function Home() {
           `/api/user?email=${user?.email?.address}`
         );
         const data = await existingUser.json();
-
+        console.log(data);
+        if (data?.user?.isVerified) {
+          setVerified(true);
+        }
         if (data.status === 404) {
           await fetch(`/api/user`, {
             method: "POST",
@@ -45,7 +49,15 @@ export default function Home() {
   return (
     <>
       {authenticated ? (
-        <MintPage userInfo={userInfo} />
+        <>
+          {verified ? (
+            <MintPage userInfo={userInfo} />
+          ) : (
+            <div className="flex flex-col items-center px-6 mt-[40%] md:mt-[15%]">
+              <InviteCodeModal setVerified={setVerified} />
+            </div>
+          )}
+        </>
       ) : (
         <div className="flex flex-col items-center px-6 mt-[40%] md:mt-[15%]">
           <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-6xl">
