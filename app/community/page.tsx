@@ -41,13 +41,13 @@ const Projects = async () => {
                   {project.name}
                   {project.verified && <VerifiedIcon size={20} />}
                 </div>
-                <Image
+                {/* <Image
                   src={project.coverImage}
                   alt={project.name}
                   width={200}
                   height={200}
                   className="rounded-lg mb-2 w-full h-36 object-cover"
-                />
+                /> */}
                 <CardTitle className=" flex flex-col gap-2">
                   <Separator />
 
@@ -66,15 +66,21 @@ const Projects = async () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Button className="w-full" variant={"secondary"} asChild>
-                  <Link
-                    href={`/community/${project.name.replace(/ /g, "-")}-${
-                      project.id
-                    }`}
-                  >
-                    View Community
-                  </Link>
-                </Button>
+                {project.verified === true ? (
+                  <Button className="w-full" variant={"secondary"} asChild>
+                    <Link
+                      href={`/community/${project.name.replace(/ /g, "-")}-${
+                        project.id
+                      }`}
+                    >
+                      View Community
+                    </Link>
+                  </Button>
+                ) : (
+                  <Button className="w-full" variant={"secondary"} disabled>
+                    Coming Soon
+                  </Button>
+                )}
               </CardContent>
             </Card>
           ))}
