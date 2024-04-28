@@ -1,7 +1,7 @@
 export function generateInviteCodes(): string[] {
   const result: string[] = [];
 
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 1; i++) {
     const code = generateAlphanumericCode(6);
 
     result.push(code);
