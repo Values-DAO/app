@@ -53,7 +53,12 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
   useEffect(() => {
     const fetchProjectData = async () => {
       setLoader(true);
-      const projectData = await axios.get(`/api/project?id=${id}`);
+      const projectData = await axios.get(`/api/project?id=${id}`, {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+        },
+      });
       if (projectData.data.status === 200) setProject(projectData.data.project);
       setLoader(false);
     };
@@ -62,7 +67,12 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
 
   useEffect(() => {
     const fetchValuesFromDB = async () => {
-      const values = await axios.get(`/api/value`);
+      const values = await axios.get(`/api/value`, {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+        },
+      });
 
       setValuesFromDB(values.data);
     };
@@ -74,19 +84,28 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
     const isUserExist = async () => {
       if (authenticated) {
         const existingUser = await fetch(
-          `/api/user?email=${user?.email?.address}`
+          `/api/user?email=${user?.email?.address}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+            },
+          }
         );
         const data = await existingUser.json();
-        console.log(data);
+
         if (data?.user?.isVerified) {
           setIsUserVerified(true);
         }
         if (data.status === 404) {
           await fetch(`/api/user`, {
             method: "POST",
+
             headers: {
               "Content-Type": "application/json",
+              "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
             },
+
             body: JSON.stringify({
               email: user?.email?.address,
               wallets: [],
@@ -129,18 +148,36 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
       chainId: 84532,
     });
 
-    await axios.post("/api/user", {
-      method: "update",
-      mintedValues: valuesMinted.map((value) => {
-        return {value: value, txHash: hash};
-      }),
-      email: user?.email?.address,
-    });
+    await axios.post(
+      "/api/user",
+      {
+        method: "update",
+        mintedValues: valuesMinted.map((value) => {
+          return {value: value, txHash: hash};
+        }),
+        email: user?.email?.address,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+        },
+      }
+    );
 
-    await axios.post("/api/value", {
-      email: user?.email?.address,
-      value: valuesMinted,
-    });
+    await axios.post(
+      "/api/value",
+      {
+        email: user?.email?.address,
+        value: valuesMinted,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+        },
+      }
+    );
     if (hash) {
       toast({
         title: "We just dropped Value NFTs to your wallet",

@@ -24,7 +24,13 @@ export default function Home() {
       if (authenticated) {
         setLoading(true);
         const existingUser = await fetch(
-          `/api/user?email=${user?.email?.address}`
+          `/api/user?email=${user?.email?.address}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+            },
+          }
         );
         const data = await existingUser.json();
 
@@ -36,10 +42,11 @@ export default function Home() {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
             },
             body: JSON.stringify({
               email: user?.email?.address,
-              wallets: user.wallet || [],
+              wallets: user.wallet?.address || [],
               method: "create_user",
               balance: 5,
               farcaster: user?.farcaster?.fid,

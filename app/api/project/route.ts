@@ -1,9 +1,40 @@
+import ApiKey from "@/models/apikey";
 import Project from "@/models/project";
 import mongoose from "mongoose";
 import {NextApiRequest} from "next";
+import {headers} from "next/headers";
 import {NextRequest, NextResponse} from "next/server";
 
 export async function POST(req: NextRequest) {
+  const headersList = headers();
+  const apiKey = headersList.get("x-api-key");
+  if (!apiKey) {
+    return NextResponse.json({
+      error: "Missing API key",
+      status: 401,
+    });
+  }
+
+  const apiKeyExists = await ApiKey.findOne({
+    key: apiKey,
+  });
+
+  if (!apiKeyExists) {
+    return NextResponse.json({
+      error: "Invalid API key",
+      status: 401,
+    });
+  }
+  if (
+    apiKeyExists &&
+    !apiKeyExists.permissions.includes("WRITE") &&
+    !apiKeyExists.permissions.includes("*")
+  ) {
+    return NextResponse.json({
+      error: "You don't have permission to write",
+      status: 403,
+    });
+  }
   const {
     name,
     description,
@@ -43,6 +74,25 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: any) {
+  const headersList = headers();
+  const apiKey = headersList.get("x-api-key");
+  if (!apiKey) {
+    return NextResponse.json({
+      error: "Missing API key",
+      status: 401,
+    });
+  }
+
+  const apiKeyExists = await ApiKey.findOne({
+    key: apiKey,
+  });
+
+  if (!apiKeyExists) {
+    return NextResponse.json({
+      error: "Invalid API key",
+      status: 401,
+    });
+  }
   const searchParams = req.nextUrl.searchParams;
   const id = searchParams.get("id");
   try {

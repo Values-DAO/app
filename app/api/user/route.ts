@@ -3,8 +3,40 @@ import User, {IUser} from "@/models/user";
 import {NextRequest, NextResponse} from "next/server";
 import {generateInviteCodes} from "@/lib/generate-invite-code";
 import InviteCodes from "@/models/inviteCodes";
+import {headers} from "next/headers";
+import ApiKey from "@/models/apikey";
 
 export async function POST(req: NextRequest) {
+  const headersList = headers();
+  const apiKey = headersList.get("x-api-key");
+  if (!apiKey) {
+    return NextResponse.json({
+      error: "Missing API key",
+      status: 401,
+    });
+  }
+
+  const apiKeyExists = await ApiKey.findOne({
+    key: apiKey,
+  });
+
+  if (!apiKeyExists) {
+    return NextResponse.json({
+      error: "Invalid API key",
+      status: 401,
+    });
+  }
+
+  if (
+    apiKeyExists &&
+    !apiKeyExists.permissions.includes("WRITE") &&
+    !apiKeyExists.permissions.includes("*")
+  ) {
+    return NextResponse.json({
+      error: "You don't have permission to write",
+      status: 403,
+    });
+  }
   try {
     await mongoose.connect(process.env.MONGODB_URI || "");
     const {
@@ -36,7 +68,7 @@ export async function POST(req: NextRequest) {
         inviteCodes: codes.map((inviteCode) => ({
           code: inviteCode,
         })),
-        farcaster: Number(farcaster),
+        ...(farcaster ? {farcaster} : {}),
       });
 
       const inviteCodesData = codes.map((inviteCode) => ({
@@ -87,6 +119,27 @@ export async function POST(req: NextRequest) {
 export async function GET(req: any) {
   const searchParams = req.nextUrl.searchParams;
   const email = searchParams.get("email");
+
+  const headersList = headers();
+  const apiKey = headersList.get("x-api-key");
+
+  if (!apiKey) {
+    return NextResponse.json({
+      error: "Missing API key",
+      status: 401,
+    });
+  }
+
+  const apiKeyExists = await ApiKey.findOne({
+    key: apiKey,
+  });
+
+  if (!apiKeyExists) {
+    return NextResponse.json({
+      error: "Invalid API key",
+      status: 401,
+    });
+  }
   try {
     await mongoose.connect(process.env.MONGODB_URI || "");
 

@@ -1,8 +1,40 @@
+import ApiKey from "@/models/apikey";
 import Value from "@/models/values";
 import mongoose from "mongoose";
+import {headers} from "next/headers";
 import {NextRequest, NextResponse} from "next/server";
 
 export async function POST(req: NextRequest) {
+  const headersList = headers();
+  const apiKey = headersList.get("x-api-key");
+  if (!apiKey) {
+    return NextResponse.json({
+      error: "Missing API key",
+      status: 401,
+    });
+  }
+
+  const apiKeyExists = await ApiKey.findOne({
+    key: apiKey,
+  });
+
+  if (!apiKeyExists) {
+    return NextResponse.json({
+      error: "Invalid API key",
+      status: 401,
+    });
+  }
+
+  if (
+    apiKeyExists &&
+    !apiKeyExists.permissions.includes("WRITE") &&
+    !apiKeyExists.permissions.includes("*")
+  ) {
+    return NextResponse.json({
+      error: "You don't have permission to write",
+      status: 403,
+    });
+  }
   try {
     await mongoose.connect(process.env.MONGODB_URI || "");
     const {name, value, email} = await req.json();
@@ -46,6 +78,25 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
+  const headersList = headers();
+  const apiKey = headersList.get("x-api-key");
+  if (!apiKey) {
+    return NextResponse.json({
+      error: "Missing API key",
+      status: 401,
+    });
+  }
+
+  const apiKeyExists = await ApiKey.findOne({
+    key: apiKey,
+  });
+
+  if (!apiKeyExists) {
+    return NextResponse.json({
+      error: "Invalid API key",
+      status: 401,
+    });
+  }
   try {
     await mongoose.connect(process.env.MONGODB_URI || "");
     const values = await Value.find({}, {__v: 0, _id: 0, "value._id": 0});
