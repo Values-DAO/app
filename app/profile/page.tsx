@@ -22,8 +22,10 @@ const ProfilePage = () => {
 
   const [isUserVerified, setIsUserVerified] = useState(false);
   const [userInfo, setUserInfo] = useState<IUser | null>(null);
+  const [loading, setLoading] = useState(false);
   const fetchValues = async () => {
     if (!user?.email?.address) return;
+    setLoading(true);
     const response = await fetch(`/api/user?email=${user?.email?.address}`, {
       method: "GET",
     });
@@ -33,13 +35,14 @@ const ProfilePage = () => {
     if (data?.user?.isVerified) {
       setIsUserVerified(true);
     }
+    setLoading(false);
   };
   useEffect(() => {
     fetchValues();
   }, [user]);
   return (
     <div className="p-4">
-      {user ? (
+      {user && !loading ? (
         <>
           {isUserVerified ? (
             <div>
@@ -51,14 +54,11 @@ const ProfilePage = () => {
 
                   <ul className="mt-2 mb-6 md:ml-6 list-disc [&>li]:mt-2">
                     {userInfo?.inviteCodes!.map((code, index) => {
-                      console.log(code);
                       const claimed = code.claimed;
                       if (claimed) {
                         return (
-                          <li key={index} className="text-lg font-light px-2">
-                            <span>
-                              {code.code} was claimed by {code.claimedBy}
-                            </span>
+                          <li key={index} className="text-lg font-light ml-4">
+                            {code.code} was claimed by {code.claimedBy}
                           </li>
                         );
                       }
@@ -155,10 +155,10 @@ const ProfilePage = () => {
           <Button
             variant="default"
             onClick={login}
-            disabled={!ready || authenticated}
+            disabled={!ready || authenticated || loading}
             className="my-4"
           >
-            Login
+            {loading ? "Loading.." : "Login"}
           </Button>
         </section>
       )}

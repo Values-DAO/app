@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import User from "@/models/user";
+import User, {IUser} from "@/models/user";
 import {NextRequest, NextResponse} from "next/server";
 import {generateInviteCodes} from "@/lib/generate-invite-code";
 import InviteCodes from "@/models/inviteCodes";
@@ -15,6 +15,7 @@ export async function POST(req: NextRequest) {
       mintedValues,
       balance,
       type,
+      farcaster,
     } = await req.json();
 
     if (!email || !method) {
@@ -35,6 +36,7 @@ export async function POST(req: NextRequest) {
         inviteCodes: codes.map((inviteCode) => ({
           code: inviteCode,
         })),
+        farcaster: Number(farcaster),
       });
 
       const inviteCodesData = codes.map((inviteCode) => ({
@@ -54,6 +56,9 @@ export async function POST(req: NextRequest) {
         for (const mv of mintedValues) {
           user?.mintedValues.push(mv);
         }
+      }
+      if (farcaster) {
+        user.farcaster = Number(farcaster);
       }
       if (balance) {
         user.balance =

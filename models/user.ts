@@ -4,7 +4,7 @@ export type IUser = {
   name: string;
   username: string;
   email: string;
-  password: string;
+  farcaster: number;
   wallets: string[];
   mintedValues: {value: string; txHash: string}[];
   balance: number;
@@ -24,6 +24,9 @@ const userSchema = new Schema(
     },
     email: {
       type: String,
+    },
+    farcaster: {
+      type: Number,
     },
     wallets: {
       type: [String],
