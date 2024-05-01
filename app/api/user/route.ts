@@ -56,6 +56,7 @@ export async function POST(req: NextRequest) {
         }));
         await InviteCodes.insertMany(inviteCodesData);
 
+
         return NextResponse.json(createdUser);
       case "update":
         if (!user) {
