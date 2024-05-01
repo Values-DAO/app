@@ -50,6 +50,12 @@ const GenerateNewValueCard: React.FC<GenerateNewValueCardProps> = ({
       {
         imageUrl: image,
         name: value,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+        },
       }
     );
 
@@ -111,10 +117,19 @@ const GenerateNewValueCard: React.FC<GenerateNewValueCardProps> = ({
         },
         hasMintedValue: false,
       };
-      await axios.post("/api/value", {
-        name: valueObject.value.metadata.name,
-        value: valueObject.value,
-      });
+      await axios.post(
+        "/api/value",
+        {
+          name: valueObject.value.metadata.name,
+          value: valueObject.value,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+          },
+        }
+      );
       setLoading({
         loading: true,
         text: "Minting...",

@@ -18,7 +18,13 @@ const InviteCodeModal: React.FC<InviteCodeModalProps> = ({setVerified}) => {
   const [showInvalidCode, setShowInvalidCode] = useState(false);
   const isValid = async () => {
     const response = await fetch(
-      `/api/validate-code?code=${value}&email=${user?.email?.address}`
+      `/api/validate-code?code=${value}&email=${user?.email?.address}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+        },
+      }
     );
     const data = await response.json();
     if (data.isValid) {

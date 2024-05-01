@@ -68,8 +68,10 @@ const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
   const fetchUser = async () => {
     const response = await fetch(`/api/user?email=${user?.email?.address}`, {
       method: "GET",
+
       headers: {
         "Content-Type": "application/json",
+        "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
       },
     });
     const data = await response.json();
@@ -150,24 +152,42 @@ const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
         if (hash) {
           await new Promise((resolve) => setTimeout(resolve, 3000));
           setValueMinted({value: key, hash, showSuccessModal: true});
-          await axios.post("/api/user", {
-            method: "update",
-            mintedValues: [
-              {
-                value: key,
-                txHash: hash,
+          await axios.post(
+            "/api/user",
+            {
+              method: "update",
+              mintedValues: [
+                {
+                  value: key,
+                  txHash: hash,
+                },
+              ],
+              type: "sub",
+              balance: 1,
+
+              email: user?.email?.address,
+            },
+            {
+              headers: {
+                "Content-Type": "application/json",
+                "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
               },
-            ],
-            type: "sub",
-            balance: 1,
+            }
+          );
 
-            email: user?.email?.address,
-          });
-
-          await axios.post("/api/value", {
-            value: key,
-            email: user?.email?.address,
-          });
+          await axios.post(
+            "/api/value",
+            {
+              value: key,
+              email: user?.email?.address,
+            },
+            {
+              headers: {
+                "Content-Type": "application/json",
+                "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+              },
+            }
+          );
 
           fetchUser();
           fetchValues();
@@ -239,7 +259,12 @@ const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
     setFilteredData(filteredData);
   };
   const fetchValues = async () => {
-    const response = await axios.get("/api/value");
+    const response = await axios.get("/api/value", {
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+      },
+    });
 
     if (response.data) setAvailableValues(response.data);
   };
@@ -282,12 +307,21 @@ const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
   useEffect(() => {
     const updateUserbalance = async () => {
       if (depositSuccess) {
-        const updatedUser = await axios.post("/api/user", {
-          method: "update",
-          balance: 10,
-          type: "add",
-          email: user?.email?.address,
-        });
+        const updatedUser = await axios.post(
+          "/api/user",
+          {
+            method: "update",
+            balance: 10,
+            type: "add",
+            email: user?.email?.address,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+            },
+          }
+        );
         setUserData((prevUserData) => ({
           ...prevUserData,
           balance: prevUserData.balance + 10,

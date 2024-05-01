@@ -1,10 +1,20 @@
+import connectToDatabase from "@/lib/connect-to-db";
+import validateApiKey from "@/lib/validate-key";
 import Value from "@/models/values";
-import mongoose from "mongoose";
+import {headers} from "next/headers";
 import {NextRequest, NextResponse} from "next/server";
 
 export async function POST(req: NextRequest) {
+  await connectToDatabase();
+  const apiKey = headers().get("x-api-key");
+  const {isValid, message, status} = await validateApiKey(apiKey, "WRITE");
+  if (!isValid) {
+    return NextResponse.json({
+      status: status,
+      error: message,
+    });
+  }
   try {
-    await mongoose.connect(process.env.MONGODB_URI || "");
     const {name, value, email} = await req.json();
     if (value && email) {
       if (Array.isArray(value)) {
@@ -41,13 +51,24 @@ export async function POST(req: NextRequest) {
       });
     }
   } catch (error) {
-    return NextResponse.json({status: 500, error});
+    return NextResponse.json({
+      status: 500,
+      error: error,
+    });
   }
 }
 
 export async function GET(req: NextRequest) {
+  await connectToDatabase();
+  const apiKey = headers().get("x-api-key");
+  const {isValid, message, status} = await validateApiKey(apiKey, "READ");
+  if (!isValid) {
+    return NextResponse.json({
+      status: status,
+      error: message,
+    });
+  }
   try {
-    await mongoose.connect(process.env.MONGODB_URI || "");
     const values = await Value.find({}, {__v: 0, _id: 0, "value._id": 0});
 
     const formattedValues = values.reduce((acc, item) => {
@@ -61,6 +82,9 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(formattedValues);
   } catch (error) {
-    return NextResponse.json({status: 500, error});
+    return NextResponse.json({
+      status: 500,
+      error: error,
+    });
   }
 }

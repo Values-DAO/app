@@ -11,7 +11,12 @@ interface WordCloudProps {
 const ValuesWordCloud: React.FC<WordCloudProps> = ({refresh}) => {
   const [words, setWords] = useState<Word[]>([]);
   const fetchWords = async () => {
-    const response = await fetch("/api/value");
+    const response = await fetch("/api/value", {
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+      },
+    });
     const data = await response.json();
     if (data) {
       const words: Word[] = [];

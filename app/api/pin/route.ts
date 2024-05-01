@@ -1,7 +1,17 @@
+import validateApiKey from "@/lib/validate-key";
 import axios from "axios";
+import {headers} from "next/headers";
 import {NextRequest, NextResponse} from "next/server";
 
 export async function POST(req: NextRequest) {
+  const apiKey = headers().get("x-api-key");
+  const {isValid, message, status} = await validateApiKey(apiKey, "WRITE");
+  if (!isValid) {
+    return NextResponse.json({
+      status: status,
+      error: message,
+    });
+  }
   const {imageUrl, name} = await req.json();
   try {
     // Download the image
@@ -34,6 +44,9 @@ export async function POST(req: NextRequest) {
       cid: pinataResponse.data.IpfsHash,
     });
   } catch (error) {
-    return NextResponse.json({status: 500, error});
+    return NextResponse.json({
+      status: 500,
+      error: error,
+    });
   }
 }

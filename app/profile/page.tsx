@@ -28,6 +28,11 @@ const ProfilePage = () => {
     setLoading(true);
     const response = await fetch(`/api/user?email=${user?.email?.address}`, {
       method: "GET",
+
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+      },
     });
     const data = await response.json();
 
