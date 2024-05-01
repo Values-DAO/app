@@ -33,6 +33,11 @@ export async function GET(req: any) {
         (Number(existingCode.claimedBy) ?? 0) + 1
       ).toString();
       await existingCode.save();
+      const user = await User.findOneAndUpdate(
+        {email},
+        {isVerified: true},
+        {new: true}
+      );
       return NextResponse.json({status: 200, isValid: true});
     }
     if (!existingCode || existingCode.claimed) {
