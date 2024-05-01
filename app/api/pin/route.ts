@@ -1,36 +1,15 @@
-import ApiKey from "@/models/apikey";
+import validateApiKey from "@/lib/validate-key";
 import axios from "axios";
 import {headers} from "next/headers";
 import {NextRequest, NextResponse} from "next/server";
 
 export async function POST(req: NextRequest) {
-  const headersList = headers();
-  const apiKey = headersList.get("x-api-key");
-  if (!apiKey) {
+  const apiKey = headers().get("x-api-key");
+  const {isValid, message, status} = await validateApiKey(apiKey, "WRITE");
+  if (!isValid) {
     return NextResponse.json({
-      error: "Missing API key",
-      status: 401,
-    });
-  }
-
-  const apiKeyExists = await ApiKey.findOne({
-    key: apiKey,
-  });
-
-  if (!apiKeyExists) {
-    return NextResponse.json({
-      error: "Invalid API key",
-      status: 401,
-    });
-  }
-  if (
-    apiKeyExists &&
-    !apiKeyExists.permissions.includes("WRITE") &&
-    !apiKeyExists.permissions.includes("*")
-  ) {
-    return NextResponse.json({
-      error: "You don't have permission to write",
-      status: 403,
+      status: status,
+      error: message,
     });
   }
   const {imageUrl, name} = await req.json();
@@ -65,6 +44,9 @@ export async function POST(req: NextRequest) {
       cid: pinataResponse.data.IpfsHash,
     });
   } catch (error) {
-    return NextResponse.json({status: 500, error});
+    return NextResponse.json({
+      status: 500,
+      error: error,
+    });
   }
 }
