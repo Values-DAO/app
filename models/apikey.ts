@@ -1,5 +1,9 @@
 import {Schema, model, models} from "mongoose";
-
+interface IApiKey {
+  key: string;
+  permissions: string[];
+  usage: number;
+}
 const apiKeySchema = new Schema(
   {
     key: {type: String, required: true, unique: true},
@@ -8,5 +12,5 @@ const apiKeySchema = new Schema(
   },
   {timestamps: true}
 );
-const ApiKey = models.ApiKey || model("ApiKey", apiKeySchema);
+const ApiKey = models.ApiKey || model<IApiKey>("ApiKey", apiKeySchema);
 export default ApiKey;
