@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
         inviteCodes: codes.map((inviteCode) => ({
           code: inviteCode,
         })),
-        farcaster: Number(farcaster),
+        ...(farcaster ? {farcaster} : {}),
       });
 
       const inviteCodesData = codes.map((inviteCode) => ({
