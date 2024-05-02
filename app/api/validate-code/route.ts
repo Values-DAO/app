@@ -26,9 +26,6 @@ export async function GET(req: any) {
 
     const existingCode = await InviteCodes.findOne({code});
     if (code === "farcon") {
-      if (Number(existingCode.claimedBy) >= 100) {
-        return NextResponse.json({status: 400, isValid: false});
-      }
       existingCode.claimedBy = (
         (Number(existingCode.claimedBy) ?? 0) + 1
       ).toString();
