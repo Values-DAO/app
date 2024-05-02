@@ -33,6 +33,9 @@ const Navbar = () => {
           <Link href={"/"}>Home</Link>
         </Button>
         <Button variant={"link"} className="text-md" asChild>
+          <Link href={"/farcon-aligned"}>Farcon</Link>
+        </Button>
+        <Button variant={"link"} className="text-md" asChild>
           <Link href={"/profile"}>Profile</Link>
         </Button>
         <Button variant={"link"} className="text-md" asChild>
@@ -63,6 +66,9 @@ const Navbar = () => {
           <DropdownMenuContent className="mr-4">
             <DropdownMenuItem asChild className="cursor-pointer">
               <Link href={"/"}>Home</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild className="cursor-pointer">
+              <Link href={"/farcon-aligned"}>Farcon</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild className="cursor-pointer">
               <Link href={"/profile"}>Profile</Link>
