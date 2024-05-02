@@ -1,9 +1,11 @@
 "use client";
+import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {Badge} from "@/components/ui/badge";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {usePrivy} from "@privy-io/react-auth";
+import {ExclamationTriangleIcon} from "@radix-ui/react-icons";
 
 import axios from "axios";
 
@@ -25,6 +27,8 @@ const FarconPage = () => {
     alignment: undefined,
   });
   const {user} = usePrivy();
+  const [isAPassHolder, setIsAPassHolder] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const analyseAlignment = async (fid: string) => {
     const response = await axios.get(
       `api/alignment?email=${user?.email?.address}&fid=${fid}`
@@ -62,10 +66,21 @@ const FarconPage = () => {
 
       if (holders.data) {
         setFarconPassHolders(holders.data.users);
+        setLoading(true);
+        if (user?.farcaster?.fid) {
+          setIsAPassHolder(
+            holders.data.users.some(
+              (item: FarconPassHolder) =>
+                Number(item.fid) === Number(user?.farcaster?.fid)
+            )
+          );
+        }
+        setLoading(false);
       }
     };
     getHolders();
-  }, []);
+  }, [user]);
+
   return (
     <div className="flex flex-col gap-4 p-4">
       <div className="flex flex-col gap-2 ">
@@ -73,18 +88,20 @@ const FarconPage = () => {
           The Farcon Pass Holders
         </h2>
         <Input
-          placeholder="Search for a Farcon Pass Holder"
+          placeholder="Search for a warpcast username"
           type="text"
           inputMode="text"
           value={searchterm}
           onChange={(e) => {
             setSearchterm(e.target.value);
           }}
+          disabled={!isAPassHolder}
           className="border-white/10 bg-white/10 text-white/90"
         />
       </div>
 
-      {filteredUsers &&
+      {isAPassHolder &&
+        filteredUsers &&
         filteredUsers.map((farconPassHolder, index) => {
           return (
             <div
@@ -143,6 +160,16 @@ const FarconPage = () => {
             </div>
           );
         })}
+
+      {!isAPassHolder && !loading && (
+        <Alert variant="destructive">
+          <ExclamationTriangleIcon className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            You don&apos;t have a Farcon Pass.
+          </AlertDescription>
+        </Alert>
+      )}
     </div>
   );
 };
