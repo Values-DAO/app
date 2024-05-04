@@ -183,7 +183,7 @@ const FarconPage = () => {
                           {farconPassHolder.username}
                         </p>
                         <p className="text-primary">
-                          {farconPassHolder.alignment}% ||Aligned
+                          {farconPassHolder.alignment?.toFixed(2)}% ||Aligned
                         </p>
                       </div>
                     </div>
@@ -251,7 +251,7 @@ const FarconPage = () => {
                     !isAPassHolder && "blur-md"
                   }`}
                 >
-                  {farconPassHolder.alignment || 0}% ||Aligned
+                  {farconPassHolder.alignment?.toFixed(2) || 0}% ||Aligned
                 </Badge>
               </Card>
             );
