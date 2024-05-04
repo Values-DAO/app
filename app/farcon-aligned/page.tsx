@@ -170,7 +170,7 @@ const FarconPage = () => {
                         alt={farconPassHolder.username}
                         width={50}
                         height={50}
-                        className="rounded-full"
+                        className="rounded-full object-cover"
                       />
                       <div className="flex flex-col gap-2">
                         <p className="text-xl font-semibold tracking-tight">
