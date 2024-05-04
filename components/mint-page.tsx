@@ -1,4 +1,5 @@
 "use client";
+import useValues from "@/app/hooks/useValues";
 import GenerateNewValueCard from "@/components/generate-new-value-card";
 import {
   AlertDialog,
@@ -21,24 +22,17 @@ import {IValuesData} from "@/types";
 import {usePrivy} from "@privy-io/react-auth";
 import axios from "axios";
 import {SearchIcon, Twitter} from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 import {useEffect, useState} from "react";
-import {parseEther} from "viem";
+import {getAddress} from "viem";
+
 import {privateKeyToAccount} from "viem/accounts";
 
-import {
-  useAccount,
-  useChainId,
-  useSendTransaction,
-  useSwitchChain,
-  useWaitForTransactionReceipt,
-  useWalletClient,
-  useWriteContract,
-} from "wagmi";
-interface IMintPageProps {
-  userInfo?: IUser;
-}
-const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
-  const [userData, setUserData] = useState<IUser>(userInfo || ({} as IUser));
+import {useAccount, useWriteContract} from "wagmi";
+
+const MintPage = () => {
+  const [userData, setUserData] = useState<IUser>({balance: 5} as IUser);
   const [availableValues, setAvailableValues] = useState<IValuesData>(
     {} as IValuesData
   );
@@ -53,77 +47,33 @@ const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
 
   //Account Hooks
   const {user, linkWallet, login, ready, authenticated, linkEmail} = usePrivy();
-  const {address, isConnected} = useAccount();
-  const {data: signer} = useWalletClient();
-  const chainId = useChainId();
-  const {switchChain} = useSwitchChain();
-  const {sendTransaction, data, isPending, error, status} =
-    useSendTransaction();
+
   const {writeContractAsync} = useWriteContract();
-  const {isSuccess: depositSuccess, isLoading} = useWaitForTransactionReceipt({
-    hash: data,
-  });
+  const {
+    fetchUser,
+    userInfo,
+    updateUser,
+    updateValue,
+    fetchAllValues,
+    addWallet,
+  } = useValues();
+  const {isConnected, address} = useAccount();
   const [showGenerateNewValueCard, setShowGenerateNewValueCard] =
     useState(false);
-  const fetchUser = async () => {
-    const response = await fetch(`/api/user?email=${user?.email?.address}`, {
-      method: "GET",
-
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
-      },
+  const fetchUserData = async () => {
+    const response = await fetchUser({
+      ...(user?.email?.address ? {email: user.email.address} : {}),
+      ...(user?.farcaster?.fid ? {fid: user.farcaster.fid} : {}),
     });
-    const data = await response.json();
-    if (data.user) setUserData(data.user);
-  };
 
-  const deposit = async () => {
-    if (!user?.email || !address || !signer) return;
-    if (!isConnected) {
-      console.log("Please connect your wallet");
-    }
-    if (chainId !== 84532) {
-      toast({
-        title: "Please switch to the Base Sepolia",
-        variant: "destructive",
-        action: (
-          <ToastAction
-            altText="switch"
-            onClick={() => switchChain({chainId: 84532})}
-          >
-            Switch
-          </ToastAction>
-        ),
-      });
-      return;
-    }
-    const response = await axios.get(
-      "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd",
-      {
-        headers: {
-          accept: "application/json",
-          "x-api-key": process.env.NEXT_PUBLIC_COINGECKO_API_KEY,
-        },
-      }
-    );
-
-    const price = 10 / response.data.ethereum.usd;
-
-    sendTransaction({
-      to:
-        (process.env.NEXT_PUBLIC_FUNDS_OWNER as `0x${string}`) ||
-        "0xdF515f14270b2d48e52Ec1d34c1aB0D1889ca88A",
-      value: parseEther(price.toString()),
-      chainId: 84532,
-      account: signer.account,
-    });
+    if (response) setUserData(response);
   };
 
   const mintValue = async ({value, key}: {value: any; key: string}) => {
-    if (!value || !key || !user?.email?.address || !address) return;
-    console.log("Minting value", value, key);
-    if (!isConnected) {
+    if (!value || !key) return;
+    const walletToUse = address ?? userInfo.wallets?.[0];
+
+    if (walletToUse === undefined) {
       toast({
         title: "Please connect your wallet",
         description: "To mint values, connect a wallet first",
@@ -131,7 +81,7 @@ const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
       return;
     }
 
-    if (userData?.balance > 0) {
+    if (userData?.balance && userData?.balance > 0) {
       setLoading((prevLoading) => ({
         ...prevLoading,
         [key]: true,
@@ -141,7 +91,7 @@ const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
           abi: NFT_CONTRACT_ABI,
           address: NFT_CONTRACT_ADDRESS,
           functionName: "safeMint",
-          args: [address, value.cid],
+          args: [getAddress(walletToUse), value.cid],
           account: privateKeyToAccount(
             process.env.NEXT_PUBLIC_ADMIN_WALLET_PRIVATE_KEY as `0x${string}`
           ),
@@ -152,48 +102,25 @@ const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
         if (hash) {
           await new Promise((resolve) => setTimeout(resolve, 3000));
           setValueMinted({value: key, hash, showSuccessModal: true});
-          await axios.post(
-            "/api/user",
-            {
-              method: "update",
-              mintedValues: [
-                {
-                  value: key,
-                  txHash: hash,
-                },
-              ],
-              type: "sub",
-              balance: 1,
 
-              email: user?.email?.address,
-            },
-            {
-              headers: {
-                "Content-Type": "application/json",
-                "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
-              },
-            }
-          );
+          await updateUser({
+            value: key,
+            hash,
+            balance: 1,
+            type: "sub",
+          });
 
-          await axios.post(
-            "/api/value",
-            {
-              value: key,
-              email: user?.email?.address,
-            },
-            {
-              headers: {
-                "Content-Type": "application/json",
-                "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
-              },
-            }
-          );
+          await updateValue({value: key});
 
-          fetchUser();
+          fetchUserData();
           fetchValues();
+          addWallet({wallets: [walletToUse]});
           toast({
-            title: "We just dropped few NFTs to your wallet",
-            description: "View them in your wallet",
+            title: `We just dropped few NFTs to your wallet`,
+            description: `View them in your wallet (${walletToUse.slice(
+              0,
+              7
+            )}...${walletToUse.slice(-4)})`,
             action: (
               <ToastAction
                 altText="opensea"
@@ -215,6 +142,7 @@ const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
           });
         }
       } catch (error) {
+        console.error("Error minting value", error);
         toast({
           title: "Failed to mint value",
           description: "Please try again",
@@ -259,14 +187,9 @@ const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
     setFilteredData(filteredData);
   };
   const fetchValues = async () => {
-    const response = await axios.get("/api/value", {
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
-      },
-    });
+    const response = await fetchAllValues();
 
-    if (response.data) setAvailableValues(response.data);
+    if (response) setAvailableValues(response);
   };
 
   useEffect(() => {
@@ -274,62 +197,12 @@ const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
   }, [searchValue, userData]);
 
   useEffect(() => {
-    if (!user?.email?.address) return;
-
-    fetchUser();
-  }, [user, user?.email?.address]);
-
-  useEffect(() => {
-    if (error) {
-      console.log("Error", error);
-      if (error.message === "User denied transaction signature") {
-        toast({
-          title: "Transaction cancelled",
-          description: "Please try again",
-        });
-      } else if (error.message.includes("insufficient funds")) {
-        toast({
-          title: "Insufficient funds",
-          description: "Please deposit funds to mint",
-        });
-      } else {
-        toast({
-          title: "Failed to deposit funds",
-          description: "Please try again",
-        });
-      }
-    }
-  }, [error, status]);
-  useEffect(() => {
-    fetchValues();
+    fetchUserData();
   }, [user]);
 
   useEffect(() => {
-    const updateUserbalance = async () => {
-      if (depositSuccess) {
-        const updatedUser = await axios.post(
-          "/api/user",
-          {
-            method: "update",
-            balance: 10,
-            type: "add",
-            email: user?.email?.address,
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
-            },
-          }
-        );
-        setUserData((prevUserData) => ({
-          ...prevUserData,
-          balance: prevUserData.balance + 10,
-        }));
-      }
-    };
-    updateUserbalance();
-  }, [depositSuccess]);
+    fetchValues();
+  }, [user]);
 
   return (
     <div className="flex justify-center">
@@ -337,34 +210,6 @@ const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
         <ValuesWordCloud refresh={availableValues} />
         <div className="flex flex-row justify-between items-center ">
           <p className="p-4">Balance: ${userData?.balance ?? 0}</p>
-          <div>
-            {isConnected ? (
-              <Button
-                onClick={deposit}
-                disabled={isPending || isLoading}
-                className=""
-                variant={"link"}
-              >
-                {isPending ? (
-                  <div className="flex flex-row justify-center items-center gap-2">
-                    <span>Sign in wallet</span>
-                    <div className="animate-spin rounded-full h-6 w-6 border-4 border-dashed border-white"></div>
-                  </div>
-                ) : isLoading ? (
-                  <div className="flex flex-row justify-center items-center gap-2">
-                    <span>Loading</span>
-                    <div className="animate-spin rounded-full h-6 w-6 border-4 border-dashed border-white"></div>
-                  </div>
-                ) : (
-                  <p> Deposit ($1 = 1 Value)</p>
-                )}
-              </Button>
-            ) : (
-              <Button variant="link" onClick={linkWallet}>
-                Connect Wallet to deposit
-              </Button>
-            )}
-          </div>
         </div>
         <div className="relative ">
           <Input
@@ -380,7 +225,7 @@ const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
         </div>{" "}
         {authenticated ? (
           <>
-            {user?.email?.address ? (
+            {(user?.email?.address || user?.farcaster?.fid) && (
               <section>
                 {!showGenerateNewValueCard &&
                   searchValue.length > 0 &&
@@ -394,7 +239,8 @@ const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
                         >
                           <span> {key}</span>
 
-                          {isConnected ? (
+                          {address ||
+                          (userInfo.wallets && userInfo.wallets?.length > 0) ? (
                             <Button
                               variant="default"
                               className="ml-auto h-8 w-32"
@@ -407,7 +253,6 @@ const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
                                 <div className="animate-spin rounded-full h-6 w-6 border-4 border-dashed border-white"></div>
                               ) : (
                                 <>
-                                  {" "}
                                   {value.hasMintedValue
                                     ? "Already Minted"
                                     : "Mint"}
@@ -461,19 +306,6 @@ const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
                   </div>
                 )}
               </section>
-            ) : (
-              <section className="w-full h-14 px-3 flex items-center hover:bg-gray-300/20 hover:cursor-pointer rounded-sm">
-                <span className="font-semibold  text-gray-300 text-lg">
-                  Link an email to proceed
-                </span>{" "}
-                <Button
-                  variant="default"
-                  onClick={linkEmail}
-                  className="ml-auto h-8 w-32"
-                >
-                  Link Email
-                </Button>
-              </section>
             )}
           </>
         ) : (
@@ -505,21 +337,36 @@ const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
                 >
                   Close
                 </AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={() => {
-                    window.open(
-                      "https://warpcast.com/~/compose?text=I%20just%20minted%20my%20values%20on%20ValuesDAO.%20Check%20if%20you%27re%20aligned%20with%20me%2C%20anon%3F%20&embeds[]=https://app.valuesdao.io",
-                      "_blank"
-                    );
-                  }}
-                >
-                  Tweet
-                  <Twitter
-                    strokeWidth={0}
-                    fill="#1DA1F2"
-                    className="h-6 w-6 ml-2"
-                  />
-                </AlertDialogAction>
+                <div className="flex flex-row gap-2">
+                  <Link
+                    href="https://warpcast.com/~/compose?text=I%20just%20minted%20my%20values%20on%20ValuesDAO.%20Check%20if%20you%27re%20aligned%20with%20me%2C%20anon%3F%20&embeds[]=https://app.valuesdao.io"
+                    target="_blank"
+                  >
+                    <Button className="flex flex-row w-full">
+                      Share
+                      <Image
+                        src="/white-purple.png"
+                        width={20}
+                        height={20}
+                        alt="farcaster"
+                        className="mx-2"
+                      />
+                    </Button>
+                  </Link>
+                  <Link
+                    href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fapp.valuesdao.io%2F&text=I%20just%20minted%20my%20values%20on%20ValuesDAO.%20Check%20if%20you%27re%20aligned%20with%20me%2C%20anon%3F"
+                    target="_blank"
+                  >
+                    <Button className="flex flex-row w-full">
+                      Tweet
+                      <Twitter
+                        strokeWidth={0}
+                        fill="#1DA1F2"
+                        className="h-6 w-6 ml-2"
+                      />
+                    </Button>
+                  </Link>
+                </div>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>

@@ -1,4 +1,4 @@
-import User from "@/models/user";
+import User, {IUser} from "@/models/user";
 import {NextRequest, NextResponse} from "next/server";
 import {generateInviteCodes} from "@/lib/generate-invite-code";
 import InviteCodes from "@/models/inviteCodes";
@@ -20,7 +20,6 @@ export async function POST(req: NextRequest) {
     }
     const {
       email,
-      username,
       wallets = [],
       method,
       mintedValues,
@@ -28,12 +27,24 @@ export async function POST(req: NextRequest) {
       type,
       farcaster,
     } = await req.json();
-
+    console.log(email, wallets, method, mintedValues, balance, type, farcaster);
     // Request validation
-    if (!email || !method) {
-      return NextResponse.json({error: "Missing required fields", status: 400});
+    if (!method) {
+      return NextResponse.json({error: "Method is required", status: 400});
     }
-    const user = await User.findOne({email});
+    if (!email && !farcaster) {
+      return NextResponse.json({
+        error: "Email or farcaster is required",
+        status: 400,
+      });
+    }
+    let user;
+    if (email) {
+      user = await User.findOne({email});
+    } else if (farcaster) {
+      user = await User.findOne({farcaster});
+    }
+
     // Handle different methods
     switch (method) {
       case "create_user":
@@ -42,12 +53,11 @@ export async function POST(req: NextRequest) {
         }
         const codes = generateInviteCodes();
         const createdUser = await User.create({
-          email,
-          username,
           wallets,
-          balance,
+          balance: 5,
           inviteCodes: codes.map((inviteCode) => ({code: inviteCode})),
           ...(farcaster ? {farcaster} : {}),
+          ...(email ? {email} : {}),
         });
 
         const inviteCodesData = codes.map((inviteCode) => ({
@@ -56,9 +66,9 @@ export async function POST(req: NextRequest) {
         }));
         await InviteCodes.insertMany(inviteCodesData);
 
-
         return NextResponse.json(createdUser);
       case "update":
+        console.log("Updating user");
         if (!user) {
           return NextResponse.json({error: "User not found", status: 404});
         }
@@ -73,6 +83,8 @@ export async function POST(req: NextRequest) {
             type === "add" ? user.balance + balance : user.balance - balance;
         }
         await user.save();
+        console.log("User updated", user);
+
         return NextResponse.json({user, status: 200});
       case "add_wallet":
         if (!user) {
@@ -107,9 +119,22 @@ export async function GET(req: NextRequest) {
     }
     const searchParams = req.nextUrl.searchParams;
     const email = searchParams.get("email");
+    const fid = searchParams.get("fid");
 
-    if (email) {
+    if (email && fid) {
+      const user = await User.findOne({email, farcaster: fid});
+      if (!user) {
+        return NextResponse.json({error: "User not found", status: 404});
+      }
+      return NextResponse.json({user, status: 200});
+    } else if (email) {
       const user = await User.findOne({email});
+      if (!user) {
+        return NextResponse.json({error: "User not found", status: 404});
+      }
+      return NextResponse.json({user, status: 200});
+    } else if (fid) {
+      const user = await User.findOne({farcaster: fid});
       if (!user) {
         return NextResponse.json({error: "User not found", status: 404});
       }

@@ -20,10 +20,19 @@ export async function GET(req: any) {
     const searchParams = req.nextUrl.searchParams;
     const code = searchParams.get("code");
     const email = searchParams.get("email");
-    if (!code || !email) {
-      return NextResponse.json({status: 400, error: "Invalid code or email"});
+    const fid = searchParams.get("fid");
+    if (!code) {
+      return NextResponse.json({
+        status: 400,
+        error: "Code is required",
+      });
     }
-
+    if (!email && !fid) {
+      return NextResponse.json({
+        status: 400,
+        error: "Email or FID is required",
+      });
+    }
     const existingCode = await InviteCodes.findOne({code: code.toLowerCase()});
 
     if (code.toLowerCase() === "farcon") {
@@ -31,11 +40,13 @@ export async function GET(req: any) {
         (Number(existingCode.claimedBy) ?? 0) + 1
       ).toString();
       await existingCode.save();
+      const userQuery = email ? {email} : {farcaster: fid};
       const user = await User.findOneAndUpdate(
-        {email},
+        userQuery,
         {isVerified: true},
         {new: true}
       );
+
       return NextResponse.json({status: 200, isValid: true});
     }
     if (!existingCode || existingCode.claimed) {
@@ -48,12 +59,13 @@ export async function GET(req: any) {
     existingCode.claimedBy = email;
     existingCode.claimed = true;
     await existingCode.save();
-
+    const userQuery = email ? {email} : {farcaster: fid};
     const user = await User.findOneAndUpdate(
-      {email},
+      userQuery,
       {isVerified: true},
       {new: true}
     );
+
     if (!user) {
       throw {message: "User not found", status: 404};
     }

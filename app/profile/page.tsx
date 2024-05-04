@@ -17,39 +17,17 @@ import {IUser} from "@/models/user";
 import {usePrivy} from "@privy-io/react-auth";
 import {Copy} from "lucide-react";
 import {useEffect, useState} from "react";
+import useValues from "../hooks/useValues";
 const ProfilePage = () => {
   const {authenticated, login, ready, user} = usePrivy();
 
-  const [isUserVerified, setIsUserVerified] = useState(false);
-  const [userInfo, setUserInfo] = useState<IUser | null>(null);
-  const [loading, setLoading] = useState(false);
-  const fetchValues = async () => {
-    if (!user?.email?.address) return;
-    setLoading(true);
-    const response = await fetch(`/api/user?email=${user?.email?.address}`, {
-      method: "GET",
-
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
-      },
-    });
-    const data = await response.json();
-
-    setUserInfo(data.user);
-    if (data?.user?.isVerified) {
-      setIsUserVerified(true);
-    }
-    setLoading(false);
-  };
-  useEffect(() => {
-    fetchValues();
-  }, [user]);
+  const {isLoading, isUserVerified, userInfo} = useValues();
+  const [isVerified, setIsVerified] = useState(false);
   return (
     <div className="p-4">
-      {user && !loading ? (
+      {user && !isLoading ? (
         <>
-          {isUserVerified ? (
+          {isUserVerified || isVerified ? (
             <div>
               {userInfo && userInfo?.inviteCodes!.length > 0 && (
                 <Card className="flex flex-col  gap-4 p-4">
@@ -148,7 +126,11 @@ const ProfilePage = () => {
             </div>
           ) : (
             <div className="flex flex-col items-center px-6 mt-[40%] md:mt-[15%]">
-              <InviteCodeModal setVerified={setIsUserVerified} />
+              <InviteCodeModal
+                onSuccess={() => {
+                  setIsVerified(true);
+                }}
+              />
             </div>
           )}
         </>
@@ -160,10 +142,10 @@ const ProfilePage = () => {
           <Button
             variant="default"
             onClick={login}
-            disabled={!ready || authenticated || loading}
+            disabled={!ready || authenticated || isLoading}
             className="my-4"
           >
-            {loading ? "Loading.." : "Login"}
+            {isLoading ? "Loading.." : "Login"}
           </Button>
         </section>
       )}

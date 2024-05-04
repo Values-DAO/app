@@ -25,6 +25,7 @@ import {Separator} from "@/components/ui/separator";
 import {getChainName} from "@/lib/utils";
 import {Skeleton} from "@/components/ui/skeleton";
 import InviteCodeModal from "@/components/invite-code-modal";
+import useValues from "@/app/hooks/useValues";
 
 interface pageProps {
   params: {id: string};
@@ -36,7 +37,7 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
   const {disconnect} = useDisconnect();
   const {writeContractAsync, isError, failureReason} = useWriteContract();
   const [project, setProject] = useState<IProject | null>(null);
-
+  const {userInfo} = useValues();
   const [valuesFromDB, setValuesFromDB] = useState<any>([]);
 
   const [loader, setLoader] = useState(false);
@@ -195,7 +196,7 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
 
   return (
     <>
-      {isUserVerified ? (
+      {userInfo.isVerified || isUserVerified ? (
         <main className="p-4 overflow-y-auto">
           {project && (
             <section className="flex flex-col items-center md:items-start md:flex-row gap-4">
@@ -316,7 +317,11 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
         </main>
       ) : (
         <div className="flex flex-col items-center px-6 mt-[40%] md:mt-[15%]">
-          <InviteCodeModal setVerified={setIsUserVerified} />
+          <InviteCodeModal
+            onSuccess={() => {
+              setIsUserVerified(true);
+            }}
+          />
         </div>
       )}
     </>

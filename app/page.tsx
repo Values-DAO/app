@@ -2,78 +2,34 @@
 import {Button} from "@/components/ui/button";
 
 import {usePrivy} from "@privy-io/react-auth";
-import {useEffect, useState} from "react";
-import {IUser} from "@/models/user";
-import MintPage from "@/components/mint-page";
 import InviteCodeModal from "@/components/invite-code-modal";
+import useValues from "./hooks/useValues";
+import {useEffect, useState} from "react";
+import MintPage from "@/components/mint-page";
 
 export default function Home() {
   const {authenticated, login, ready, user} = usePrivy();
-  const [userInfo, setUserInfo] = useState<IUser>({
-    wallets: [],
-    email: "",
-    balance: 5,
-  } as unknown as IUser);
-  const [verified, setVerified] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (!user?.email?.address) return;
-
-    const isUserExist = async () => {
-      if (authenticated) {
-        setLoading(true);
-        const existingUser = await fetch(
-          `/api/user?email=${user?.email?.address}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
-            },
-          }
-        );
-        const data = await existingUser.json();
-
-        if (data?.user?.isVerified) {
-          setVerified(true);
-        }
-        if (data.status === 404) {
-          await fetch(`/api/user`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
-            },
-            body: JSON.stringify({
-              email: user?.email?.address,
-              wallets: user.wallet?.address || [],
-              method: "create_user",
-              balance: 5,
-              farcaster: user?.farcaster?.fid,
-            }),
-          });
-        }
-        setLoading(false);
-      }
-    };
-    isUserExist();
-  }, [user?.email?.address, authenticated, user]);
-
+  const {isLoading, isUserVerified} = useValues();
+  const [isVerified, setIsVerified] = useState(false);
   return (
     <>
-      {loading ? (
-        <div className="flex items-center justify-center h-screen">
-          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-white"></div>
+      {isLoading ? (
+        <div className="flex items-center justify-center h-[60vh]">
+          <div className="animate-spin rounded-full h-14 w-14 border-t-2 border-b-2 border-primary"></div>
         </div>
       ) : (
         <>
           {authenticated ? (
             <>
-              {verified ? (
-                <MintPage userInfo={userInfo} />
+              {isUserVerified || isVerified ? (
+                <MintPage />
               ) : (
                 <div className="flex flex-col items-center px-6 mt-[40%] md:mt-[15%]">
-                  <InviteCodeModal setVerified={setVerified} />
+                  <InviteCodeModal
+                    onSuccess={() => {
+                      setIsVerified(true);
+                    }}
+                  />
                 </div>
               )}
             </>
