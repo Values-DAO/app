@@ -153,6 +153,7 @@ const FarconPage = () => {
           <p className="font-semibold text-lg">Most ||aligned</p>
           <div className="flex flex-col md:flex-row gap-2 justify-evenly w-[100%] m-auto">
             {mostAligned.map((farconPassHolder, index) => {
+              if(farconPassHolder.fid === String(user?.farcaster?.fid)) return null;
               return (
                 <Card key={index} className="w-full bg-gray-400/30">
                   <CardHeader>
@@ -219,6 +220,7 @@ const FarconPage = () => {
         filteredUsers
           .slice(mostAligned?.length ?? 0)
           .map((farconPassHolder, index) => {
+            if
             return (
               <Card
                 className="px-4 py-2 flex flex-row gap-4 items-center rounded-md"
