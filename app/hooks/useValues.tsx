@@ -55,7 +55,7 @@ const useValues = () => {
           setIsUserVerified(true);
         }
         if (userInfo === null) {
-          await createUser({fid: user?.farcaster?.fid, wallets: wallets});
+          await createUser({wallets: wallets});
         }
       }
       if (user?.email) {
@@ -72,7 +72,7 @@ const useValues = () => {
           setIsUserVerified(true);
         }
         if (userInfo === null) {
-          await createUser({email: user?.email?.address});
+          await createUser();
         }
       }
       setIsLoading(false);
@@ -80,9 +80,6 @@ const useValues = () => {
     isUserExist();
   }, [user]);
 
-  useEffect(() => {
-    console.log(isUserVerified);
-  }, [isUserVerified]);
   const fetchUser = async ({
     email,
     fid,
@@ -222,10 +219,8 @@ const useValues = () => {
     }
   };
   const validateInviteCode = async ({inviteCode}: {inviteCode: string}) => {
-    console.log(inviteCode);
     if (!inviteCode) return false;
     if (user?.email?.address) {
-      console.log(user?.email?.address);
       const response = await axios.get(
         `/api/validate-code?code=${inviteCode}&email=${user?.email?.address}`,
         {
@@ -241,7 +236,6 @@ const useValues = () => {
       return isValid;
     }
     if (user?.farcaster?.fid) {
-      console.log(user?.farcaster?.fid);
       const response = await axios.get(
         `/api/validate-code?code=${inviteCode}&fid=${user?.farcaster?.fid}`,
         {
@@ -336,11 +330,7 @@ const useValues = () => {
 
     try {
       const data: FarcasterSocialData = await graphQLClient.request(query);
-      console.log(
-        data.Socials.Social[0].connectedAddresses.map(
-          (address) => address.address
-        )
-      );
+
       return data.Socials.Social[0].connectedAddresses.map(
         (address) => address.address
       );
