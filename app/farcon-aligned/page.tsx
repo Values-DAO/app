@@ -116,7 +116,7 @@ const FarconPage = () => {
             .filter(
               (holder) =>
                 (holder?.alignment || 0) > 0 &&
-                holder.fid !== String(user?.farcaster?.fid)
+                holder.fid !== String(user?.farcaster?.fid || 0)
             )
             .slice(0, 3);
           setMostAligned(positiveAlignmentHolders);
@@ -153,7 +153,7 @@ const FarconPage = () => {
           <p className="font-semibold text-lg">Most ||aligned</p>
           <div className="flex flex-col md:flex-row gap-2 justify-evenly w-[100%] m-auto">
             {mostAligned.map((farconPassHolder, index) => {
-              if(farconPassHolder.fid === String(user?.farcaster?.fid)) return null;
+              if(farconPassHolder.fid === String(user?.farcaster?.fid ||  0)) return null;
               return (
                 <Card key={index} className="w-full bg-gray-400/30">
                   <CardHeader>
