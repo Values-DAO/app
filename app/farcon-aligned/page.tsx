@@ -144,49 +144,47 @@ const FarconPage = () => {
         />
       </div>
 
-      {isAPassHolder && (
+      {isAPassHolder && !loader && mostAligned && mostAligned?.length > 0 && (
         <Card className="flex flex-col gap-2 p-4">
           <p className="font-semibold text-lg">Most ||aligned</p>
           <div className="flex flex-col md:flex-row gap-2 justify-evenly w-[100%] m-auto">
-            {!loader &&
-              mostAligned &&
-              mostAligned.map((farconPassHolder, index) => {
-                return (
-                  <Card key={index} className="w-full">
-                    <CardHeader>
-                      <CardDescription>
-                        We Recommend you meet{" "}
-                        <Link
-                          className="text-primary hover:underline"
-                          href={`https://warpcast.com/${farconPassHolder.username}`}
-                          target="_blank"
-                        >
+            {mostAligned.map((farconPassHolder, index) => {
+              return (
+                <Card key={index} className="w-full">
+                  <CardHeader>
+                    <CardDescription>
+                      We Recommend you meet{" "}
+                      <Link
+                        className="text-primary hover:underline"
+                        href={`https://warpcast.com/${farconPassHolder.username}`}
+                        target="_blank"
+                      >
+                        {farconPassHolder.username}
+                      </Link>
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-row gap-4">
+                      <Image
+                        src={farconPassHolder.image}
+                        alt={farconPassHolder.username}
+                        width={50}
+                        height={50}
+                        className="rounded-full"
+                      />
+                      <div className="flex flex-col gap-2">
+                        <p className="text-xl font-semibold tracking-tight">
                           {farconPassHolder.username}
-                        </Link>
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex flex-row gap-4">
-                        <Image
-                          src={farconPassHolder.image}
-                          alt={farconPassHolder.username}
-                          width={50}
-                          height={50}
-                          className="rounded-full"
-                        />
-                        <div className="flex flex-col gap-2">
-                          <p className="text-xl font-semibold tracking-tight">
-                            {farconPassHolder.username}
-                          </p>
-                          <p className="text-primary">
-                            {farconPassHolder.alignment}% ||Aligned
-                          </p>
-                        </div>
+                        </p>
+                        <p className="text-primary">
+                          {farconPassHolder.alignment}% ||Aligned
+                        </p>
                       </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </Card>
       )}

@@ -72,7 +72,7 @@ const MintPage = () => {
   const mintValue = async ({value, key}: {value: any; key: string}) => {
     if (!value || !key) return;
     const walletToUse = address ?? userInfo.wallets?.[0];
-    console.log("walletToUse", walletToUse);
+
     if (walletToUse === undefined) {
       toast({
         title: "Please connect your wallet",
@@ -232,11 +232,6 @@ const MintPage = () => {
                   filteredData &&
                   Object.entries(filteredData).map(
                     ([key, value]: [any, any]) => {
-                      console.log(
-                        address ||
-                          (userInfo.wallets && userInfo.wallets?.length > 0)
-                      );
-                      console.log(userInfo.wallets);
                       return (
                         <div
                           key={key}
