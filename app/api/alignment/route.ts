@@ -14,6 +14,7 @@ export const GET = async (req: any) => {
 
   try {
     await connectToDatabase();
+
     const user: IUser | null = await User.findOne({
       ...(currentUserEmail && {email: currentUserEmail}),
       ...(currentUserFid && {farcaster: currentUserFid}),
@@ -24,31 +25,40 @@ export const GET = async (req: any) => {
     }
 
     const sourceValues = user.mintedValues.map((item) => item.value);
-    const farconPassholder = await Farcon.find({}, {__v: 0, _id: 0});
-    const alignmentOfHolder = [];
-    for (const holder of farconPassholder) {
-      const farconUser: IUser | null = await User.findOne({
-        farcaster: holder.fid,
-      });
+
+    const farconPassholders = await Farcon.find({}, {__v: 0, _id: 0});
+
+    // Fetch all users at once based on the fids from farconPassholders
+    const fids = farconPassholders.map((holder) => holder.fid);
+
+    const users = await User.find({farcaster: {$in: fids}});
+
+    const userMap = new Map(users.map((user) => [user.farcaster, user]));
+
+    const alignmentOfHolder = farconPassholders.map((holder) => {
+      const farconUser: IUser = userMap.get(Number(holder.fid) || "");
+
       if (!farconUser) {
-        alignmentOfHolder.push({
+        return {
           fid: holder.fid,
           alignment: 0,
           messages: "User not found",
-        });
-        continue;
+        };
       }
 
       const partnerValues = farconUser.mintedValues.map((item) => item.value);
-
       const intersection = sourceValues.filter((value) =>
         partnerValues.includes(value)
       );
-
       const union = Array.from(new Set([...sourceValues, ...partnerValues]));
       const percentageAlignment = (intersection.length / union.length) * 100;
-      alignmentOfHolder.push({fid: holder.fid, alignment: percentageAlignment});
-    }
+
+      return {
+        fid: holder.fid,
+        alignment: percentageAlignment,
+      };
+    });
+
     return NextResponse.json({holders: alignmentOfHolder, status: 200});
   } catch (error) {
     return NextResponse.json({
