@@ -150,9 +150,9 @@ const FarconPage = () => {
           <div className="flex flex-col md:flex-row gap-2 justify-evenly w-[100%] m-auto">
             {mostAligned.map((farconPassHolder, index) => {
               return (
-                <Card key={index} className="w-full">
+                <Card key={index} className="w-full bg-gray-400/30">
                   <CardHeader>
-                    <CardDescription>
+                    <CardDescription className="text-white">
                       We Recommend you meet{" "}
                       <Link
                         className="text-primary hover:underline"
@@ -209,41 +209,45 @@ const FarconPage = () => {
           <div className="animate-spin rounded-full h-14 w-14 border-t-2 border-b-2 border-primary"></div>
         </div>
       )}
+
+      <p className="font-semibold text-lg">Everyone else</p>
       {filteredUsers &&
-        filteredUsers.map((farconPassHolder, index) => {
-          return (
-            <div
-              className="px-4 py-2 bg-gray-400/30 flex flex-row gap-4 items-center rounded-md"
-              key={index}
-            >
-              <Avatar>
-                <AvatarImage src={farconPassHolder.image} />
-                <AvatarFallback>{farconPassHolder.username}</AvatarFallback>
-              </Avatar>
-              <div className="flex-grow gap-2 ">
-                <p className="scroll-m-20 text-xl md:text-2xl font-semibold tracking-tight text-primary">
-                  {farconPassHolder.username}
-                </p>
-                <div className="flex-row gap-2 flex-wrap my-1 hidden md:flex">
-                  {farconPassHolder.address.length > 0 &&
-                    farconPassHolder.address.map((address) => (
-                      <Badge key={address} variant="secondary">
-                        {address.slice(0, 6)}...{address.slice(-4)}
-                      </Badge>
-                    ))}
-                </div>{" "}
-              </div>
-              <Badge
-                variant="secondary"
-                className={`text-lg w-40 flex justify-center text-green-400 border-[1px] border-white/40 ${
-                  !isAPassHolder && "blur-md"
-                }`}
+        filteredUsers
+          .slice(mostAligned?.length ?? 0)
+          .map((farconPassHolder, index) => {
+            return (
+              <Card
+                className="px-4 py-2 flex flex-row gap-4 items-center rounded-md"
+                key={index}
               >
-                {farconPassHolder.alignment || 0}% ||Aligned
-              </Badge>
-            </div>
-          );
-        })}
+                <Avatar>
+                  <AvatarImage src={farconPassHolder.image} />
+                  <AvatarFallback>{farconPassHolder.username}</AvatarFallback>
+                </Avatar>
+                <div className="flex-grow gap-2 ">
+                  <p className="scroll-m-20 text-xl md:text-2xl font-semibold tracking-tight text-primary">
+                    {farconPassHolder.username}
+                  </p>
+                  <div className="flex-row gap-2 flex-wrap my-1 hidden md:flex">
+                    {farconPassHolder.address.length > 0 &&
+                      farconPassHolder.address.map((address) => (
+                        <Badge key={address} variant="secondary">
+                          {address.slice(0, 6)}...{address.slice(-4)}
+                        </Badge>
+                      ))}
+                  </div>{" "}
+                </div>
+                <Badge
+                  variant="secondary"
+                  className={`text-lg w-40 flex justify-center text-green-400 border-[1px] border-white/40 ${
+                    !isAPassHolder && "blur-md"
+                  }`}
+                >
+                  {farconPassHolder.alignment || 0}% ||Aligned
+                </Badge>
+              </Card>
+            );
+          })}
     </div>
   );
 };

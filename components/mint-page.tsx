@@ -210,6 +210,11 @@ const MintPage = () => {
         <ValuesWordCloud refresh={availableValues} />
         <div className="flex flex-row justify-between items-center ">
           <p className="p-4">Balance: ${userData?.balance ?? 0}</p>
+          <Link href={"/farcon-aligned"}>
+            <Button variant="default" className="text-md">
+              Farcon
+            </Button>
+          </Link>
         </div>
         <div className="relative ">
           <Input
@@ -222,7 +227,7 @@ const MintPage = () => {
           <div className="absolute inset-y-0 right-3 pl-3 flex items-center cursor-pointer">
             <SearchIcon className="h-5 w-5 text-gray-400" />
           </div>
-        </div>{" "}
+        </div>
         {authenticated ? (
           <>
             {(user?.email?.address || user?.farcaster?.fid) && (
