@@ -72,7 +72,7 @@ const useValues = () => {
           setIsUserVerified(true);
         }
         if (userInfo === null) {
-          await createUser();
+          await createUser({});
         }
       }
       setIsLoading(false);
