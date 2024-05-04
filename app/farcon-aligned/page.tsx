@@ -113,7 +113,11 @@ const FarconPage = () => {
           );
           setFarconPassHolders(mergedData);
           const positiveAlignmentHolders = mergedData
-            .filter((holder) => holder?.alignment || 0 > 0)
+            .filter(
+              (holder) =>
+                (holder?.alignment || 0) > 0 &&
+                holder.fid !== String(user?.farcaster?.fid)
+            )
             .slice(0, 3);
           setMostAligned(positiveAlignmentHolders);
         }
