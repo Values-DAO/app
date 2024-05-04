@@ -24,8 +24,9 @@ export async function GET(req: any) {
       return NextResponse.json({status: 400, error: "Invalid code or email"});
     }
 
-    const existingCode = await InviteCodes.findOne({code});
-    if (code === "farcon") {
+    const existingCode = await InviteCodes.findOne({code: code.toLowerCase()});
+
+    if (code.toLowerCase() === "farcon") {
       existingCode.claimedBy = (
         (Number(existingCode.claimedBy) ?? 0) + 1
       ).toString();

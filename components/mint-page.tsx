@@ -508,7 +508,7 @@ const MintPage: React.FC<IMintPageProps> = ({userInfo}) => {
                 <AlertDialogAction
                   onClick={() => {
                     window.open(
-                      `https://twitter.com/intent/tweet?url=https%3A%2F%2Fapp.valuesdao.io&text=I%20just%20minted%20my%20values.%20are%20you%20aligned%20with%20me%2C%20anon%3F%20check%20on%20ValuesDAO.`,
+                      "https://warpcast.com/~/compose?text=I%20just%20minted%20my%20values%20on%20ValuesDAO.%20Check%20if%20you%27re%20aligned%20with%20me%2C%20anon%3F%20&embeds[]=https://app.valuesdao.io",
                       "_blank"
                     );
                   }}

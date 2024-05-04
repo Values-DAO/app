@@ -63,6 +63,7 @@ export const POST = async (req: any) => {
 };
 export const GET = async (req: any) => {
   try {
+    await connectToDatabase();
     const users = await Farcon.find({});
     return NextResponse.json({total: users.length, users});
   } catch (error) {

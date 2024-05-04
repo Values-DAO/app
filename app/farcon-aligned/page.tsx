@@ -153,6 +153,7 @@ const FarconPage = () => {
                   onClick={() => {
                     analyseAlignment(farconPassHolder.fid);
                   }}
+                  disabled={loading || !isAPassHolder}
                 >
                   Find Alignment
                 </Button>
@@ -160,16 +161,6 @@ const FarconPage = () => {
             </div>
           );
         })}
-
-      {!isAPassHolder && !loading && (
-        <Alert variant="destructive">
-          <ExclamationTriangleIcon className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>
-            You don&apos;t have a Farcon Pass.
-          </AlertDescription>
-        </Alert>
-      )}
     </div>
   );
 };
