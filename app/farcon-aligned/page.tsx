@@ -2,14 +2,24 @@
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {Badge} from "@/components/ui/badge";
-import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {usePrivy} from "@privy-io/react-auth";
 import {ExclamationTriangleIcon} from "@radix-ui/react-icons";
 
 import axios from "axios";
 
 import React, {useEffect, useState} from "react";
+import {Button} from "@/components/ui/button";
+import Link from "next/link";
+import Image from "next/image";
 interface FarconPassHolder {
   username: string;
   address: string[];
@@ -34,6 +44,9 @@ const FarconPage = () => {
   const [isAPassHolder, setIsAPassHolder] = useState<boolean>(false);
 
   const [loader, setLoader] = useState<boolean>(false);
+  const [mostAligned, setMostAligned] = useState<FarconPassHolder[] | null>(
+    null
+  );
   const mergeData = (
     farconPassHolders: FarconPassHolder[],
     alignmentPassHolders: AlignmentPassHolder[]
@@ -99,6 +112,10 @@ const FarconPage = () => {
             alignment.data.holders
           );
           setFarconPassHolders(mergedData);
+          const positiveAlignmentHolders = mergedData
+            .filter((holder) => holder?.alignment || 0 > 0)
+            .slice(0, 3);
+          setMostAligned(positiveAlignmentHolders);
         }
       } else {
         setFarconPassHolders(holders.data.users);
@@ -126,6 +143,51 @@ const FarconPage = () => {
           className="border-white/10 bg-white/10 text-white/90"
         />
       </div>
+
+      {isAPassHolder && (
+        <Card className="flex flex-col gap-2 p-4">
+          <p className="font-semibold text-lg">Most ||aligned</p>
+          <div className="flex flex-col md:flex-row gap-2 justify-evenly w-[100%] m-auto">
+            {mostAligned &&
+              mostAligned.map((farconPassHolder, index) => {
+                return (
+                  <Card key={index} className="w-full">
+                    <CardHeader>
+                      <CardDescription>
+                        We Recommend you meet{" "}
+                        <Link
+                          className="text-primary hover:underline"
+                          href={`https://warpcast.com/pareen${farconPassHolder.username}`}
+                        >
+                          {farconPassHolder.username}
+                        </Link>
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex flex-row gap-4">
+                        <Image
+                          src={farconPassHolder.image}
+                          alt={farconPassHolder.username}
+                          width={50}
+                          height={50}
+                          className="rounded-full"
+                        />
+                        <div className="flex flex-col gap-2">
+                          <p className="text-xl font-semibold tracking-tight">
+                            {farconPassHolder.username}
+                          </p>
+                          <p className="text-primary">
+                            {farconPassHolder.alignment}% ||Aligned
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+          </div>
+        </Card>
+      )}
       {!loader && user?.farcaster?.fid === undefined && (
         <Alert variant="destructive">
           <ExclamationTriangleIcon className="h-4 w-4" />
