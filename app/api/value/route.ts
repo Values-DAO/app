@@ -15,25 +15,32 @@ export async function POST(req: NextRequest) {
     });
   }
   try {
-    const {name, value, email} = await req.json();
-    if (value && email) {
+    const {name, value, email, farcaster} = await req.json();
+
+    if (!email && !farcaster) {
+      return NextResponse.json({
+        status: 400,
+        error: "Email or farcaster is required",
+      });
+    }
+    if (value) {
       if (Array.isArray(value)) {
         for (const v of value) {
           const existingValue = await Value.findOne({name: v});
-          if (existingValue.minters.includes(email)) {
+          if (existingValue.minters.includes(email ?? farcaster)) {
             continue;
           }
-          existingValue.minters.push(email);
+          existingValue.minters.push(email ?? farcaster);
           await existingValue.save();
         }
         return NextResponse.json({status: 200});
       } else {
         const existingValue = await Value.findOne({name: value});
 
-        if (existingValue.minters.includes(email)) {
+        if (existingValue.minters.includes(email ?? farcaster)) {
           return NextResponse.json({status: 200, value: existingValue});
         }
-        existingValue.minters.push(email);
+        existingValue.minters.push(email ?? farcaster);
         const updatedValue = await existingValue.save();
         return NextResponse.json({status: 200, value: updatedValue});
       }

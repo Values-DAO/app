@@ -81,12 +81,19 @@ const Navbar = () => {
               <Link href={"/mint"}>Mint a Value</Link>
             </DropdownMenuItem> */}
 
-            {authenticated && user && (
+            {authenticated ? (
               <DropdownMenuItem
                 className="cursor-pointer"
                 onClick={() => logout()}
               >
                 Logout
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => login()}
+              >
+                Login
               </DropdownMenuItem>
             )}
           </DropdownMenuContent>

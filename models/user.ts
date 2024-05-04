@@ -1,13 +1,13 @@
 import mongoose, {Schema, models} from "mongoose";
 
 export type IUser = {
-  name: string;
-  username: string;
-  email: string;
-  farcaster: number;
-  wallets: string[];
+  name?: string;
+  username?: string;
+  email?: string;
+  farcaster?: number;
+  wallets?: string[];
   mintedValues: {value: string; txHash: string}[];
-  balance: number;
+  balance?: number;
   invitedBy?: string;
   isVerified?: boolean;
   totalInvites?: number;
@@ -24,9 +24,11 @@ const userSchema = new Schema(
     },
     email: {
       type: String,
+      unique: true,
     },
     farcaster: {
       type: Number,
+      unique: true,
     },
     wallets: {
       type: [String],
