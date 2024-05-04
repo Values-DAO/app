@@ -316,7 +316,11 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
         </main>
       ) : (
         <div className="flex flex-col items-center px-6 mt-[40%] md:mt-[15%]">
-          <InviteCodeModal setVerified={setIsUserVerified} />
+          <InviteCodeModal
+            onSuccess={() => {
+              setIsUserVerified(true);
+            }}
+          />
         </div>
       )}
     </>

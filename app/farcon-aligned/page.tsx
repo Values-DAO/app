@@ -174,7 +174,7 @@ const FarconPage = () => {
               <Badge
                 variant="secondary"
                 className={`text-lg w-40 flex justify-center text-green-400 border-[1px] border-white/40 ${
-                  !isAPassHolder && "blur-sm"
+                  !isAPassHolder && "blur-md"
                 }`}
               >
                 {farconPassHolder.alignment || 0}% ||Aligned
