@@ -232,6 +232,11 @@ const MintPage = () => {
                   filteredData &&
                   Object.entries(filteredData).map(
                     ([key, value]: [any, any]) => {
+                      console.log(
+                        address ||
+                          (userInfo.wallets && userInfo.wallets?.length > 0)
+                      );
+                      console.log(userInfo.wallets);
                       return (
                         <div
                           key={key}

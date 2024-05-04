@@ -148,7 +148,8 @@ const FarconPage = () => {
         <Card className="flex flex-col gap-2 p-4">
           <p className="font-semibold text-lg">Most ||aligned</p>
           <div className="flex flex-col md:flex-row gap-2 justify-evenly w-[100%] m-auto">
-            {mostAligned &&
+            {!loader &&
+              mostAligned &&
               mostAligned.map((farconPassHolder, index) => {
                 return (
                   <Card key={index} className="w-full">
