@@ -157,7 +157,8 @@ const FarconPage = () => {
                         We Recommend you meet{" "}
                         <Link
                           className="text-primary hover:underline"
-                          href={`https://warpcast.com/pareen${farconPassHolder.username}`}
+                          href={`https://warpcast.com/${farconPassHolder.username}`}
+                          target="_blank"
                         >
                           {farconPassHolder.username}
                         </Link>
