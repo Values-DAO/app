@@ -61,7 +61,7 @@ const FarconPage = () => {
       if (!user?.farcaster?.fid) return;
       setLoader(true);
       const isAHolderResponse = await axios.get(
-        `/api/farcon?fid=${user?.farcaster?.fid}`
+        `/api/farcaster-meetup?fid=${user?.farcaster?.fid}`
       );
 
       setIsAPassHolder(isAHolderResponse.data.isHolder);
@@ -69,7 +69,9 @@ const FarconPage = () => {
       const alignmentParam = user?.farcaster?.fid
         ? `fid=${user?.farcaster?.fid}`
         : `email=${user?.email?.address}`;
-      const alignment = await axios.get(`/api/alignment?${alignmentParam}`);
+      const alignment = await axios.get(
+        `/api/alignment?${alignmentParam}&fc_meetup=true`
+      );
 
       setFarconPassHolders(alignment.data.holders);
       setLoader(false);

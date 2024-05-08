@@ -1,4 +1,5 @@
 import connectToDatabase from "@/lib/connect-to-db";
+import FarcasterMeetup from "@/models/farcastermeetup";
 import Farcon from "@/models/farcon";
 import User, {IUser} from "@/models/user";
 import {NextResponse} from "next/server";
@@ -8,7 +9,7 @@ export const GET = async (req: any) => {
 
   const currentUserEmail = searchParams.get("email");
   const currentUserFid = searchParams.get("fid");
-
+  const meetup = searchParams.get("fc_meetup");
   if (!currentUserFid && !currentUserEmail)
     return NextResponse.json({error: "Missing parameters", status: 400});
 
@@ -26,7 +27,9 @@ export const GET = async (req: any) => {
 
     const sourceValues = user.mintedValues?.map((item) => item.value) ?? [];
 
-    const farconPassholders = await Farcon.find({}, {__v: 0, _id: 0});
+    const farconPassholders = meetup
+      ? await FarcasterMeetup.find({}, {__v: 0, _id: 0})
+      : await Farcon.find({}, {__v: 0, _id: 0});
 
     const fids = farconPassholders.map((holder) => holder.fid);
 
