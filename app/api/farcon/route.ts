@@ -62,8 +62,23 @@ export const POST = async (req: any) => {
   }
 };
 export const GET = async (req: any) => {
+  const searchParams = req.nextUrl.searchParams;
+  const fid = searchParams.get("fid");
   try {
     await connectToDatabase();
+
+    if (fid) {
+      const user = await Farcon.findOne({fid});
+      if (!user) {
+        return NextResponse.json({
+          error: "User not found",
+          status: 404,
+          user: null,
+          isHolder: false,
+        });
+      }
+      return NextResponse.json({user, isHolder: true});
+    }
     const users = await Farcon.find({});
     return NextResponse.json({total: users.length, users});
   } catch (error) {

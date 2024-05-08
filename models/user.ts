@@ -6,7 +6,7 @@ export type IUser = {
   email?: string;
   farcaster?: number;
   wallets?: string[];
-  mintedValues: {value: string; txHash: string}[];
+  mintedValues?: {value: string; txHash: string}[];
   balance?: number;
   invitedBy?: string;
   isVerified?: boolean;

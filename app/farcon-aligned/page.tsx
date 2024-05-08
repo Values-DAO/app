@@ -17,7 +17,6 @@ import {ExclamationTriangleIcon} from "@radix-ui/react-icons";
 import axios from "axios";
 
 import React, {useEffect, useState} from "react";
-import {Button} from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
 interface FarconPassHolder {
@@ -28,11 +27,7 @@ interface FarconPassHolder {
   alignment?: number;
   message?: string;
 }
-interface AlignmentPassHolder {
-  fid: string;
-  alignment: number;
-  message?: string;
-}
+
 const FarconPage = () => {
   const [farconPassHolders, setFarconPassHolders] = useState<
     FarconPassHolder[]
@@ -40,32 +35,11 @@ const FarconPage = () => {
   const [searchterm, setSearchterm] = useState<string>("");
   const [filteredUsers, setFilteredUsers] = useState<FarconPassHolder[]>([]);
 
-  const {user} = usePrivy();
-  const [isAPassHolder, setIsAPassHolder] = useState<boolean>(false);
+  const {user, authenticated} = usePrivy();
+  const [isAPassHolder, setIsAPassHolder] = useState<boolean | null>(null);
 
   const [loader, setLoader] = useState<boolean>(false);
-  const [mostAligned, setMostAligned] = useState<FarconPassHolder[] | null>(
-    null
-  );
-  const mergeData = (
-    farconPassHolders: FarconPassHolder[],
-    alignmentPassHolders: AlignmentPassHolder[]
-  ): FarconPassHolder[] => {
-    const merged = farconPassHolders.map((farconPassHolder) => {
-      const alignmentData = alignmentPassHolders.find(
-        (alignment) => alignment.fid === farconPassHolder.fid
-      );
-      return {
-        ...farconPassHolder,
-        alignment: alignmentData?.alignment,
-        message: alignmentData?.message,
-      };
-    });
 
-    // Sorting the merged array by alignment in descending order
-    merged.sort((a, b) => (b.alignment || 0) - (a.alignment || 0));
-    return merged;
-  };
   useEffect(() => {
     function searchByUsername(searchTerm: string) {
       if (searchTerm.length === 0) {
@@ -84,51 +58,27 @@ const FarconPage = () => {
   }, [searchterm, farconPassHolders]);
   useEffect(() => {
     const getHolders = async () => {
+      if (!user?.farcaster?.fid) return;
       setLoader(true);
-      const holders = await axios.get("/api/farcon");
+      const isAHolderResponse = await axios.get(
+        `/api/farcon?fid=${user?.farcaster?.fid}`
+      );
 
-      if (holders.data) {
-        if (user?.farcaster?.fid) {
-          setIsAPassHolder(
-            holders.data.users.some(
-              (item: FarconPassHolder) =>
-                Number(item.fid) === Number(user?.farcaster?.fid)
-            )
-          );
-        }
+      setIsAPassHolder(isAHolderResponse.data.isHolder);
 
-        if (
-          (user?.farcaster?.fid || user?.email?.address) &&
-          holders.data.users &&
-          holders.data.users.length > 0
-        ) {
-          const alignmentParam = user?.farcaster?.fid
-            ? `fid=${user?.farcaster?.fid}`
-            : `email=${user?.email?.address}`;
-          const alignment = await axios.get(`/api/alignment?${alignmentParam}`);
+      const alignmentParam = user?.farcaster?.fid
+        ? `fid=${user?.farcaster?.fid}`
+        : `email=${user?.email?.address}`;
+      const alignment = await axios.get(`/api/alignment?${alignmentParam}`);
 
-          const mergedData = mergeData(
-            holders.data.users,
-            alignment.data.holders
-          );
-          setFarconPassHolders(mergedData);
-          const positiveAlignmentHolders = mergedData
-            .filter(
-              (holder) =>
-                (holder?.alignment || 0) > 0 &&
-                holder.fid !== String(user?.farcaster?.fid || 0)
-            )
-            .slice(0, 3);
-          setMostAligned(positiveAlignmentHolders);
-        }
-      } else {
-        setFarconPassHolders(holders.data.users);
-      }
+      setFarconPassHolders(alignment.data.holders);
       setLoader(false);
     };
     getHolders();
   }, [user]);
-
+  const topAlignedUsers = farconPassHolders
+    .filter((holder) => holder.alignment && holder.alignment > 0)
+    .slice(0, 3);
   return (
     <div className="flex flex-col gap-4 p-4">
       <div className="flex flex-col gap-2 ">
@@ -148,53 +98,57 @@ const FarconPage = () => {
         />
       </div>
 
-      {isAPassHolder && !loader && mostAligned && mostAligned?.length > 0 && (
-        <Card className="flex flex-col gap-2 p-4">
-          <p className="font-semibold text-lg">Most ||aligned</p>
-          <div className="flex flex-col md:flex-row gap-2 justify-evenly w-[100%] m-auto">
-            {mostAligned.map((farconPassHolder, index) => {
-              if (farconPassHolder.fid === String(user?.farcaster?.fid || 0))
-                return;
-              return (
-                <Card key={index} className="w-full bg-gray-400/30">
-                  <CardHeader>
-                    <CardDescription className="text-white">
-                      We Recommend you meet{" "}
-                      <Link
-                        className="text-primary hover:underline"
-                        href={`https://warpcast.com/${farconPassHolder.username}`}
-                        target="_blank"
-                      >
-                        {farconPassHolder.username}
-                      </Link>
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-row gap-4">
-                      <Image
-                        src={farconPassHolder.image}
-                        alt={farconPassHolder.username}
-                        width={50}
-                        height={50}
-                        className="rounded-full object-cover"
-                      />
-                      <div className="flex flex-col gap-2">
-                        <p className="text-xl font-semibold tracking-tight">
+      {isAPassHolder &&
+        !loader &&
+        farconPassHolders &&
+        topAlignedUsers.length > 0 && (
+          <Card className="flex flex-col gap-2 p-4">
+            <p className="font-semibold text-lg">Most ||aligned</p>
+            <div className="flex flex-col md:flex-row gap-2 justify-evenly w-[100%] m-auto">
+              {topAlignedUsers.map((farconPassHolder, index) => {
+                if (farconPassHolder.fid === String(user?.farcaster?.fid || 0))
+                  return null;
+                return (
+                  <Card key={index} className="w-full bg-gray-400/30">
+                    <CardHeader>
+                      <CardDescription className="text-white">
+                        We Recommend you meet{" "}
+                        <Link
+                          className="text-primary hover:underline"
+                          href={`https://warpcast.com/${farconPassHolder.username}`}
+                          target="_blank"
+                        >
                           {farconPassHolder.username}
-                        </p>
-                        <p className="text-primary">
-                          {farconPassHolder.alignment?.toFixed(2)}% ||Aligned
-                        </p>
+                        </Link>
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex flex-row gap-4">
+                        <Image
+                          src={farconPassHolder.image}
+                          alt={farconPassHolder.username}
+                          width={50}
+                          height={50}
+                          className="rounded-full object-cover"
+                        />
+                        <div className="flex flex-col gap-2">
+                          <p className="text-xl font-semibold tracking-tight">
+                            {farconPassHolder.username}
+                          </p>
+                          <p className="text-primary">
+                            {farconPassHolder.alignment?.toFixed()}% ||Aligned
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </Card>
-      )}
-      {!loader && user?.farcaster?.fid === undefined && (
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </Card>
+        )}
+
+      {!loader && authenticated && user?.farcaster?.fid === undefined && (
         <Alert variant="destructive">
           <ExclamationTriangleIcon className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
@@ -203,7 +157,7 @@ const FarconPage = () => {
           </AlertDescription>
         </Alert>
       )}
-      {!loader && user?.farcaster?.fid && !isAPassHolder && (
+      {!loader && authenticated && isAPassHolder === false && (
         <Alert variant="destructive">
           <ExclamationTriangleIcon className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
@@ -216,46 +170,56 @@ const FarconPage = () => {
         </div>
       )}
 
-      <p className="font-semibold text-lg">Everyone else</p>
-      {filteredUsers &&
-        filteredUsers
-          .slice(mostAligned?.length ?? 0)
-          .map((farconPassHolder, index) => {
-            if (farconPassHolder.fid === String(user?.farcaster?.fid || 0))
-              return;
-            return (
-              <Card
-                className="px-4 py-2 flex flex-row gap-4 items-center rounded-md"
-                key={index}
+      {filteredUsers.length > 0 && (
+        <p className="font-semibold text-lg">Everyone else</p>
+      )}
+
+      {filteredUsers.length > 0 &&
+        filteredUsers.map((farconPassHolder, index) => {
+          if (farconPassHolder.fid === String(user?.farcaster?.fid || 0))
+            return;
+          if (
+            topAlignedUsers &&
+            topAlignedUsers.length > 0 &&
+            topAlignedUsers
+              .slice(0, 3)
+              .some((holder) => holder.fid === farconPassHolder.fid)
+          ) {
+            return;
+          }
+          return (
+            <Card
+              className="px-4 py-2 flex flex-row gap-4 items-center rounded-md"
+              key={index}
+            >
+              <Avatar>
+                <AvatarImage src={farconPassHolder.image} />
+                <AvatarFallback>{farconPassHolder.username}</AvatarFallback>
+              </Avatar>
+              <div className="flex-grow gap-2 ">
+                <p className="scroll-m-20 text-xl md:text-2xl font-semibold tracking-tight text-primary">
+                  {farconPassHolder.username}
+                </p>
+                <div className="flex-row gap-2 flex-wrap my-1 hidden md:flex">
+                  {farconPassHolder.address.length > 0 &&
+                    farconPassHolder.address.map((address) => (
+                      <Badge key={address} variant="secondary">
+                        {address.slice(0, 6)}...{address.slice(-4)}
+                      </Badge>
+                    ))}
+                </div>{" "}
+              </div>
+              <Badge
+                variant="secondary"
+                className={`text-lg w-40 flex justify-center text-green-400 border-[1px] border-white/40 ${
+                  !isAPassHolder && "blur-md"
+                }`}
               >
-                <Avatar>
-                  <AvatarImage src={farconPassHolder.image} />
-                  <AvatarFallback>{farconPassHolder.username}</AvatarFallback>
-                </Avatar>
-                <div className="flex-grow gap-2 ">
-                  <p className="scroll-m-20 text-xl md:text-2xl font-semibold tracking-tight text-primary">
-                    {farconPassHolder.username}
-                  </p>
-                  <div className="flex-row gap-2 flex-wrap my-1 hidden md:flex">
-                    {farconPassHolder.address.length > 0 &&
-                      farconPassHolder.address.map((address) => (
-                        <Badge key={address} variant="secondary">
-                          {address.slice(0, 6)}...{address.slice(-4)}
-                        </Badge>
-                      ))}
-                  </div>{" "}
-                </div>
-                <Badge
-                  variant="secondary"
-                  className={`text-lg w-40 flex justify-center text-green-400 border-[1px] border-white/40 ${
-                    !isAPassHolder && "blur-md"
-                  }`}
-                >
-                  {farconPassHolder.alignment?.toFixed(2) || 0}% ||Aligned
-                </Badge>
-              </Card>
-            );
-          })}
+                {farconPassHolder.alignment?.toFixed() || 0}% ||Aligned
+              </Badge>
+            </Card>
+          );
+        })}
     </div>
   );
 };

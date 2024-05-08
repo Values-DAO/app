@@ -1,14 +1,7 @@
 import Project from "@/models/project";
 import React from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import Image from "next/image";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+
 import {Button} from "@/components/ui/button";
 import Link from "next/link";
 import {Badge} from "@/components/ui/badge";

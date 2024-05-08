@@ -27,8 +27,7 @@ export async function POST(req: NextRequest) {
       type,
       farcaster,
     } = await req.json();
-    console.log(email, wallets, method, mintedValues, balance, type, farcaster);
-    // Request validation
+
     if (!method) {
       return NextResponse.json({error: "Method is required", status: 400});
     }
@@ -58,6 +57,7 @@ export async function POST(req: NextRequest) {
           inviteCodes: codes.map((inviteCode) => ({code: inviteCode})),
           ...(farcaster ? {farcaster} : {}),
           ...(email ? {email} : {}),
+          mintedValues: mintedValues || [],
         });
 
         const inviteCodesData = codes.map((inviteCode) => ({
@@ -68,9 +68,12 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json(createdUser);
       case "update":
-        console.log("Updating user");
         if (!user) {
-          return NextResponse.json({error: "User not found", status: 404});
+          return NextResponse.json({
+            user: null,
+            error: "User not found",
+            status: 404,
+          });
         }
         if (mintedValues) {
           user.mintedValues.push(...mintedValues);
@@ -83,12 +86,15 @@ export async function POST(req: NextRequest) {
             type === "add" ? user.balance + balance : user.balance - balance;
         }
         await user.save();
-        console.log("User updated", user);
 
         return NextResponse.json({user, status: 200});
       case "add_wallet":
         if (!user) {
-          return NextResponse.json({error: "User not found", status: 404});
+          return NextResponse.json({
+            user: null,
+            error: "User not found",
+            status: 404,
+          });
         }
         for (const w of wallets) {
           if (!user.wallets.includes(w)) user.wallets.push(w);

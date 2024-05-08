@@ -29,6 +29,7 @@
     "lucide-react": "^0.373.0",
     "mongodb": "^6.5.0",
     "mongoose": "^8.3.2",
+    "moralis": "^2.26.1",
     "next": "14.2.3",
     "openai": "^4.38.5",
     "react": "^18",

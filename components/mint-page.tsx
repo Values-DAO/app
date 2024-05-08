@@ -1,9 +1,10 @@
 "use client";
-import useValues from "@/app/hooks/useValues";
+import {useEffect, useState} from "react";
+import Image from "next/image";
+import Link from "next/link";
 import GenerateNewValueCard from "@/components/generate-new-value-card";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -16,26 +17,27 @@ import {Input} from "@/components/ui/input";
 import {ToastAction} from "@/components/ui/toast";
 import {toast} from "@/components/ui/use-toast";
 import ValuesWordCloud from "@/components/ui/values-word-cloud";
-import {NFT_CONTRACT_ABI, NFT_CONTRACT_ADDRESS} from "@/lib/constants";
-import {IUser} from "@/models/user";
+
+import {useUserContext} from "@/providers/user-context-provider";
 import {IValuesData} from "@/types";
-import {usePrivy} from "@privy-io/react-auth";
-import axios from "axios";
+
 import {SearchIcon, Twitter} from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import {useEffect, useState} from "react";
-import {getAddress} from "viem";
-
+import {usePrivy} from "@privy-io/react-auth";
 import {privateKeyToAccount} from "viem/accounts";
-
 import {useAccount, useWriteContract} from "wagmi";
+import {getAddress} from "viem";
+import useValues from "@/app/hooks/useValues";
+import {NFT_CONTRACT_ABI, NFT_CONTRACT_ADDRESS} from "@/lib/constants";
 
 const MintPage = () => {
-  const [userData, setUserData] = useState<IUser>({balance: 5} as IUser);
-  const [availableValues, setAvailableValues] = useState<IValuesData>(
-    {} as IValuesData
-  );
+  const {updateUser, updateValue, addWallet} = useValues();
+  const {userInfo, setUserInfo, valuesAvailable, setValuesAvailable} =
+    useUserContext();
+  const {user, linkWallet, login, ready, authenticated, linkEmail} = usePrivy();
+
+  const {writeContractAsync} = useWriteContract();
+
+  const {address} = useAccount();
   const [valueMinted, setValueMinted] = useState<{
     value: string;
     hash: string;
@@ -45,32 +47,11 @@ const MintPage = () => {
   const [searchValue, setSearchValue] = useState("");
   const [loading, setLoading] = useState<{[key: string]: boolean}>({});
 
-  //Account Hooks
-  const {user, linkWallet, login, ready, authenticated, linkEmail} = usePrivy();
-
-  const {writeContractAsync} = useWriteContract();
-  const {
-    fetchUser,
-    userInfo,
-    updateUser,
-    updateValue,
-    fetchAllValues,
-    addWallet,
-  } = useValues();
-  const {isConnected, address} = useAccount();
   const [showGenerateNewValueCard, setShowGenerateNewValueCard] =
     useState(false);
-  const fetchUserData = async () => {
-    const response = await fetchUser({
-      ...(user?.email?.address ? {email: user.email.address} : {}),
-      ...(user?.farcaster?.fid ? {fid: user.farcaster.fid} : {}),
-    });
-
-    if (response) setUserData(response);
-  };
 
   const mintValue = async ({value, key}: {value: any; key: string}) => {
-    if (!value || !key) return;
+    if (!value || !key || !userInfo) return;
     const walletToUse = address ?? userInfo.wallets?.[0];
 
     if (walletToUse === undefined) {
@@ -81,7 +62,7 @@ const MintPage = () => {
       return;
     }
 
-    if (userData?.balance && userData?.balance > 0) {
+    if (userInfo?.balance && userInfo.balance > 0) {
       setLoading((prevLoading) => ({
         ...prevLoading,
         [key]: true,
@@ -98,23 +79,55 @@ const MintPage = () => {
           chainId: 84532,
         });
 
-        // If hash is available, sleep for 5 seconds
         if (hash) {
-          await new Promise((resolve) => setTimeout(resolve, 3000));
           setValueMinted({value: key, hash, showSuccessModal: true});
 
           await updateUser({
-            value: key,
-            hash,
+            values: [
+              {
+                value: key,
+                txHash: hash,
+              },
+            ],
+
             balance: 1,
             type: "sub",
           });
 
           await updateValue({value: key});
-
-          fetchUserData();
-          fetchValues();
           addWallet({wallets: [walletToUse]});
+          setUserInfo({
+            ...userInfo,
+            balance: userInfo.balance - 1,
+            mintedValues: [
+              ...(userInfo.mintedValues ?? []),
+              {
+                value: key,
+                txHash: hash,
+              },
+            ],
+          });
+
+          const newValuesAvailable = ((
+            prevValues: IValuesData
+          ): IValuesData => {
+            const newMinters = [
+              ...(prevValues[key]?.minters || []),
+              ...(typeof userInfo.email === "string" ? [userInfo.email] : []),
+              ...(typeof userInfo.farcaster === "string"
+                ? [userInfo.farcaster]
+                : []),
+            ];
+            return {
+              ...prevValues,
+              [key]: {
+                ...prevValues[key],
+                minters: newMinters,
+              },
+            };
+          })(valuesAvailable || {});
+
+          setValuesAvailable(newValuesAvailable);
           toast({
             title: `We just dropped few NFTs to your wallet`,
             description: `View them in your wallet (${walletToUse.slice(
@@ -165,16 +178,18 @@ const MintPage = () => {
   const hasMintedValue = async (value: string) => {
     if (
       !value ||
-      !userData ||
-      !userData.mintedValues ||
-      userData.mintedValues.length === 0
+      !userInfo ||
+      !userInfo.mintedValues ||
+      userInfo.mintedValues.length === 0
     )
       return false;
-    return userData.mintedValues.some(
+    return userInfo.mintedValues.some(
       (obj: {value: string; txHash: string}) => obj.value === value
     );
   };
-  const filteredDataPromises = Object.entries(availableValues)
+  const filteredDataPromises = Object.entries(
+    valuesAvailable ?? ({} as IValuesData)
+  )
     .filter(([key]) => key.includes(searchValue.toLowerCase()))
     .map(async ([key, value]) => {
       const hasMintedValueBefore = await hasMintedValue(key);
@@ -186,30 +201,17 @@ const MintPage = () => {
     );
     setFilteredData(filteredData);
   };
-  const fetchValues = async () => {
-    const response = await fetchAllValues();
-
-    if (response) setAvailableValues(response);
-  };
 
   useEffect(() => {
     fetchData();
-  }, [searchValue, userData]);
-
-  useEffect(() => {
-    fetchUserData();
-  }, [user]);
-
-  useEffect(() => {
-    fetchValues();
-  }, [user]);
+  }, [searchValue, userInfo]);
 
   return (
     <div className="flex justify-center">
       <div className="flex flex-col md:w-[900px] w-[98vw] max-w-[90%] m-auto">
-        <ValuesWordCloud refresh={availableValues} />
+        <ValuesWordCloud refresh={valuesAvailable} />
         <div className="flex flex-row justify-between items-center ">
-          <p className="p-4">Balance: ${userData?.balance ?? 0}</p>
+          <p className="p-4">Balance: ${userInfo?.balance ?? 0}</p>
           <Link href={"/farcon-aligned"}>
             <Button variant="default" className="text-md">
               Farcon
@@ -245,7 +247,9 @@ const MintPage = () => {
                           <span> {key}</span>
 
                           {address ||
-                          (userInfo.wallets && userInfo.wallets?.length > 0) ? (
+                          (userInfo &&
+                            userInfo.wallets &&
+                            userInfo.wallets?.length > 0) ? (
                             <Button
                               variant="default"
                               className="ml-auto h-8 w-32"

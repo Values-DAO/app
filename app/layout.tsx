@@ -6,6 +6,7 @@ import {cn} from "@/lib/utils";
 import Navbar from "@/components/ui/navbar";
 import Footer from "@/components/ui/footer";
 import {Toaster} from "@/components/ui/toaster";
+import {UserContextProvider} from "@/providers/user-context-provider";
 
 const inter = Inter({subsets: ["latin"], variable: "--font-sans"});
 
@@ -30,9 +31,11 @@ export default function RootLayout({
         )}
       >
         <Providers>
-          <Navbar />
-          <section className="flex-grow"> {children}</section>
-          <Toaster />
+          <UserContextProvider>
+            <Navbar />
+            <section className="flex-grow"> {children}</section>
+            <Toaster />
+          </UserContextProvider>
         </Providers>
         <Footer />
       </body>

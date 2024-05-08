@@ -6,5 +6,6 @@ export interface IValuesData {
       image: string;
     };
     cid: string;
+    minters: string[];
   };
 }

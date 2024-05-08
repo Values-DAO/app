@@ -5,16 +5,18 @@ import {usePrivy} from "@privy-io/react-auth";
 import {ToastAction} from "@radix-ui/react-toast";
 import axios from "axios";
 import {gql, GraphQLClient} from "graphql-request";
-import {useEffect, useState} from "react";
-import {parseEther} from "viem";
+
+import {formatEther, parseEther} from "viem";
+import Moralis from "moralis";
 import {
   useAccount,
   useChainId,
   useSendTransaction,
   useSwitchChain,
-  useWaitForTransactionReceipt,
   useWalletClient,
 } from "wagmi";
+import {IValuesData} from "@/types";
+import {supportedChainsMoralis} from "@/lib/constants";
 type FarcasterSocialData = {
   Socials: {
     Social: {
@@ -25,99 +27,49 @@ type FarcasterSocialData = {
   };
 };
 const useValues = () => {
-  const [isUserExist, setIsUserExist] = useState(false);
-  const [isUserVerified, setIsUserVerified] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [userInfo, setUserInfo] = useState<IUser>({} as IUser);
-  const {user, authenticated} = usePrivy();
+  const {user} = usePrivy();
   const {address} = useAccount();
   const {data: signer} = useWalletClient();
   const chainId = useChainId();
   const {switchChain} = useSwitchChain();
   const {sendTransaction, data: depositTxhash, error} = useSendTransaction();
 
-  useEffect(() => {
-    if (!authenticated) return;
-    const isUserExist = async () => {
-      setIsLoading(true);
+  const fetchUser = async (): Promise<{
+    user: IUser | null;
+    message: string;
+  }> => {
+    if (!user?.email?.address && !user?.farcaster?.fid) {
+      return {user: null, message: "No user data"};
+    }
 
-      if (user?.farcaster?.fid) {
-        const userInfo: IUser | null | undefined = await fetchUser({
-          fid: user?.farcaster?.fid,
-        });
-        const wallets = await fetchFarcasterUserWallets();
-        if (userInfo) {
-          setUserInfo(userInfo);
-          setIsUserExist(true);
-        }
+    const endpoint = user?.email?.address
+      ? `/api/user?email=${user?.email?.address}`
+      : `/api/user?fid=${user?.farcaster?.fid}`;
 
-        if (userInfo?.isVerified) {
-          setIsUserVerified(true);
-        }
-        if (userInfo === null) {
-          await createUser({wallets: wallets});
-        }
-      }
-      if (user?.email) {
-        const userInfo: IUser | null | undefined = await fetchUser({
-          email: user?.email?.address,
-        });
-
-        if (userInfo) {
-          setUserInfo(userInfo);
-          setIsUserExist(true);
-        }
-
-        if (userInfo?.isVerified) {
-          setIsUserVerified(true);
-        }
-        if (userInfo === null) {
-          await createUser({});
-        }
-      }
-      setIsLoading(false);
-    };
-    isUserExist();
-  }, [user]);
-
-  const fetchUser = async ({
-    email,
-    fid,
-  }: {
-    email?: string;
-    fid?: number;
-  }): Promise<IUser | null | undefined> => {
-    if (!email && !fid) return undefined;
-
-    if (email) {
-      const user = await axios.get(`/api/user?email=${email}`, {
+    try {
+      const {data} = await axios.get(endpoint, {
         headers: {
           "Content-Type": "application/json",
           "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
         },
       });
-      if (user.data.status === 404) {
-        return null;
-      }
-      return user.data.user;
-    }
-    if (fid) {
-      const user = await axios.get(`/api/user?fid=${fid}`, {
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
-        },
-      });
-      if (user.data.status === 404) {
-        return null;
+
+      if (data.status === 404) {
+        return {user: null, message: "User not found"};
       }
 
-      return user.data.user;
+      return {user: data.user, message: "User found"};
+    } catch (error) {
+      return {user: null, message: error as string};
     }
-    return null;
   };
-  const createUser = async ({wallets}: {wallets?: string[]}) => {
-    if (!user?.email?.address && !user?.farcaster?.fid) return;
+  const createUser = async ({
+    wallets,
+  }: {
+    wallets?: string[];
+  }): Promise<{user: IUser | null; message: string}> => {
+    if (!user?.email?.address && !user?.farcaster?.fid)
+      return {user: null, message: "No user data"};
 
     try {
       const userCreated = await axios.post(
@@ -128,6 +80,7 @@ const useValues = () => {
           wallets: wallets || [],
           method: "create_user",
           balance: 5,
+          mintedValues: [],
         },
         {
           headers: {
@@ -136,36 +89,72 @@ const useValues = () => {
           },
         }
       );
-      return user;
+      return {user: userCreated as IUser, message: "User created successfully"};
     } catch (error) {
-      return error;
+      return {
+        user: null,
+        message: error as string,
+      };
     }
   };
   const updateUser = async ({
-    value,
-    hash,
+    values,
     balance,
     type,
   }: {
-    value: string;
-    hash: string;
-    balance: number;
-    type: string;
-  }) => {
+    values: {value: string; txHash: string}[];
+    balance?: number;
+    type?: string;
+  }): Promise<{user: IUser | null; message: string}> => {
+    if (!user?.email?.address && !user?.farcaster?.fid)
+      return {user: null, message: "No user data"};
+
     try {
       const response = await axios.post(
         "/api/user",
         {
           method: "update",
-          mintedValues: [
-            {
-              value,
-              txHash: hash,
-            },
-          ],
-          type,
-          balance,
+          mintedValues: values,
+          ...(balance && {balance}),
+          ...(type && {type}),
+          ...(user?.email?.address && {email: user?.email?.address}),
+          ...(user?.farcaster?.fid && {farcaster: user?.farcaster?.fid}),
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+          },
+        }
+      );
 
+      return {user: response.data, message: "User updated successfully"};
+    } catch (error) {
+      return {user: null, message: error as string};
+    }
+  };
+
+  const createNewValue = async ({
+    name,
+    value,
+    minters,
+  }: {
+    name: string;
+    value: IValuesData;
+    minters: string[];
+  }): Promise<{
+    value: IValuesData | null;
+    message: string;
+  }> => {
+    if (!name || !value || !minters) return {value: null, message: "No data"};
+    try {
+      const response = await axios.post(
+        "/api/value",
+        {
+          name,
+          value,
+          minters,
+          method: "create",
           ...(user?.email?.address ? {email: user?.email?.address} : {}),
           ...(user?.farcaster?.fid ? {farcaster: user?.farcaster?.fid} : {}),
         },
@@ -176,13 +165,18 @@ const useValues = () => {
           },
         }
       );
-
-      return response.data;
+      return {value: response.data, message: "Value created successfully"};
     } catch (error) {
-      return error;
+      return {
+        value: null,
+        message: error as string,
+      };
     }
   };
-  const fetchAllValues = async () => {
+  const fetchAllValues = async (): Promise<{
+    values: IValuesData;
+    message: string;
+  }> => {
     try {
       const response = await axios.get("/api/value", {
         headers: {
@@ -190,13 +184,27 @@ const useValues = () => {
           "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
         },
       });
-      return response.data;
+      return {values: response.data, message: "Values fetched successfully"};
     } catch (error) {
-      return error;
+      return {
+        values: {},
+        message: error as string,
+      };
     }
   };
-  const updateValue = async ({value}: {value: string}) => {
-    if (!user?.email?.address && !user?.farcaster?.fid) return;
+  const updateValue = async ({
+    value,
+  }: {
+    value: string;
+  }): Promise<{
+    value: IValuesData | null;
+    message: string;
+  }> => {
+    if (!user?.email?.address && !user?.farcaster?.fid)
+      return {
+        value: null,
+        message: "No data",
+      };
 
     try {
       const response = await axios.post(
@@ -213,16 +221,38 @@ const useValues = () => {
           },
         }
       );
-      return response.data;
+      return {value: response.data, message: "Value updated successfully"};
     } catch (error) {
-      return error;
+      return {
+        value: null,
+        message: error as string,
+      };
     }
   };
-  const validateInviteCode = async ({inviteCode}: {inviteCode: string}) => {
-    if (!inviteCode) return false;
-    if (user?.email?.address) {
-      const response = await axios.get(
-        `/api/validate-code?code=${inviteCode}&email=${user?.email?.address}`,
+
+  const updateValuesBulk = async ({
+    values,
+  }: {
+    values: string[];
+  }): Promise<{
+    values: IValuesData[] | null;
+    message: string;
+  }> => {
+    if (!user?.email?.address && !user?.farcaster?.fid) {
+      return {
+        values: null,
+        message: "No data",
+      };
+    }
+
+    try {
+      const response = await axios.post(
+        "/api/value",
+        {
+          value: values,
+          ...(user?.email?.address ? {email: user?.email?.address} : {}),
+          ...(user?.farcaster?.fid ? {farcaster: user?.farcaster?.fid} : {}),
+        },
         {
           headers: {
             "Content-Type": "application/json",
@@ -230,31 +260,51 @@ const useValues = () => {
           },
         }
       );
-
-      const {isValid} = response.data;
-      setIsUserVerified(isValid);
-      return isValid;
+      return {
+        values: response.data.values,
+        message: "Values updated successfully",
+      };
+    } catch (error) {
+      return {
+        values: null,
+        message: error as string,
+      };
     }
-    if (user?.farcaster?.fid) {
-      const response = await axios.get(
-        `/api/validate-code?code=${inviteCode}&fid=${user?.farcaster?.fid}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
-          },
-        }
-      );
-
-      const {isValid} = response.data;
-      setIsUserVerified(isValid);
-
-      return isValid;
+  };
+  const validateInviteCode = async ({
+    inviteCode,
+  }: {
+    inviteCode: string;
+  }): Promise<{isValid: boolean; message: string; user: IUser | null}> => {
+    if (!inviteCode) {
+      return {isValid: false, message: "No invite code provided", user: null};
     }
-    return false;
+
+    const endpoint = user?.email?.address
+      ? `/api/validate-code?code=${inviteCode}&email=${user?.email?.address}`
+      : `/api/validate-code?code=${inviteCode}&fid=${user?.farcaster?.fid}`;
+
+    try {
+      const response = await axios.get(endpoint, {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+        },
+      });
+
+      const {isValid, user} = response.data;
+
+      return {
+        isValid,
+        message: isValid ? "Code is valid" : "Code is invalid",
+        user,
+      };
+    } catch (error) {
+      return {isValid: false, message: error as string, user: null};
+    }
   };
 
-  const deposiFunds = async ({email, fid}: {email?: string; fid?: string}) => {
+  const depositFunds = async ({email, fid}: {email?: string; fid?: string}) => {
     if (!address || !signer) return;
     if (!email && !fid) {
       console.log("Please provide an email or farcaster id");
@@ -302,8 +352,8 @@ const useValues = () => {
     return;
   };
 
-  const fetchFarcasterUserWallets = async () => {
-    if (!user?.farcaster?.fid) return;
+  const fetchFarcasterUserWallets = async (): Promise<string[]> => {
+    if (!user?.farcaster?.fid) return [];
 
     const query = gql`
       query MyQuery {
@@ -339,7 +389,14 @@ const useValues = () => {
     }
   };
 
-  const addWallet = async ({wallets}: {wallets: string[]}) => {
+  const addWallet = async ({
+    wallets,
+  }: {
+    wallets: string[];
+  }): Promise<{
+    user: IUser | null;
+    message: string;
+  }> => {
     try {
       const response = await axios.post(
         "/api/user",
@@ -356,28 +413,79 @@ const useValues = () => {
           },
         }
       );
-      return response.data;
+      return {user: response.data, message: "Wallet added successfully"};
+    } catch (error) {
+      return {
+        user: null,
+        message: error as string,
+      };
+    }
+  };
+  const fetchCommunityProjects = async ({id}: {id: string}) => {
+    if (!id) return;
+    try {
+      const projectData = await axios.get(`/api/project?id=${id}`, {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+        },
+      });
+
+      return projectData.data.project;
     } catch (error) {
       return error;
     }
   };
 
+  const isAHolderOfToken = async ({
+    tokenAddress,
+    chain,
+  }: {
+    tokenAddress: string;
+    chain: number;
+  }) => {
+    const userInfo = await fetchUser();
+
+    const wallets = [...(userInfo?.user?.wallets ?? []), address!];
+    if (!wallets || !tokenAddress || !chain) return;
+    let balance = 0;
+    try {
+      for (const wallet of wallets) {
+        if (!wallet) continue;
+        const response = await axios.get(
+          `https://deep-index.moralis.io/api/v2.2/${wallet}/erc20?chain=${
+            supportedChainsMoralis[chain] ?? "eth"
+          }&token_addresses%5B0%5D=${tokenAddress}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "X-API-Key": process.env.NEXT_PUBLIC_MORALIS_API_KEY as string,
+            },
+          }
+        );
+
+        balance += response.data[0].balance;
+      }
+      return balance / 10 ** 18;
+    } catch (e) {
+      console.error(e);
+      return 0;
+    }
+  };
   return {
     fetchUser,
     createUser,
-    isUserExist,
-    isUserVerified,
-    setIsUserExist,
-    setIsUserVerified,
-    userInfo,
-    setUserInfo,
-    isLoading,
+    createNewValue,
     validateInviteCode,
-    deposiFunds,
+    depositFunds,
     updateUser,
     updateValue,
     fetchAllValues,
     addWallet,
+    fetchCommunityProjects,
+    updateValuesBulk,
+    isAHolderOfToken,
+    fetchFarcasterUserWallets,
   };
 };
 

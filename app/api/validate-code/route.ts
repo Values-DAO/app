@@ -47,7 +47,7 @@ export async function GET(req: any) {
         {new: true}
       );
 
-      return NextResponse.json({status: 200, isValid: true});
+      return NextResponse.json({status: 200, isValid: true, user});
     }
     if (!existingCode || existingCode.claimed) {
       return NextResponse.json({
@@ -70,7 +70,7 @@ export async function GET(req: any) {
       throw {message: "User not found", status: 404};
     }
 
-    return NextResponse.json({status: 200, isValid: true});
+    return NextResponse.json({status: 200, isValid: true, user});
   } catch (error) {
     return NextResponse.json({
       status: 500,

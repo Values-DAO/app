@@ -1,19 +1,11 @@
 "use client";
 import React, {useEffect, useState} from "react";
-import axios from "axios";
-import Image from "next/image";
+
 import {Badge} from "@/components/ui/badge";
 import {IProject} from "@/models/project";
 import {Button} from "@/components/ui/button";
-import {
-  useAccount,
-  useConnect,
-  useDisconnect,
-  useReadContract,
-  useWriteContract,
-} from "wagmi";
+import {useAccount, useDisconnect, useWriteContract} from "wagmi";
 
-import {erc20Abi} from "viem";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 import {RocketIcon, WandSparklesIcon} from "lucide-react";
 
@@ -27,110 +19,66 @@ import {Skeleton} from "@/components/ui/skeleton";
 import InviteCodeModal from "@/components/invite-code-modal";
 import useValues from "@/app/hooks/useValues";
 
+import {useUserContext} from "@/providers/user-context-provider";
+
 interface pageProps {
   params: {id: string};
 }
 
 const ProjectsPage: React.FC<pageProps> = ({params}) => {
-  const {user, login, authenticated, linkWallet, linkEmail} = usePrivy();
+  const {user, login, linkWallet} = usePrivy();
+  const {userInfo, valuesAvailable} = useUserContext();
+  const {
+    fetchCommunityProjects,
+
+    updateUser,
+    isAHolderOfToken,
+    updateValuesBulk,
+  } = useValues();
   const {address} = useAccount();
   const {disconnect} = useDisconnect();
-  const {writeContractAsync, isError, failureReason} = useWriteContract();
+  const {writeContractAsync} = useWriteContract();
   const [project, setProject] = useState<IProject | null>(null);
-  const {userInfo} = useValues();
-  const [valuesFromDB, setValuesFromDB] = useState<any>([]);
-
   const [loader, setLoader] = useState(false);
+  const [tokenBalance, setTokenBalance] = useState<number | null>(null);
   const id = params.id.split("-").pop();
-  const [isUserVerified, setIsUserVerified] = useState(false);
-  const {data: userBalanceOfToken} = useReadContract({
-    abi: erc20Abi,
-    address: project?.contractAddress! as `0x${string}`,
-    functionName: "balanceOf",
-    args: [address!],
-    chainId: Number(project?.chainId!),
-  });
 
   useEffect(() => {
     const fetchProjectData = async () => {
       setLoader(true);
-      const projectData = await axios.get(`/api/project?id=${id}`, {
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
-        },
-      });
-      if (projectData.data.status === 200) setProject(projectData.data.project);
+      const projectData = await fetchCommunityProjects({id: id as string});
+      if (projectData) setProject(projectData);
       setLoader(false);
     };
+
     fetchProjectData();
   }, []);
 
-  useEffect(() => {
-    const fetchValuesFromDB = async () => {
-      const values = await axios.get(`/api/value`, {
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
-        },
-      });
-
-      setValuesFromDB(values.data);
-    };
-    fetchValuesFromDB();
-  }, []);
-  useEffect(() => {
-    if (!user?.email?.address) return;
-
-    const isUserExist = async () => {
-      if (authenticated) {
-        const existingUser = await fetch(
-          `/api/user?email=${user?.email?.address}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
-            },
-          }
-        );
-        const data = await existingUser.json();
-
-        if (data?.user?.isVerified) {
-          setIsUserVerified(true);
-        }
-        if (data.status === 404) {
-          await fetch(`/api/user`, {
-            method: "POST",
-
-            headers: {
-              "Content-Type": "application/json",
-              "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
-            },
-
-            body: JSON.stringify({
-              email: user?.email?.address,
-              wallets: [],
-              method: "create_user",
-              balance: 5,
-            }),
-          });
-        }
-      }
-    };
-    isUserExist();
-  }, [user?.email?.address, authenticated, user]);
   const mintValues = async () => {
+    const wallets = [...(userInfo?.wallets ?? []), address!];
+    if (!wallets) {
+      toast({
+        title: "Please connect a wallet",
+        description: "You need to connect a wallet to mint values",
+        variant: "destructive",
+      });
+      return;
+    }
     setLoader(true);
 
     const cidsToMint = [];
     const valuesMinted = [];
     if (project?.values)
       for (const value of project?.values) {
-        const existingValue = valuesFromDB[value.toLowerCase()];
+        if (!valuesAvailable || !userInfo) return;
+        const existingValue = valuesAvailable[value.toLowerCase()];
 
         if (existingValue) {
-          if (existingValue.minters?.includes(user?.email?.address)) {
-            console.log("Already minted");
+          if (
+            existingValue.minters?.includes(
+              (userInfo?.email || userInfo?.farcaster?.toString()) as string
+            )
+          ) {
             continue;
           }
 
@@ -138,47 +86,34 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
           valuesMinted.push(value.toLowerCase());
         }
       }
+    if (cidsToMint.length === 0) {
+      setLoader(false);
+      toast({
+        title: "You already hold these Values",
+        description: "View them in your wallet",
+      });
+      return;
+    }
     const hash = await writeContractAsync({
       abi: NFT_CONTRACT_ABI,
       address: NFT_CONTRACT_ADDRESS,
       functionName: "batchMint",
-      args: [address, cidsToMint],
+      args: [wallets[0], cidsToMint],
       account: privateKeyToAccount(
         process.env.NEXT_PUBLIC_ADMIN_WALLET_PRIVATE_KEY as `0x${string}`
       ),
       chainId: 84532,
     });
 
-    await axios.post(
-      "/api/user",
-      {
-        method: "update",
-        mintedValues: valuesMinted.map((value) => {
-          return {value: value, txHash: hash};
-        }),
-        email: user?.email?.address,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
-        },
-      }
-    );
+    await updateUser({
+      values: valuesMinted.map((value) => {
+        return {value: value, txHash: hash};
+      }),
+    });
 
-    await axios.post(
-      "/api/value",
-      {
-        email: user?.email?.address,
-        value: valuesMinted,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
-        },
-      }
-    );
+    await updateValuesBulk({
+      values: valuesMinted,
+    });
     if (hash) {
       toast({
         title: "We just dropped Value NFTs to your wallet",
@@ -194,9 +129,21 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
     setLoader(false);
   };
 
+  useEffect(() => {
+    const fetchUserTokenBalance = async () => {
+      const tokenbalance = await isAHolderOfToken({
+        tokenAddress: project?.contractAddress as `0x${string}`,
+
+        chain: Number(project?.chainId!),
+      });
+      if (tokenbalance) setTokenBalance(tokenbalance);
+    };
+    fetchUserTokenBalance();
+  }, [project, address, user, userInfo]);
+
   return (
     <>
-      {userInfo.isVerified || isUserVerified ? (
+      {userInfo && userInfo.isVerified && (
         <main className="p-4 overflow-y-auto">
           {project && (
             <section className="flex flex-col items-center md:items-start md:flex-row gap-4">
@@ -227,7 +174,7 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
                   ))}
                 </div>
 
-                {user?.email?.address && !address && (
+                {!userInfo.wallets && !address && (
                   <Button
                     variant="secondary"
                     onClick={linkWallet}
@@ -237,28 +184,18 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
                   </Button>
                 )}
 
-                {user?.email?.address &&
-                  address &&
-                  Number(userBalanceOfToken) > 0 && (
+                {(userInfo.wallets || address) &&
+                  tokenBalance &&
+                  tokenBalance > 0 && (
                     <Button
                       className="mt-4 w-full"
-                      disabled={Number(userBalanceOfToken) <= 0 || loader}
+                      disabled={tokenBalance <= 0 || loader}
                       onClick={mintValues}
                       variant="secondary"
                     >
                       {loader ? "Minting..." : "Mint Values"}
                     </Button>
                   )}
-
-                {user && !user?.email?.address && (
-                  <Button
-                    variant="secondary"
-                    onClick={linkEmail}
-                    className="w-full"
-                  >
-                    Link Email
-                  </Button>
-                )}
 
                 {!user && (
                   <Button
@@ -270,7 +207,7 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
                   </Button>
                 )}
 
-                {user && address && Number(userBalanceOfToken) <= 0 && (
+                {tokenBalance && tokenBalance <= 0 && (
                   <Alert className="my-8">
                     <WandSparklesIcon className="h-4 w-4" />
                     <AlertTitle className="leading-2">
@@ -290,11 +227,11 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
                     </AlertDescription>
                   </Alert>
                 )}
-                {user && address && Number(userBalanceOfToken) > 0 && (
+                {tokenBalance && tokenBalance > 0 && (
                   <Alert className="my-8">
                     <RocketIcon className="h-4 w-4" />
                     <AlertTitle>
-                      You hold {Number(userBalanceOfToken).toFixed()}{" "}
+                      You hold {tokenBalance.toFixed(2)}{" "}
                       {project.category === "NFT" ? "NFT" : "tokens"} from this
                       project.
                     </AlertTitle>
@@ -315,13 +252,11 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
             </div>
           )}
         </main>
-      ) : (
+      )}
+
+      {userInfo && userInfo?.isVerified === false && (
         <div className="flex flex-col items-center px-6 mt-[40%] md:mt-[15%]">
-          <InviteCodeModal
-            onSuccess={() => {
-              setIsUserVerified(true);
-            }}
-          />
+          <InviteCodeModal />
         </div>
       )}
     </>

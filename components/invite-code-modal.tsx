@@ -12,22 +12,23 @@ import {Input} from "./ui/input";
 import Image from "next/image";
 import useValues from "@/app/hooks/useValues";
 import Link from "next/link";
-interface InviteCodeModalProps {
-  onSuccess: () => void;
-}
+import {useUserContext} from "@/providers/user-context-provider";
+interface InviteCodeModalProps {}
 
-const InviteCodeModal: React.FC<InviteCodeModalProps> = ({onSuccess}) => {
+const InviteCodeModal: React.FC<InviteCodeModalProps> = ({}) => {
   const [value, setValue] = useState("");
-  const {user, linkEmail} = usePrivy();
+  const {user} = usePrivy();
   const [showInvalidCode, setShowInvalidCode] = useState(false);
   const {validateInviteCode} = useValues();
-
+  const {setUserInfo} = useUserContext();
   const isValid = async () => {
-    const isValid = await validateInviteCode({
+    const response = await validateInviteCode({
       inviteCode: value,
     });
-    if (isValid) onSuccess();
-    if (!isValid) {
+    if (response.isValid) {
+      setUserInfo(response.user ?? {});
+    }
+    if (!response.isValid) {
       setShowInvalidCode(true);
       setValue("");
     }

@@ -607,3 +607,9 @@ export const FARCON_TICKETS = {
   community: "0x238b522fa4d04bfe0b9b875e9ccea6d3f98d51d2",
   vibes: "0x27fb25e111d2540b195a4a0c6e471a5e7e8cd6ec",
 };
+
+export const supportedChainsMoralis: {[key: number]: string} = {
+  1: "eth",
+  10: "optimism",
+  137: "polygon",
+};

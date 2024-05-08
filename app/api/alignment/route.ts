@@ -24,40 +24,52 @@ export const GET = async (req: any) => {
       return NextResponse.json({error: "User not found", status: 404});
     }
 
-    const sourceValues = user.mintedValues.map((item) => item.value);
+    const sourceValues = user.mintedValues?.map((item) => item.value) ?? [];
 
     const farconPassholders = await Farcon.find({}, {__v: 0, _id: 0});
 
-    // Fetch all users at once based on the fids from farconPassholders
     const fids = farconPassholders.map((holder) => holder.fid);
 
     const users = await User.find({farcaster: {$in: fids}});
 
     const userMap = new Map(users.map((user) => [user.farcaster, user]));
 
-    const alignmentOfHolder = farconPassholders.map((holder) => {
-      const farconUser: IUser = userMap.get(Number(holder.fid) || "");
+    const alignmentOfHolder = farconPassholders
+      .map((holder) => {
+        const farconUser: IUser = userMap.get(Number(holder.fid) || "");
+        if (holder.fid === currentUserFid) {
+          return null;
+        }
+        if (!farconUser) {
+          return {
+            fid: holder.fid,
+            alignment: 0,
+            messages: "User not found",
+            username: holder.username,
+            image: holder.image,
+            address: holder.address,
+          };
+        }
 
-      if (!farconUser) {
+        const partnerValues =
+          farconUser.mintedValues?.map((item) => item.value) ?? [];
+        const intersection = partnerValues
+          ? sourceValues.filter((value: any) => partnerValues.includes(value))
+          : [];
+        const union = Array.from(new Set([...sourceValues, ...partnerValues]));
+        const percentageAlignment = (intersection.length / union.length) * 100;
+
         return {
           fid: holder.fid,
-          alignment: 0,
-          messages: "User not found",
+          alignment: percentageAlignment,
+          username: holder.username,
+          image: holder.image,
+          address: holder.address,
         };
-      }
+      })
+      .filter((holder) => holder !== null);
 
-      const partnerValues = farconUser.mintedValues.map((item) => item.value);
-      const intersection = sourceValues.filter((value) =>
-        partnerValues.includes(value)
-      );
-      const union = Array.from(new Set([...sourceValues, ...partnerValues]));
-      const percentageAlignment = (intersection.length / union.length) * 100;
-
-      return {
-        fid: holder.fid,
-        alignment: percentageAlignment,
-      };
-    });
+    alignmentOfHolder.sort((a, b) => b.alignment - a.alignment);
 
     return NextResponse.json({holders: alignmentOfHolder, status: 200});
   } catch (error) {

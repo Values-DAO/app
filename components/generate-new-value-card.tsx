@@ -8,6 +8,8 @@ import {toast} from "./ui/use-toast";
 import {generateDescription} from "@/lib/generate-description";
 import {useAccount} from "wagmi";
 import {usePrivy} from "@privy-io/react-auth";
+import {useUserContext} from "@/providers/user-context-provider";
+import useValues from "@/app/hooks/useValues";
 
 interface GenerateNewValueCardProps {
   value: string;
@@ -28,9 +30,20 @@ const GenerateNewValueCard: React.FC<GenerateNewValueCardProps> = ({
     loading: false,
     text: "",
   });
-  const {isConnected} = useAccount();
+  const {address} = useAccount();
+  const {userInfo} = useUserContext();
+  const {createNewValue} = useValues();
   const {ready, linkWallet} = usePrivy();
   const generateImageFromOpenAI = async () => {
+    if (valuePrompt.length === 0) {
+      toast({
+        title: "Please enter your thoughts",
+        description:
+          "Please enter  your thoughts to proceed to minting this value",
+        variant: "destructive",
+      });
+      return;
+    }
     setLoading({
       loading: true,
       text: "Generating image...",
@@ -73,10 +86,12 @@ const GenerateNewValueCard: React.FC<GenerateNewValueCardProps> = ({
   };
 
   const mintValue = async () => {
-    if (!isConnected) {
+    const wallets = [...(userInfo?.wallets || []), address];
+    if (wallets.length === 0) {
       toast({
         title: "Please connect your wallet",
         description: "You need to connect your wallet to mint a value",
+        variant: "destructive",
       });
       return;
     }
@@ -117,19 +132,13 @@ const GenerateNewValueCard: React.FC<GenerateNewValueCardProps> = ({
         },
         hasMintedValue: false,
       };
-      await axios.post(
-        "/api/value",
-        {
-          name: valueObject.value.metadata.name,
-          value: valueObject.value,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
-          },
-        }
-      );
+
+      await createNewValue({
+        name: valueObject.value.metadata.name,
+        value: valueObject.value,
+        minters: [],
+      });
+
       setLoading({
         loading: true,
         text: "Minting...",
@@ -158,7 +167,7 @@ const GenerateNewValueCard: React.FC<GenerateNewValueCardProps> = ({
       />
       {generatedImage !== null ? (
         <>
-          {isConnected ? (
+          {userInfo?.wallets || address ? (
             <Button
               className="mt-4 w-full cursor-pointer"
               onClick={mintValue}
