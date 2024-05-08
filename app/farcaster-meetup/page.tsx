@@ -19,6 +19,7 @@ import axios from "axios";
 import React, {useEffect, useState} from "react";
 import Link from "next/link";
 import Image from "next/image";
+import {Button} from "@/components/ui/button";
 interface FarconPassHolder {
   username: string;
   address: string[];
@@ -137,9 +138,12 @@ const FarconPage = () => {
                           <p className="text-xl font-semibold tracking-tight">
                             {farconPassHolder.username}
                           </p>
-                          <p className="text-primary">
-                            {farconPassHolder.alignment?.toFixed()}% ||Aligned
-                          </p>
+                          <Button
+                            variant={"default"}
+                            className="text-white font-bold hover:bg-green-500/40  bg-green-500"
+                          >
+                            {farconPassHolder.alignment?.toFixed()}% ||aligned
+                          </Button>
                         </div>
                       </div>
                     </CardContent>
