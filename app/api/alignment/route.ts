@@ -67,10 +67,10 @@ export const GET = async (req: any) => {
           address: holder.address,
         };
       })
+
       .filter((holder) => holder !== null);
 
-    alignmentOfHolder.sort((a, b) => b.alignment - a.alignment);
-
+    alignmentOfHolder.sort((a, b) => b!.alignment - a!.alignment);
     return NextResponse.json({holders: alignmentOfHolder, status: 200});
   } catch (error) {
     return NextResponse.json({

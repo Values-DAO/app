@@ -140,7 +140,7 @@ const useValues = () => {
     minters,
   }: {
     name: string;
-    value: IValuesData;
+    value: any;
     minters: string[];
   }): Promise<{
     value: IValuesData | null;
