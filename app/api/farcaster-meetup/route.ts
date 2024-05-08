@@ -26,7 +26,10 @@ export const POST = async (req: any) => {
   }
   const fetchFarconSummitHolders = async () => {
     const attendees = [
-      "0x9b98d145ca95f04b5a9355f41101b898f495e48d",
+      "0xae05751d86c113334109ef9fd0f924c12bd1fd51",
+      "0x538527f3602acad78596f17b422fcf5613af1409",
+      "0x7de72ba2ce33a101b225dd8119c8216267aefec6",
+      "0x55586a270ada7ed0bc94abe8e9bab08dc7bdb5ba",
       "0x3dbadfe41aa29fd69e541c34c372048c31725317",
       "0x86926b033bf15a05ee80e7510f6bf91671041400",
       "0xe2f0d0523f8dfcc80b544513fe38baedf5d19a2e",
@@ -48,6 +51,26 @@ export const POST = async (req: any) => {
       "0x74f42246f2cb65ec86b6ea43a8df27211c2aa89f",
       "0x83760d441dabc9ac87141a5d62ae8c371b26f124",
       "0x3d295f5cd5952f325650c7bd556872f25ec40d66",
+      "0x25571de579cbe167ae379adaa3c6456c1ebb7f6e",
+      "0xed08e483557bd0955fe5fdebe464293a961edaae",
+      "0x4622146b77ecefe4ca7552a81949d54eac991512",
+      "0xcc168396cb323f4828192b4d78c3f7848314228e",
+      "0x2e69082fd66bb416df9ff4762943796093f843c8",
+      "0xf502af70bbea89c4879d35165211f371380ac7a8",
+      "0x6443ed8a3ffb006e3bb5a866bae6edfb93f8ff3e",
+      "0x4d3c2990f37fb9813abd95f91aebdb6c42e18f97",
+      "0x7487a8845fb4153cec245779f34fd0773388c156",
+      "0x83437f4232f005830960bc6f1d7ba153b63a6376",
+      "0x93fd240c251cc609534226f60343d67040a4f9e0",
+      "2hsfb7GvSvwt3A1UoxnVrAMqCvhbWd4VCPa7SW4ySNVL",
+      "0xefcbf0a3c475780a4ed25158e35f528d929c9a23",
+      "0x06f16d4bf16cd1fc075ad079b506cafae8fdbfbb",
+      "0x1ec1ed57e467db06fd35a63b630f95a8437657bb",
+      "0xfe78ef88d4202da7abea9452f6373c5bdcdbd793",
+      "0xb995ae158f428bc45a4e488fd4d5e4be27d76bb4",
+      "0x66bb22073bac565389df3e569f2a60fcbb4f007d",
+      "0x74d0e99e28fd2c515d28ddc926caf80741b056bd",
+      "0x99508cb8ec66fb3726a09b8943f2ce1721048c46",
     ];
     return attendees;
   };

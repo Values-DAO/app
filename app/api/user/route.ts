@@ -54,6 +54,7 @@ export async function POST(req: NextRequest) {
         const createdUser = await User.create({
           wallets,
           balance: 5,
+          isVerified: true,
           inviteCodes: codes.map((inviteCode) => ({code: inviteCode})),
           ...(farcaster ? {farcaster} : {}),
           ...(email ? {email} : {}),

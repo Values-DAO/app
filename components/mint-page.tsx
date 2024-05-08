@@ -212,9 +212,9 @@ const MintPage = () => {
         <ValuesWordCloud refresh={valuesAvailable} />
         <div className="flex flex-row justify-between items-center ">
           <p className="p-4">Balance: ${userInfo?.balance ?? 0}</p>
-          <Link href={"/farcon-aligned"}>
+          <Link href={"/farcaster-meetup"}>
             <Button variant="default" className="text-md">
-              Farcon
+              Farcaster Meetup SF
             </Button>
           </Link>
         </div>

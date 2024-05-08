@@ -163,7 +163,7 @@ const FarconPage = () => {
         <Alert variant="destructive">
           <ExclamationTriangleIcon className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
-          <AlertDescription>You are not a farcon pass holder.</AlertDescription>
+          <AlertDescription>You are not a meetup attendee.</AlertDescription>
         </Alert>
       )}
       {loader && (
