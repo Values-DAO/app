@@ -29,6 +29,7 @@ export const POST = async (req: any) => {
       "0xae05751d86c113334109ef9fd0f924c12bd1fd51",
       "0x538527f3602acad78596f17b422fcf5613af1409",
       "0x7de72ba2ce33a101b225dd8119c8216267aefec6",
+      "0x1a3cde21e27ca9a2670c2c647550d39a72d9637c",
       "0x55586a270ada7ed0bc94abe8e9bab08dc7bdb5ba",
       "0x3dbadfe41aa29fd69e541c34c372048c31725317",
       "0x86926b033bf15a05ee80e7510f6bf91671041400",
