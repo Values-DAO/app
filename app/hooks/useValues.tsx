@@ -75,7 +75,9 @@ const useValues = () => {
       const userCreated = await axios.post(
         `/api/user`,
         {
-          ...(user?.email?.address ? {email: user?.email?.address} : {}),
+          ...(user?.email?.address
+            ? {email: user?.email?.address}
+            : {email: String(user?.farcaster?.fid)}),
           ...(user?.farcaster?.fid ? {farcaster: user?.farcaster?.fid} : {}),
           wallets: wallets || [],
           method: "create_user",
