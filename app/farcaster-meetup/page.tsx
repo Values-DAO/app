@@ -107,6 +107,24 @@ const FarconPage = () => {
         topAlignedUsers.length > 0 && (
           <Card className="flex flex-col gap-2 p-4">
             <p className="font-semibold text-lg">Most ||aligned</p>
+            <Card className="p-4">
+              <h3 className="scroll-m-20 text-xl font-medium tracking-tight py-4 px-2">
+                These are people you have the most potential to build trusted
+                relationship with. Connect with them:{" "}
+                <Link
+                  target="_blank"
+                  href={`https://warpcast.com/~/compose?text=Hey%20${topAlignedUsers
+                    .map((user) => `@${user.username}`)
+                    .join(
+                      "%20"
+                    )}%20I%20have%20been%20told%20by%20/ValuesDAO%20that%20our%20values%20align.%20Want%20to%20connect%20in%20DMs?&embeds[]=https://warpcast.com/~/channel/valuesdao`}
+                >
+                  <Button variant={"default"} className="mx-2">
+                    Click Here
+                  </Button>
+                </Link>
+              </h3>
+            </Card>
             <div className="flex flex-col md:flex-row gap-2 justify-evenly w-[100%] m-auto">
               {topAlignedUsers.map((farconPassHolder, index) => {
                 if (farconPassHolder.fid === String(user?.farcaster?.fid || 0))
