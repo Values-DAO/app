@@ -26,6 +26,7 @@ export const POST = async (req: any) => {
   }
   const fetchFarconSummitHolders = async () => {
     const attendees = [
+      "0x9b98d145ca95f04b5a9355f41101b898f495e48d",
       "0x3dbadfe41aa29fd69e541c34c372048c31725317",
       "0x86926b033bf15a05ee80e7510f6bf91671041400",
       "0xe2f0d0523f8dfcc80b544513fe38baedf5d19a2e",

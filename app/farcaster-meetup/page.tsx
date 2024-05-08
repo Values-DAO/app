@@ -85,7 +85,7 @@ const FarconPage = () => {
     <div className="flex flex-col gap-4 p-4">
       <div className="flex flex-col gap-2 ">
         <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
-          The Farcon Pass Holders
+          The Farcaster Meetup SF
         </h2>
         <Input
           placeholder="Search for a warpcast username"

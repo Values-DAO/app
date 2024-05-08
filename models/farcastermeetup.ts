@@ -13,5 +13,6 @@ const farcasterMeetup = new Schema({
 });
 
 const FarcasterMeetup =
-  models.Farcon || model<IFARCASTERMEETUP>("FarcasterMeetup", farcasterMeetup);
+  models.FarcasterMeetup ||
+  model<IFARCASTERMEETUP>("FarcasterMeetup", farcasterMeetup);
 export default FarcasterMeetup;
