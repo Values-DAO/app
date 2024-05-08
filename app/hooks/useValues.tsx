@@ -91,7 +91,7 @@ const useValues = () => {
           },
         }
       );
-      return {user: userCreated as IUser, message: "User created successfully"};
+      return {user: userCreated.data, message: "User created successfully"};
     } catch (error) {
       return {
         user: null,
