@@ -87,6 +87,6 @@ userSchema.pre("save", async function (next) {
   );
   next();
 });
-
+userSchema.index({email: 1}, {unique: true, sparse: true});
 const User = models.User || mongoose.model("User", userSchema);
 export default User;
