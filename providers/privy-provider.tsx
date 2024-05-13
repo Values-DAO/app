@@ -28,7 +28,7 @@ export default function Providers({children}: {children: React.ReactNode}) {
           theme: "light",
           accentColor: "#f5d442",
         },
-        loginMethods: ["farcaster"],
+        loginMethods: ["farcaster", "email"],
       }}
     >
       <QueryClientProvider client={queryClient}>
