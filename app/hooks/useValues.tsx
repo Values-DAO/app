@@ -103,10 +103,12 @@ const useValues = () => {
     values,
     balance,
     type,
+    twitter,
   }: {
-    values: {value: string; txHash: string}[];
+    values?: {value: string; txHash: string}[];
     balance?: number;
     type?: string;
+    twitter?: string;
   }): Promise<{user: IUser | null; message: string}> => {
     if (!user?.email?.address && !user?.farcaster?.fid)
       return {user: null, message: "No user data"};
@@ -121,6 +123,7 @@ const useValues = () => {
           ...(type && {type}),
           ...(user?.email?.address && {email: user?.email?.address}),
           ...(user?.farcaster?.fid && {farcaster: user?.farcaster?.fid}),
+          ...(twitter && {twitter}),
         },
         {
           headers: {
@@ -474,6 +477,48 @@ const useValues = () => {
       return 0;
     }
   };
+
+  const analyseUserAndGenerateValues = async ({
+    fid,
+    twitter,
+  }: {
+    fid?: number;
+    twitter?: string;
+  }) => {
+    if (!user?.farcaster?.fid)
+      return {
+        user: null,
+        values: null,
+        message: "No user data",
+      };
+    const query =
+      fid && twitter
+        ? `fid=${fid}&twitter=${twitter}&twitter_userId=${user?.twitter?.subject}`
+        : fid
+        ? `fid=${fid}`
+        : `twitter=${twitter}&twitter_userId=${user?.twitter?.subject}`;
+    try {
+      const response = await axios.get(`/api/generate-user-value?${query}`, {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+        },
+      });
+
+      return {
+        user: response.data.user,
+        values: response.data.user.generatedValues,
+        message: "Values generated successfully",
+      };
+    } catch (error) {
+      return {
+        user: null,
+        values: null,
+        message: error as string,
+      };
+    }
+  };
+
   return {
     fetchUser,
     createUser,
@@ -488,6 +533,7 @@ const useValues = () => {
     updateValuesBulk,
     isAHolderOfToken,
     fetchFarcasterUserWallets,
+    analyseUserAndGenerateValues,
   };
 };
 

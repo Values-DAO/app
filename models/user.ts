@@ -5,6 +5,7 @@ export type IUser = {
   username?: string;
   email?: string;
   farcaster?: number;
+  twitter?: string;
   wallets?: string[];
   mintedValues?: {value: string; txHash: string}[];
   balance?: number;
@@ -12,6 +13,7 @@ export type IUser = {
   isVerified?: boolean;
   totalInvites?: number;
   inviteCodes?: {code: string; claimedBy: string; claimed: boolean}[];
+  generatedValues?: string[];
 };
 
 const userSchema = new Schema(
@@ -24,12 +26,15 @@ const userSchema = new Schema(
     },
     email: {
       type: String,
-      unique: true,
     },
     farcaster: {
       type: Number,
       unique: true,
     },
+    twitter: {
+      type: String,
+    },
+
     wallets: {
       type: [String],
       default: [],
@@ -42,6 +47,9 @@ const userSchema = new Schema(
         },
       ],
       default: [],
+    },
+    generatedValues: {
+      type: [String],
     },
     balance: {
       type: Number,
@@ -85,8 +93,14 @@ userSchema.pre("save", async function (next) {
   user.wallets = user.wallets.filter(
     (value, index, self) => self.indexOf(value) === index
   );
+  if (user.isNew) {
+    const existingUser = await User.findOne({email: user.email}).exec();
+    if (existingUser) {
+      return next();
+    }
+  }
   next();
 });
-userSchema.index({email: 1}, {unique: true, sparse: true});
+
 const User = models.User || mongoose.model("User", userSchema);
 export default User;

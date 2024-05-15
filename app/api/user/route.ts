@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
       balance,
       type,
       farcaster,
+      twitter,
     } = await req.json();
 
     if (!method) {
@@ -85,6 +86,9 @@ export async function POST(req: NextRequest) {
         if (balance) {
           user.balance =
             type === "add" ? user.balance + balance : user.balance - balance;
+        }
+        if (twitter) {
+          user.twitter = twitter;
         }
         await user.save();
 

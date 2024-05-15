@@ -32,12 +32,16 @@ export const UserContextProvider = ({
   useEffect(() => {
     if (!authenticated) return;
     setLoading(true);
+
     const isUserExist = async () => {
       let userInfo: IUser | null | undefined = null;
       let wallets;
 
       if (user?.email?.address || user?.farcaster?.fid) {
         userInfo = (await fetchUser())?.user;
+        if (!userInfo?.generatedValues) {
+          userInfo = {...userInfo, generatedValues: []};
+        }
         wallets = await fetchFarcasterUserWallets();
       }
 
@@ -50,6 +54,7 @@ export const UserContextProvider = ({
       }
     };
     setLoading(false);
+
     isUserExist();
   }, [user]);
 

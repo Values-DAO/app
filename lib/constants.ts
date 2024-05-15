@@ -601,7 +601,7 @@ export const NFT_CONTRACT_ABI = [
     type: "function",
   },
 ];
-
+export const AIRSTACK_API_URL = "https://api.airstack.xyz/graphql";
 export const FARCON_TICKETS = {
   summit: "0x456cc03543d41eb1c9a7ca9fa86e9383b404f50d",
   community: "0x238b522fa4d04bfe0b9b875e9ccea6d3f98d51d2",
