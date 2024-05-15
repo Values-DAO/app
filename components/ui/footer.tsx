@@ -5,7 +5,7 @@ const Footer = () => {
   return (
     <div className="mt-auto pb-6 flex flex-row gap-4 justify-center">
       <Button asChild variant="link" className="md:text-md">
-        <Link href="https://discord.gg/bdGJsAh2" target="_blank">
+        <Link href="https://discord.gg/zRbGmWe4xN" target="_blank">
           Discord
         </Link>
       </Button>
