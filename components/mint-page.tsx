@@ -29,8 +29,8 @@ import {getAddress} from "viem";
 import useValues from "@/app/hooks/useValues";
 import {NFT_CONTRACT_ABI, NFT_CONTRACT_ADDRESS} from "@/lib/constants";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import Projects from "@/app/community/page";
 import ValuePage from "@/app/value/page";
+import Projects from "./projects";
 
 const MintPage = () => {
   const {updateUser, updateValue, addWallet} = useValues();
