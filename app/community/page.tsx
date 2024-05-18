@@ -1,5 +1,6 @@
-import Project from "@/models/project";
-import React from "react";
+"use client";
+import Project, {IProject} from "@/models/project";
+import React, {useEffect} from "react";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 
 import {Button} from "@/components/ui/button";
@@ -9,18 +10,31 @@ import {Separator} from "@/components/ui/separator";
 
 import {VerifiedIcon} from "lucide-react";
 import mongoose from "mongoose";
-
-const Projects = async () => {
-  await mongoose.connect(process.env.MONGODB_URI || "");
-
-  const projects = await Project.find({}, {__v: 0, _id: 0});
-
+interface Project {
+  limit?: number;
+  style?: string;
+}
+const Projects: React.FC<Project> = ({limit, style}) => {
+  const [projects, setProjects] = React.useState<IProject[]>([]);
+  useEffect(() => {
+    async function fetchProjects() {
+      const res = await fetch(`/api/project?limit=${limit}`, {
+        headers: {
+          "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+        },
+      });
+      const data = await res.json();
+      setProjects(data.projects);
+    }
+    fetchProjects();
+  }, [limit]);
   return (
     <div className="p-4">
-      <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl my-2 pl-1">
-        Communities
-      </h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div
+        className={`grid gap-4 ${
+          style ?? "grid-cols-1 md:grid-cols-2 lg:grid-cols-5 "
+        }`}
+      >
         {projects &&
           projects.length > 0 &&
           projects.map((project) => (

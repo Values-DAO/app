@@ -51,6 +51,8 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
+  const searchParams = req.nextUrl.searchParams;
+  const limit = searchParams.get("limit");
   try {
     await connectToDatabase();
     const apiKey = headers().get("x-api-key");
@@ -67,7 +69,9 @@ export async function GET(req: NextRequest) {
       console.log(project);
       return NextResponse.json({status: 200, message: "Success", project});
     }
-    const projects = await Project.find({}, {__v: 0, _id: 0});
+    const projects = await Project.find({}, {__v: 0, _id: 0}).limit(
+      limit ? Number(limit) : Infinity
+    );
     return NextResponse.json({status: 200, message: "Success", projects});
   } catch (error) {
     return NextResponse.json({
