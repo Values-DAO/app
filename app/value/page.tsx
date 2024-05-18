@@ -77,19 +77,21 @@ const ValuePage = () => {
   return (
     <>
       {authenticated && (
-        <div className="p-4 flex flex-col items-center justify-center flex-grow min-h-[80vh] gap-4">
+        <div className="p-4 flex flex-col flex-grow min-h-[80vh] gap-4">
           {!isLoading &&
             userInfo?.generatedValues &&
             userInfo.generatedValues.length > 0 && (
               <div className="flex flex-col gap-4">
-                <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 max-w-5xl text-muted-foreground">
+                <h2 className="scroll-m-20 text-center border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 max-w-5xl text-muted-foreground">
                   Your values
-                </h2>
-                {userInfo.generatedValues.map((value, index) => (
-                  <div key={index} className="flex flex-col gap-4">
-                    <Badge key={index}>{value}</Badge>
-                  </div>
-                ))}
+                </h2>{" "}
+                <div className="grid grid-cols-2 gap-4 md:flex md:flex-row md:gap-4 font-medium">
+                  {userInfo.generatedValues.map((value, index) => (
+                    <Badge key={index} className="rounded-sm text-[18px] ">
+                      {value}
+                    </Badge>
+                  ))}{" "}
+                </div>
               </div>
             )}
 
@@ -97,13 +99,19 @@ const ValuePage = () => {
             !isLoading &&
             userInfo?.generatedValues?.length === 0 && (
               <div className="flex flex-col gap-4 items-center justify-center">
-                <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 max-w-5xl text-muted-foreground">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut
-                  dicta cupiditate cumque nemo natus.
+                <h2 className="scroll-m-20 border-b pb-2 text-md tracking-tight first:mt-0 max-w-5xl text-center">
+                  We are building an AI model that takes your content and drills
+                  it down to Values. While this is not completely accurate, the
+                  more data we get, the better we can train the model.<br></br>
+                  <br></br> Think of this as a starting point to make your
+                  values tangible. Not the final solution. <br></br>
+                  <br></br>You can mint these values to start with. They are
+                  accurate enough to connect you to aligned people and
+                  communities.<br></br>
+                  <br></br> Once you are done, mint your Community Values and
+                  try minting manually too.
                 </h2>
-                <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
-                  Analyse your values?
-                </h4>
+
                 {error ? (
                   <div className="flex flex-col gap-2 justify-center">
                     <p>Connect your account to continue</p>
@@ -143,7 +151,7 @@ const ValuePage = () => {
             )}
 
           {loading && (
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 justify-center">
               <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 max-w-5xl text-muted-foreground">
                 {loaderText}
               </h2>

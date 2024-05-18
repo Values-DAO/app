@@ -28,6 +28,9 @@ import {useAccount, useWriteContract} from "wagmi";
 import {getAddress} from "viem";
 import useValues from "@/app/hooks/useValues";
 import {NFT_CONTRACT_ABI, NFT_CONTRACT_ADDRESS} from "@/lib/constants";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import ValuePage from "@/app/value/page";
+import Projects from "./projects";
 
 const MintPage = () => {
   const {updateUser, updateValue, addWallet} = useValues();
@@ -208,125 +211,156 @@ const MintPage = () => {
 
   return (
     <div className="flex justify-center">
-      <div className="flex flex-col md:w-[900px] w-[98vw] max-w-[90%] m-auto">
+      <div className="flex flex-col md:w-[900px] w-[98vw] max-w-[98%] m-auto">
         <ValuesWordCloud refresh={valuesAvailable} />
-        <div className="flex flex-row justify-between items-center ">
-          <p className="p-4">Balance: ${userInfo?.balance ?? 0}</p>
-          <Link href={"/farcaster-meetup"}>
-            <Button variant="default" className="text-md">
-              Farcaster Meetup SF
-            </Button>
-          </Link>
-        </div>
-        <div className="relative ">
-          <Input
-            placeholder="Search for values"
-            className="w-full h-12 "
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-          />
 
-          <div className="absolute inset-y-0 right-3 pl-3 flex items-center cursor-pointer">
-            <SearchIcon className="h-5 w-5 text-gray-400" />
-          </div>
-        </div>
-        {authenticated ? (
-          <>
-            {(user?.email?.address || user?.farcaster?.fid) && (
-              <section>
-                {!showGenerateNewValueCard &&
-                  searchValue.length > 0 &&
-                  filteredData &&
-                  Object.entries(filteredData).map(
-                    ([key, value]: [any, any]) => {
-                      return (
-                        <div
-                          key={key}
-                          className="w-full h-14 px-3 flex items-center hover:bg-gray-300/20 hover:cursor-pointer rounded-sm"
-                        >
-                          <span> {key}</span>
+        <Tabs defaultValue="manual" className="w-full">
+          <TabsList className="flex justify-center">
+            <TabsTrigger value="manual" className="text-sm">
+              Manual Mint
+            </TabsTrigger>
+            <TabsTrigger value="ai" className="text-sm">
+              AI Value Analysis
+            </TabsTrigger>
+            <TabsTrigger value="community" className="text-sm">
+              Community Mint
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="manual">
+            <div className="flex flex-row justify-between items-center ">
+              <p className="p-4">Balance: ${userInfo?.balance ?? 0}</p>
+              {/* <Link href={"/farcaster-meetup"}>
+                <Button variant="default" className="text-md">
+                  Farcaster Meetup SF
+                </Button>
+              </Link> */}
+            </div>
+            <div className="relative ">
+              <Input
+                placeholder="Search for values"
+                className="w-full h-12 "
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+              />
 
-                          {address ||
-                          (userInfo &&
-                            userInfo.wallets &&
-                            userInfo.wallets?.length > 0) ? (
-                            <Button
-                              variant="default"
-                              className="ml-auto h-8 w-32"
-                              disabled={value.hasMintedValue || loading[key]}
-                              onClick={() => {
-                                mintValue({value: value.value, key});
-                              }}
+              <div className="absolute inset-y-0 right-3 pl-3 flex items-center cursor-pointer">
+                <SearchIcon className="h-5 w-5 text-gray-400" />
+              </div>
+            </div>
+            {authenticated ? (
+              <>
+                {(user?.email?.address || user?.farcaster?.fid) && (
+                  <section>
+                    {!showGenerateNewValueCard &&
+                      searchValue.length > 0 &&
+                      filteredData &&
+                      Object.entries(filteredData).map(
+                        ([key, value]: [any, any]) => {
+                          return (
+                            <div
+                              key={key}
+                              className="w-full h-14 px-3 flex items-center hover:bg-gray-300/20 hover:cursor-pointer rounded-sm"
                             >
-                              {loading[key] ? (
-                                <div className="animate-spin rounded-full h-6 w-6 border-4 border-dashed border-white"></div>
+                              <span> {key}</span>
+
+                              {address ||
+                              (userInfo &&
+                                userInfo.wallets &&
+                                userInfo.wallets?.length > 0) ? (
+                                <Button
+                                  variant="default"
+                                  className="ml-auto h-8 w-32"
+                                  disabled={
+                                    value.hasMintedValue || loading[key]
+                                  }
+                                  onClick={() => {
+                                    mintValue({value: value.value, key});
+                                  }}
+                                >
+                                  {loading[key] ? (
+                                    <div className="animate-spin rounded-full h-6 w-6 border-4 border-dashed border-white"></div>
+                                  ) : (
+                                    <>
+                                      {value.hasMintedValue
+                                        ? "Already Minted"
+                                        : "Mint"}
+                                    </>
+                                  )}
+                                </Button>
                               ) : (
-                                <>
-                                  {value.hasMintedValue
-                                    ? "Already Minted"
-                                    : "Mint"}
-                                </>
+                                <div className="ml-auto">
+                                  <Button
+                                    variant="default"
+                                    onClick={linkWallet}
+                                  >
+                                    Connect Wallet
+                                  </Button>
+                                </div>
                               )}
-                            </Button>
-                          ) : (
-                            <div className="ml-auto">
-                              <Button variant="default" onClick={linkWallet}>
-                                Connect Wallet
-                              </Button>
                             </div>
-                          )}
+                          );
+                        }
+                      )}
+                    {!showGenerateNewValueCard &&
+                      searchValue.length > 0 &&
+                      Object.entries(filteredData).length !== 0 && (
+                        <div className="w-full h-14 px-3 flex items-center hover:bg-gray-300/20 hover:cursor-pointer rounded-sm">
+                          <span className=" text-gray-300 text-md">
+                            Not finding what you are looking for?
+                          </span>{" "}
+                          <Button
+                            variant="default"
+                            onClick={() => {
+                              setShowGenerateNewValueCard(true);
+                            }}
+                            className="ml-auto h-8 w-32"
+                          >
+                            Mint your value
+                          </Button>
                         </div>
-                      );
-                    }
-                  )}
-                {!showGenerateNewValueCard &&
-                  searchValue.length > 0 &&
-                  Object.entries(filteredData).length !== 0 && (
-                    <div className="w-full h-14 px-3 flex items-center hover:bg-gray-300/20 hover:cursor-pointer rounded-sm">
-                      <span className=" text-gray-300 text-md">
-                        Not finding what you are looking for?
-                      </span>{" "}
-                      <Button
-                        variant="default"
-                        onClick={() => {
-                          setShowGenerateNewValueCard(true);
-                        }}
-                        className="ml-auto h-8 w-32"
-                      >
-                        Mint your value
-                      </Button>
-                    </div>
-                  )}
+                      )}
 
-                {searchValue.length > 0 &&
-                  (showGenerateNewValueCard ||
-                    Object.entries(filteredData).length === 0) && (
-                    <GenerateNewValueCard
-                      value={searchValue}
-                      mint={mintValue}
-                    />
-                  )}
+                    {searchValue.length > 0 &&
+                      (showGenerateNewValueCard ||
+                        Object.entries(filteredData).length === 0) && (
+                        <GenerateNewValueCard
+                          value={searchValue}
+                          mint={mintValue}
+                        />
+                      )}
 
-                {searchValue.length === 0 && (
-                  <div className="flex justify-center items-center p-4">
-                    <span className="font-semibold  text-gray-300 text-lg">
-                      Type out your values and mint them
-                    </span>{" "}
-                  </div>
+                    {searchValue.length === 0 && (
+                      <div className="flex justify-center items-center p-4">
+                        <span className="font-semibold  text-gray-300 text-lg">
+                          Type out your values and mint them
+                        </span>{" "}
+                      </div>
+                    )}
+                  </section>
                 )}
+              </>
+            ) : (
+              <section className="md:w-[900px] pl-4 h-14  flex flex-row justify-between items-center hover:bg-gray-300/20 hover:cursor-pointer rounded-sm mt-4">
+                <span className="font-semibold  text-gray-300 text-lg">
+                  Login to proceed
+                </span>
+                <Button variant="default" onClick={login}>
+                  Login
+                </Button>
               </section>
             )}
-          </>
-        ) : (
-          <section className="md:w-[900px] pl-4 h-14  flex flex-row justify-between items-center hover:bg-gray-300/20 hover:cursor-pointer rounded-sm mt-4">
-            <span className="font-semibold  text-gray-300 text-lg">
-              Login to proceed
-            </span>
-            <Button variant="default" onClick={login}>
-              Login
-            </Button>
-          </section>
-        )}
+          </TabsContent>
+          <TabsContent value="ai">
+            <ValuePage />
+          </TabsContent>
+          <TabsContent value="community">
+            <Projects
+              limit={3}
+              style="grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+            />
+          </TabsContent>
+        </Tabs>
+
         {valueMinted && (
           <AlertDialog open={valueMinted.showSuccessModal}>
             <AlertDialogContent>
