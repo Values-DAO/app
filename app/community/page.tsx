@@ -1,5 +1,5 @@
 "use client";
-import Project, {IProject} from "@/models/project";
+import {IProject} from "@/models/project";
 import React, {useEffect} from "react";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 
@@ -9,12 +9,12 @@ import {Badge} from "@/components/ui/badge";
 import {Separator} from "@/components/ui/separator";
 
 import {VerifiedIcon} from "lucide-react";
-import mongoose from "mongoose";
-interface Project {
+interface IProjectProps {
   limit?: number;
   style?: string;
 }
-const Projects: React.FC<Project> = ({limit, style}) => {
+
+const Projects: React.FC<IProjectProps> = ({limit, style}) => {
   const [projects, setProjects] = React.useState<IProject[]>([]);
   useEffect(() => {
     async function fetchProjects() {
