@@ -148,6 +148,7 @@ const ValuePage = () => {
       toast({
         title: "You already hold these Values",
         description: "View them in your wallet",
+        variant: "destructive",
       });
       return;
     }
@@ -206,7 +207,7 @@ const ValuePage = () => {
               userInfo?.aiGeneratedValues?.warpcast?.length > 0) && (
               <div className="flex flex-col gap-4">
                 <h2 className="scroll-m-20 text-center border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 max-w-5xl text-muted-foreground">
-                  Your values
+                  ||Your values
                 </h2>
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-5 md:gap-4 font-medium">
                   {Array.from(

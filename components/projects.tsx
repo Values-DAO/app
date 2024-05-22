@@ -1,7 +1,15 @@
 "use client";
 import {IProject} from "@/models/project";
 import React, {useEffect} from "react";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 import {Button} from "@/components/ui/button";
 import Link from "next/link";
@@ -20,74 +28,62 @@ const Projects = ({limit, style}: {limit?: number; style?: string}) => {
         },
       });
       const data = await res.json();
+      console.log(data.projects);
       setProjects(data.projects);
     }
     fetchProjects();
   }, []);
   return (
     <div className="p-4">
-      <div
-        className={`grid gap-4 ${
-          style ?? "grid-cols-1 md:grid-cols-2 lg:grid-cols-5 "
-        }`}
-      >
-        {projects &&
-          projects.length > 0 &&
-          projects.map((project) => (
-            <Card
+      <h2 className="scroll-m-20 text-center border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 max-w-5xl text-muted-foreground mb-2">
+        ||Community
+      </h2>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead>Values</TableHead>
+            <TableHead>Verified</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {projects.map((project) => (
+            <TableRow
               key={project.id}
-              className="m-2 flex flex-col justify-between"
+              className="cursor-pointer"
+              onClick={() => {
+                window.location.href = `/community/${project.name.replace(
+                  / /g,
+                  "-"
+                )}-${project.id}`;
+              }}
             >
-              <CardHeader>
-                {" "}
-                <div className="flex flex-row items-center gap-2 h-6 mb-2 font-medium">
-                  {project.name}
-                  {project.verified && <VerifiedIcon size={20} />}
-                </div>
-                {/* <Image
-                  src={project.coverImage}
-                  alt={project.name}
-                  width={200}
-                  height={200}
-                  className="rounded-lg mb-2 w-full h-36 object-cover"
-                /> */}
-                <CardTitle className=" flex flex-col gap-2">
-                  <Separator />
-
-                  <p className="text-xl font-bold tracking-tight">Values </p>
-                  <div className="flex flex-wrap flex-row gap-2 font-medium">
-                    {project?.values.map((value: string, index: number) => (
-                      <Badge
-                        key={index}
-                        variant={"default"}
-                        className="rounded-sm text-[18px] "
-                      >
-                        {value}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {project.verified === true ? (
-                  <Button className="w-full" variant={"secondary"} asChild>
-                    <Link
-                      href={`/community/${project.name.replace(/ /g, "-")}-${
-                        project.id
-                      }`}
-                    >
-                      View Community
-                    </Link>
-                  </Button>
-                ) : (
-                  <Button className="w-full" variant={"secondary"} disabled>
-                    Coming Soon
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
+              <Link
+                href={`/community/${project.name.replace(/ /g, "-")}-${
+                  project.id
+                }`}
+                key={project.id}
+              >
+                <TableCell>{project.name}</TableCell>
+              </Link>
+              <TableCell className="">
+                {project.values.map((value: string, index: number) => (
+                  <Badge
+                    key={index}
+                    variant={"default"}
+                    className="rounded-sm text-[18px] m-2"
+                  >
+                    {value}
+                  </Badge>
+                ))}
+              </TableCell>
+              <TableCell>
+                {project.verified ? <VerifiedIcon /> : <p>AI</p>}
+              </TableCell>
+            </TableRow>
           ))}
-      </div>
+        </TableBody>
+      </Table>
     </div>
   );
 };
