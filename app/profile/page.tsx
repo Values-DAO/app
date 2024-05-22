@@ -26,7 +26,7 @@ const ProfilePage = () => {
     <div className="p-4">
       {authenticated && userInfo && userInfo.isVerified && !isLoading && (
         <div>
-          {userInfo && userInfo?.inviteCodes!.length > 0 && (
+          {/* {userInfo && userInfo?.inviteCodes!.length > 0 && (
             <Card className="flex flex-col  gap-4 p-4">
               <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight mb-4">
                 Invite your ||aligned friend
@@ -74,7 +74,7 @@ const ProfilePage = () => {
                 because that is the person you are most ||aligned with
               </p>
             </Card>
-          )}
+          )} */}
           {userInfo &&
             userInfo.mintedValues &&
             userInfo.mintedValues.length > 0 && (
@@ -118,7 +118,7 @@ const ProfilePage = () => {
             )}
         </div>
       )}
-
+      {/* 
       {authenticated &&
         userInfo &&
         userInfo.isVerified == false &&
@@ -126,7 +126,7 @@ const ProfilePage = () => {
           <div className="flex flex-col items-center px-6 mt-[40%] md:mt-[15%]">
             <InviteCodeModal />
           </div>
-        )}
+        )} */}
       {!authenticated && (
         <section className="w-full mt-24 md:mt-[15%]  flex flex-col items-center ">
           <span className="font-semibold  text-gray-300 text-lg">
