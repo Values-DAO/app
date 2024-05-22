@@ -33,7 +33,6 @@ const useValues = () => {
   const chainId = useChainId();
   const {switchChain} = useSwitchChain();
   const {sendTransaction, data: depositTxhash, error} = useSendTransaction();
-
   const fetchUser = async (): Promise<{
     user: IUser | null;
     message: string;
@@ -519,6 +518,27 @@ const useValues = () => {
     }
   };
 
+  const batchUploadValuesPinata = async ({values}: {values: string[]}) => {
+    try {
+      const response = await axios.post(
+        "/api/batch-upload-pinata",
+        {
+          values,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+          },
+        }
+      );
+
+      return response.data.values;
+    } catch (error) {
+      console.error(error);
+      return {error: error || "An error occurred"};
+    }
+  };
   return {
     fetchUser,
     createUser,
@@ -534,6 +554,7 @@ const useValues = () => {
     isAHolderOfToken,
     fetchFarcasterUserWallets,
     analyseUserAndGenerateValues,
+    batchUploadValuesPinata,
   };
 };
 

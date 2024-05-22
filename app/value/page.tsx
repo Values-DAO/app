@@ -5,18 +5,37 @@ import React, {useState, useEffect} from "react";
 import useValues from "../hooks/useValues";
 import {useUserContext} from "@/providers/user-context-provider";
 import {Badge} from "@/components/ui/badge";
+import {privateKeyToAccount} from "viem/accounts";
+import {NFT_CONTRACT_ABI, NFT_CONTRACT_ADDRESS} from "@/lib/constants";
+import {toast} from "@/components/ui/use-toast";
+import {useAccount, useWriteContract} from "wagmi";
 
 const ValuePage = () => {
   const {user, authenticated, ready, login, linkTwitter, linkFarcaster} =
     usePrivy();
-  const {analyseUserAndGenerateValues, updateUser} = useValues();
-  const {userInfo, setUserInfo, isLoading} = useUserContext();
+  const {
+    analyseUserAndGenerateValues,
+    updateUser,
+    batchUploadValuesPinata,
+    updateValuesBulk,
+    fetchAllValues,
+  } = useValues();
+  const {
+    userInfo,
+    setUserInfo,
+    isLoading,
+    valuesAvailable,
+    setValuesAvailable,
+  } = useUserContext();
   const [loading, setLoading] = useState(false);
   const [loaderText, setLoaderText] = useState("Analyzing your values");
   const [error, setError] = useState<{
     platform: string;
     message: string;
   } | null>(null);
+  const {address} = useAccount();
+  const {writeContractAsync} = useWriteContract();
+  const [loader, setLoader] = useState(false);
 
   const loaderTexts: string[] = [
     "Analyzing your social content...",
@@ -64,6 +83,110 @@ const ValuePage = () => {
     setUserInfo({...userInfo, aiGeneratedValues: values});
     setLoading(false);
   };
+
+  const batchMintValues = async () => {
+    setLoader(true);
+    await batchUploadValuesPinata({
+      values: [
+        ...(userInfo?.aiGeneratedValues?.twitter || []),
+        ...(userInfo?.aiGeneratedValues?.warpcast || []),
+      ],
+    });
+    const response = await fetchAllValues();
+
+    setValuesAvailable(response.values);
+
+    await mintValues();
+    setLoader(false);
+  };
+
+  const mintValues = async () => {
+    const wallets = [...(userInfo?.wallets ?? []), address!];
+    if (!wallets) {
+      toast({
+        title: "Please connect a wallet",
+        description: "You need to connect a wallet to mint values",
+        variant: "destructive",
+      });
+      return;
+    }
+    setLoader(true);
+
+    const cidsToMint = [];
+    const valuesMinted = [];
+    const valuesToMint = Array.from(
+      new Set([
+        ...(userInfo?.aiGeneratedValues?.twitter || []),
+        ...(userInfo?.aiGeneratedValues?.warpcast || []),
+      ])
+    );
+
+    if (
+      userInfo?.aiGeneratedValues &&
+      (userInfo?.aiGeneratedValues?.twitter?.length > 0 ||
+        userInfo?.aiGeneratedValues?.warpcast?.length > 0)
+    )
+      for (const value of valuesToMint) {
+        if (!userInfo) return;
+        const existingValue = valuesAvailable![value.toLowerCase()];
+
+        if (existingValue) {
+          if (
+            existingValue.minters?.includes(
+              (userInfo?.email || userInfo?.farcaster?.toString()) as string
+            )
+          ) {
+            continue;
+          }
+
+          cidsToMint.push(existingValue.cid);
+          valuesMinted.push(value.toLowerCase());
+        }
+      }
+    if (cidsToMint.length === 0) {
+      setLoader(false);
+      toast({
+        title: "You already hold these Values",
+        description: "View them in your wallet",
+      });
+      return;
+    }
+
+    const hash = await writeContractAsync({
+      abi: NFT_CONTRACT_ABI,
+      address: NFT_CONTRACT_ADDRESS,
+      functionName: "batchMint",
+      args: [wallets[0], cidsToMint],
+      account: privateKeyToAccount(
+        process.env.NEXT_PUBLIC_ADMIN_WALLET_PRIVATE_KEY as `0x${string}`
+      ),
+      chainId: 84532,
+    });
+
+    await updateUser({
+      values: valuesMinted.map((value) => {
+        return {value: value, txHash: hash};
+      }),
+    });
+
+    await updateValuesBulk({
+      values: valuesMinted,
+    });
+    if (hash) {
+      toast({
+        title: "We just dropped Value NFTs to your wallet",
+        description: "View them in your wallet",
+      });
+    } else {
+      toast({
+        title: "You already hold these Values",
+        description: "View them in your wallet",
+      });
+    }
+
+    setLoader(false);
+  };
+
   useEffect(() => {
     const addTwitterHandle = async () => {
       if (user?.twitter?.username) {
@@ -97,6 +220,15 @@ const ValuePage = () => {
                     </Badge>
                   ))}
                 </div>
+
+                <Button
+                  variant={"secondary"}
+                  className="w-full cursor-pointer "
+                  onClick={batchMintValues}
+                  disabled={loader}
+                >
+                  {loader ? "Minting..." : "Mint Values"}
+                </Button>
               </div>
             )}
 
