@@ -507,7 +507,7 @@ const useValues = () => {
 
       return {
         user: response.data.user,
-        values: response.data.user.generatedValues,
+        values: response.data.user.aiGeneratedValues,
         message: "Values generated successfully",
       };
     } catch (error) {

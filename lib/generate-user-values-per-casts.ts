@@ -15,7 +15,7 @@ export const generateValuesForUser = async (casts: string[]) => {
       },
     ],
   });
-  console.log(completion.choices[0].message.content);
+
   let values = completion.choices[0].message.content?.split(",");
   values = values?.map((value: string) => value.trim());
   return values;

@@ -14,6 +14,10 @@ export type IUser = {
   totalInvites?: number;
   inviteCodes?: {code: string; claimedBy: string; claimed: boolean}[];
   generatedValues?: string[];
+  aiGeneratedValues?: {
+    twitter: string[];
+    warpcast: string[];
+  };
 };
 
 const userSchema = new Schema(
@@ -48,8 +52,19 @@ const userSchema = new Schema(
       ],
       default: [],
     },
+    // deprecated
     generatedValues: {
       type: [String],
+    },
+    aiGeneratedValues: {
+      twitter: {
+        type: [String],
+        default: [],
+      },
+      warpcast: {
+        type: [String],
+        default: [],
+      },
     },
     balance: {
       type: Number,
