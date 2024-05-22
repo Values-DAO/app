@@ -214,16 +214,16 @@ const MintPage = () => {
       <div className="flex flex-col md:w-[900px] w-[98vw] max-w-[98%] m-auto">
         <ValuesWordCloud refresh={valuesAvailable} />
 
-        <Tabs defaultValue="manual" className="w-full">
-          <TabsList className="flex justify-center">
-            <TabsTrigger value="manual" className="text-sm">
-              Manual Mint
-            </TabsTrigger>
+        <Tabs defaultValue="ai" className="w-full">
+          <TabsList className="flex justify-center bg-secondary border-primary border-[1px] text-white text-lg">
             <TabsTrigger value="ai" className="text-sm">
               AI Value Analysis
-            </TabsTrigger>
+            </TabsTrigger>{" "}
             <TabsTrigger value="community" className="text-sm">
               Community Mint
+            </TabsTrigger>
+            <TabsTrigger value="manual" className="text-sm">
+              Manual Mint
             </TabsTrigger>
           </TabsList>
           <TabsContent value="manual">

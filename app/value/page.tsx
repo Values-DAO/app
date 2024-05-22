@@ -61,12 +61,11 @@ const ValuePage = () => {
       return;
     }
 
-    setUserInfo({...userInfo, generatedValues: values});
+    setUserInfo({...userInfo, aiGeneratedValues: values});
     setLoading(false);
   };
   useEffect(() => {
     const addTwitterHandle = async () => {
-      console.log(user);
       if (user?.twitter?.username) {
         await updateUser({twitter: user.twitter.username});
         setUserInfo({...userInfo, twitter: user.twitter.username});
@@ -77,28 +76,35 @@ const ValuePage = () => {
   return (
     <>
       {authenticated && (
-        <div className="p-4 flex flex-col flex-grow min-h-[80vh] gap-4">
+        <div className="p-4 flex flex-col min-h-[80vh] gap-4">
           {!isLoading &&
-            userInfo?.generatedValues &&
-            userInfo.generatedValues.length > 0 && (
+            userInfo?.aiGeneratedValues &&
+            (userInfo?.aiGeneratedValues?.twitter?.length > 0 ||
+              userInfo?.aiGeneratedValues?.warpcast?.length > 0) && (
               <div className="flex flex-col gap-4">
                 <h2 className="scroll-m-20 text-center border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 max-w-5xl text-muted-foreground">
                   Your values
-                </h2>{" "}
-                <div className="grid grid-cols-2 gap-4 md:flex md:flex-row md:gap-4 font-medium">
-                  {userInfo.generatedValues.map((value, index) => (
-                    <Badge key={index} className="rounded-sm text-[18px] ">
+                </h2>
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-5 md:gap-4 font-medium">
+                  {Array.from(
+                    new Set([
+                      ...(userInfo.aiGeneratedValues?.twitter || []),
+                      ...(userInfo.aiGeneratedValues?.warpcast || []),
+                    ])
+                  ).map((value, index) => (
+                    <Badge key={index} className="rounded-sm text-[18px]">
                       {value}
                     </Badge>
-                  ))}{" "}
+                  ))}
                 </div>
               </div>
             )}
 
-          {!loading &&
-            !isLoading &&
-            userInfo?.generatedValues?.length === 0 && (
-              <div className="flex flex-col gap-4 items-center justify-center">
+          {!loading && !isLoading && (
+            <div className="flex flex-col gap-4 items-center justify-center">
+              {(userInfo?.aiGeneratedValues === undefined ||
+                (userInfo?.aiGeneratedValues?.twitter?.length === 0 &&
+                  userInfo?.aiGeneratedValues?.warpcast?.length === 0)) && (
                 <h2 className="scroll-m-20 border-b pb-2 text-md tracking-tight first:mt-0 max-w-5xl text-center">
                   We are building an AI model that takes your content and drills
                   it down to Values. While this is not completely accurate, the
@@ -111,32 +117,39 @@ const ValuePage = () => {
                   <br></br> Once you are done, mint your Community Values and
                   try minting manually too.
                 </h2>
+              )}
 
-                {error ? (
-                  <div className="flex flex-col gap-2 justify-center">
-                    <p>Connect your account to continue</p>
-                    <div className="flex flex-row gap-2 justify-center">
-                      {!user?.twitter?.username &&
-                        error.platform === "twitter" && (
-                          <Button onClick={linkTwitter}>Link Twitter</Button>
-                        )}
-                      {!user?.farcaster?.fid &&
-                        error.platform === "warpcast" && (
-                          <Button onClick={linkFarcaster}>Link Warpcast</Button>
-                        )}
-                    </div>
+              {error ? (
+                <div className="flex flex-col gap-2 justify-center">
+                  <p>Connect your account to continue</p>
+                  <div className="flex flex-row gap-2 justify-center">
+                    {!user?.twitter?.username &&
+                      error.platform === "twitter" && (
+                        <Button onClick={linkTwitter}>Link Twitter</Button>
+                      )}
+                    {!user?.farcaster?.fid && error.platform === "warpcast" && (
+                      <Button onClick={linkFarcaster}>Link Warpcast</Button>
+                    )}
                   </div>
-                ) : (
-                  <div className="flex flex-col gap-2 justify-center">
-                    <p>Analyse using my data from</p>
-                    <div className="flex flex-row gap-2 justify-center">
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2 justify-center">
+                  {userInfo?.aiGeneratedValues?.twitter?.length === 0 &&
+                    userInfo?.aiGeneratedValues?.warpcast?.length === 0 && (
+                      <p>Analyse using my data from</p>
+                    )}
+                  <div className="flex flex-row gap-2 justify-center">
+                    {userInfo?.aiGeneratedValues?.twitter?.length === 0 && (
                       <Button
                         onClick={() => {
                           analyse("twitter");
                         }}
                       >
                         Twitter
-                      </Button>{" "}
+                      </Button>
+                    )}
+
+                    {userInfo?.aiGeneratedValues?.warpcast?.length === 0 && (
                       <Button
                         onClick={() => {
                           analyse("warpcast");
@@ -144,11 +157,12 @@ const ValuePage = () => {
                       >
                         Warpcast
                       </Button>
-                    </div>
+                    )}
                   </div>
-                )}
-              </div>
-            )}
+                </div>
+              )}
+            </div>
+          )}
 
           {loading && (
             <div className="flex flex-col gap-4 justify-center">

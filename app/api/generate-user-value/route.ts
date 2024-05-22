@@ -48,19 +48,25 @@ export async function GET(req: NextRequest) {
     let generatedValues: string[] | undefined = undefined;
     if (twitter && twitter_userId) {
       const tweets = await fetchUserTweets(twitter_userId);
-      console.log(tweets);
+
       generatedValues = await generateValuesForUser(tweets);
-      console.log(generatedValues);
     } else if (fid) {
       const casts = await fetchCastsForUser(fid, 200);
       generatedValues = await generateValuesForUser(casts);
     }
     if (generatedValues && generatedValues.length > 2) {
       const uniqueValues = new Set([
-        ...user.generatedValues.map((value: string) => value.toLowerCase()),
+        ...user.aiGeneratedValues.twitter.map((value: string) =>
+          value.toLowerCase()
+        ),
+        ...user.aiGeneratedValues.warpcast.map((value: string) =>
+          value.toLowerCase()
+        ),
         ...generatedValues.map((value) => value.toLowerCase()),
       ]);
-      user.generatedValues = Array.from(uniqueValues);
+
+      user.aiGeneratedValues[twitter ? "twitter" : "warpcast"] =
+        Array.from(uniqueValues);
     }
     await user.save();
     return NextResponse.json({
