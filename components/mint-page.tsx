@@ -237,7 +237,7 @@ const MintPage = () => {
           </TabsList>
           <TabsContent value="manual">
             <h2 className="scroll-m-20 py-4 text-center border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 max-w-5xl text-muted-foreground mb-2">
-              ||manual mint
+              || manual mint
             </h2>
             <div className="flex flex-row justify-between items-center ">
               <p className="p-4">Balance: ${userInfo?.balance ?? 0}</p>

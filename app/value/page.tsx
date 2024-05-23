@@ -239,7 +239,7 @@ const ValuePage = () => {
         <div className="py-4 flex flex-col min-h-[80vh] gap-4">
           <div className="flex flex-col gap-4">
             <h2 className="scroll-m-20 text-center border-b pb-2 text-3xl font-medium tracking-tight first:mt-0 max-w-5xl text-muted-foreground">
-              ||ai generated values
+              || ai generated values
             </h2>
             <Tabs defaultValue={"warpcast"} className="w-full">
               <TabsList className="flex justify-center bg-primary text-primary-foreground  bg-white py-8 md:py-4">
@@ -247,13 +247,13 @@ const ValuePage = () => {
                   value="warpcast"
                   className="text-md text-wrap md:text-lg  w-[50%] md:py-[1px] "
                 >
-                  Using your Warpcast Casts
+                  Warpcast
                 </TabsTrigger>
                 <TabsTrigger
                   value="twitter"
                   className="text-md text-wrap md:text-lg w-[50%] md:py-[1px]"
                 >
-                  Using your Twitter Tweets
+                  Twitter
                 </TabsTrigger>{" "}
               </TabsList>
 
@@ -314,17 +314,7 @@ const ValuePage = () => {
                   userInfo?.aiGeneratedValues?.twitter?.length === 0 && (
                     <div className="flex flex-col gap-4">
                       <h2 className="scroll-m-20 border-b pb-2 text-md tracking-tight first:mt-0 max-w-5xl text-center">
-                        We are building an AI model that takes your content and
-                        drills it down to Values. While this is not completely
-                        accurate, the more data we get, the better we can train
-                        the model.<br></br>
-                        <br></br> Think of this as a starting point to make your
-                        values tangible. Not the final solution. <br></br>
-                        <br></br>You can mint these values to start with. They
-                        are accurate enough to connect you to aligned people and
-                        communities.<br></br>
-                        <br></br> Once you are done, mint your Community Values
-                        and try minting manually too.
+                        super early feature, still in development
                       </h2>
 
                       {error && error.platform === "INSUFFICIENT_TWEETS" && (
