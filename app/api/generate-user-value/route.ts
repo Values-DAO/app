@@ -48,25 +48,26 @@ export async function GET(req: NextRequest) {
     let generatedValues: string[] | undefined = undefined;
     if (twitter && twitter_userId) {
       const tweets = await fetchUserTweets(twitter_userId);
-
+      if (tweets.length < 100) {
+        return NextResponse.json({
+          status: 400,
+          error: "User has less than 100 tweets",
+        });
+      }
       generatedValues = await generateValuesForUser(tweets);
     } else if (fid) {
       const casts = await fetchCastsForUser(fid, 200);
+      if (casts.length < 100) {
+        return NextResponse.json({
+          status: 400,
+          error: "User has less than 100 casts",
+        });
+      }
       generatedValues = await generateValuesForUser(casts);
     }
     if (generatedValues && generatedValues.length > 2) {
-      const uniqueValues = new Set([
-        ...user.aiGeneratedValues.twitter.map((value: string) =>
-          value.toLowerCase()
-        ),
-        ...user.aiGeneratedValues.warpcast.map((value: string) =>
-          value.toLowerCase()
-        ),
-        ...generatedValues.map((value) => value.toLowerCase()),
-      ]);
-
       user.aiGeneratedValues[twitter ? "twitter" : "warpcast"] =
-        Array.from(uniqueValues);
+        Array.from(generatedValues);
     }
     await user.save();
     return NextResponse.json({

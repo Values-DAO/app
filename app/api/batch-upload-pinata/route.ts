@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     const existingValues = await Value.find({
       name: {$in: values.map((value) => value.toLowerCase())}, // Ensure you're mapping to the 'name' property correctly
     });
-
+    console.log("Existing values:", existingValues);
     // Mapping existing values to their names for easier comparison
     const existingNames = existingValues.map((ev) => ev.name); // Convert to lowercase for case-insensitive comparison
     cidsToReturn.push(...existingValues.map((ev) => ev.value.cid));
@@ -85,6 +85,7 @@ export async function POST(req: NextRequest) {
       status: 200,
       message: "Success",
       values: valuesToReturn,
+      cid: cidsToReturn,
     });
   } catch (error) {
     console.error(error);

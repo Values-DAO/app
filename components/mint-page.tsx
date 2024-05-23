@@ -214,26 +214,33 @@ const MintPage = () => {
       <div className="flex flex-col md:w-[900px] w-[98vw] max-w-[98%] m-auto">
         <ValuesWordCloud refresh={valuesAvailable} />
 
-        <Tabs defaultValue="ai" className="w-full">
-          <TabsList className="flex justify-center bg-secondary border-primary border-[1px] text-white text-lg">
-            <TabsTrigger value="ai" className="text-sm">
+        <Tabs className="w-[96%] m-auto">
+          <TabsList className="flex justify-center bg-primary text-primary-foreground  bg-white py-8 md:py-4">
+            <TabsTrigger
+              value="ai"
+              className="text-md text-wrap md:text-lg font-semibold  py-[3px]"
+            >
               AI Value Analysis
             </TabsTrigger>{" "}
-            <TabsTrigger value="community" className="text-sm">
+            <TabsTrigger
+              value="community"
+              className="text-md text-wrap md:text-lg font-semibold  py-[3px]"
+            >
               Community Mint
             </TabsTrigger>
-            <TabsTrigger value="manual" className="text-sm">
+            <TabsTrigger
+              value="manual"
+              className="text-md text-wrap md:text-lg font-semibold  py-[3px]"
+            >
               Manual Mint
             </TabsTrigger>
           </TabsList>
           <TabsContent value="manual">
+            <h2 className="scroll-m-20 py-4 text-center border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 max-w-5xl text-muted-foreground mb-2">
+              ||manual mint
+            </h2>
             <div className="flex flex-row justify-between items-center ">
               <p className="p-4">Balance: ${userInfo?.balance ?? 0}</p>
-              {/* <Link href={"/farcaster-meetup"}>
-                <Button variant="default" className="text-md">
-                  Farcaster Meetup SF
-                </Button>
-              </Link> */}
             </div>
             <div className="relative ">
               <Input

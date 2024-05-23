@@ -36,7 +36,7 @@ const Projects = ({limit, style}: {limit?: number; style?: string}) => {
   return (
     <div className="p-4">
       <h2 className="scroll-m-20 text-center border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 max-w-5xl text-muted-foreground mb-2">
-        ||Community
+        ||community
       </h2>
       <Table>
         <TableHeader>
@@ -66,19 +66,23 @@ const Projects = ({limit, style}: {limit?: number; style?: string}) => {
               >
                 <TableCell>{project.name}</TableCell>
               </Link>
-              <TableCell className="">
-                {project.values.map((value: string, index: number) => (
-                  <Badge
-                    key={index}
-                    variant={"default"}
-                    className="rounded-sm text-[18px] m-2"
-                  >
-                    {value}
-                  </Badge>
-                ))}
+              <TableCell>
+                <div className="flex flex-col md:grid md:grid-cols-4 gap-2">
+                  {project.values.map((value: string, index: number) => (
+                    <Badge
+                      key={index}
+                      variant={"default"}
+                      className="rounded-sm text-[18px] bg-transparent border border-primary text-primary"
+                    >
+                      {value}
+                    </Badge>
+                  ))}
+                </div>
               </TableCell>
               <TableCell>
-                {project.verified ? <VerifiedIcon /> : <p>AI</p>}
+                <div className="flex justify-center items-center">
+                  {project.verified ? <VerifiedIcon /> : <p>AI</p>}
+                </div>
               </TableCell>
             </TableRow>
           ))}

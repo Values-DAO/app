@@ -483,7 +483,11 @@ const useValues = () => {
   }: {
     fid?: number;
     twitter?: string;
-  }) => {
+  }): Promise<{
+    user: IUser | null;
+    values: any | null;
+    message: string;
+  }> => {
     if (!user?.farcaster?.fid)
       return {
         user: null,
@@ -505,9 +509,9 @@ const useValues = () => {
       });
 
       return {
-        user: response.data.user,
-        values: response.data.user.aiGeneratedValues,
-        message: "Values generated successfully",
+        user: response.data.user ?? null,
+        values: response.data.user.aiGeneratedValues ?? null,
+        message: response.data.error ?? "Values generated successfully",
       };
     } catch (error) {
       return {

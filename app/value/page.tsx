@@ -9,6 +9,9 @@ import {privateKeyToAccount} from "viem/accounts";
 import {NFT_CONTRACT_ABI, NFT_CONTRACT_ADDRESS} from "@/lib/constants";
 import {toast} from "@/components/ui/use-toast";
 import {useAccount, useWriteContract} from "wagmi";
+import {TabsContent} from "@radix-ui/react-tabs";
+import {Tabs, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 
 const ValuePage = () => {
   const {user, authenticated, ready, login, linkTwitter, linkFarcaster} =
@@ -23,8 +26,7 @@ const ValuePage = () => {
   const {
     userInfo,
     setUserInfo,
-    isLoading,
-    valuesAvailable,
+
     setValuesAvailable,
   } = useUserContext();
   const [loading, setLoading] = useState(false);
@@ -61,16 +63,17 @@ const ValuePage = () => {
 
   const analyse = async (socialMedia: string) => {
     setLoading(true);
-    let values;
+
+    let result = null; // Use a result object to hold the function's output
 
     if (socialMedia === "twitter" && user?.twitter?.username) {
-      ({values} = await analyseUserAndGenerateValues({
+      result = await analyseUserAndGenerateValues({
         twitter: user.twitter.username,
-      }));
+      });
     } else if (socialMedia === "warpcast" && user?.farcaster?.fid) {
-      ({values} = await analyseUserAndGenerateValues({
+      result = await analyseUserAndGenerateValues({
         fid: user.farcaster.fid,
-      }));
+      });
     } else {
       setError({
         platform: socialMedia,
@@ -80,27 +83,58 @@ const ValuePage = () => {
       return;
     }
 
-    setUserInfo({...userInfo, aiGeneratedValues: values});
+    if (
+      result?.values &&
+      (result.values.twitter.length > 0 || result.values.warpcast.length > 0)
+    ) {
+      setUserInfo({...userInfo, aiGeneratedValues: result.values});
+    } else {
+      setError({
+        platform:
+          socialMedia === "twitter"
+            ? "INSUFFICIENT_TWEETS"
+            : "INSUFFICIENT_CASTS",
+        message:
+          "This account has less than 100 casts/tweets. We need more data to generate values.",
+      });
+      setLoading(false);
+      return;
+    }
     setLoading(false);
   };
 
-  const batchMintValues = async () => {
+  const batchMintValues = async ({
+    platform,
+  }: {
+    platform: "WARPCAST" | "TWITTER";
+  }) => {
     setLoader(true);
-    await batchUploadValuesPinata({
-      values: [
-        ...(userInfo?.aiGeneratedValues?.twitter || []),
-        ...(userInfo?.aiGeneratedValues?.warpcast || []),
-      ],
+    const cids = await batchUploadValuesPinata({
+      values:
+        platform === "TWITTER"
+          ? userInfo?.aiGeneratedValues?.twitter ?? []
+          : platform === "WARPCAST"
+          ? userInfo?.aiGeneratedValues?.warpcast ?? []
+          : [],
     });
     const response = await fetchAllValues();
 
     setValuesAvailable(response.values);
 
-    await mintValues();
+    await mintValues({
+      platform,
+      valuesAvailable: response.values,
+    });
     setLoader(false);
   };
 
-  const mintValues = async () => {
+  const mintValues = async ({
+    platform,
+    valuesAvailable,
+  }: {
+    platform: "WARPCAST" | "TWITTER";
+    valuesAvailable: any;
+  }) => {
     const wallets = [...(userInfo?.wallets ?? []), address!];
     if (!wallets) {
       toast({
@@ -114,12 +148,14 @@ const ValuePage = () => {
 
     const cidsToMint = [];
     const valuesMinted = [];
-    const valuesToMint = Array.from(
-      new Set([
-        ...(userInfo?.aiGeneratedValues?.twitter || []),
-        ...(userInfo?.aiGeneratedValues?.warpcast || []),
-      ])
-    );
+    const valuesToMint =
+      platform === "WARPCAST"
+        ? userInfo?.aiGeneratedValues?.warpcast
+        : userInfo?.aiGeneratedValues?.twitter;
+    if (!valuesToMint) {
+      setLoader(false);
+      return;
+    }
 
     if (
       userInfo?.aiGeneratedValues &&
@@ -152,7 +188,6 @@ const ValuePage = () => {
       });
       return;
     }
-
     const hash = await writeContractAsync({
       abi: NFT_CONTRACT_ABI,
       address: NFT_CONTRACT_ADDRESS,
@@ -197,105 +232,234 @@ const ValuePage = () => {
     };
     addTwitterHandle();
   }, [user]);
+
   return (
     <>
       {authenticated && (
-        <div className="p-4 flex flex-col min-h-[80vh] gap-4">
-          {!isLoading &&
-            userInfo?.aiGeneratedValues &&
-            (userInfo?.aiGeneratedValues?.twitter?.length > 0 ||
-              userInfo?.aiGeneratedValues?.warpcast?.length > 0) && (
-              <div className="flex flex-col gap-4">
-                <h2 className="scroll-m-20 text-center border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 max-w-5xl text-muted-foreground">
-                  ||Your values
-                </h2>
-                <div className="grid grid-cols-2 gap-4 md:grid-cols-5 md:gap-4 font-medium">
-                  {Array.from(
-                    new Set([
-                      ...(userInfo.aiGeneratedValues?.twitter || []),
-                      ...(userInfo.aiGeneratedValues?.warpcast || []),
-                    ])
-                  ).map((value, index) => (
-                    <Badge key={index} className="rounded-sm text-[18px]">
-                      {value}
-                    </Badge>
-                  ))}
-                </div>
-
-                <Button
-                  variant={"secondary"}
-                  className="w-full cursor-pointer "
-                  onClick={batchMintValues}
-                  disabled={loader}
+        <div className="py-4 flex flex-col min-h-[80vh] gap-4">
+          <div className="flex flex-col gap-4">
+            <h2 className="scroll-m-20 text-center border-b pb-2 text-3xl font-medium tracking-tight first:mt-0 max-w-5xl text-muted-foreground">
+              ||ai generated values
+            </h2>
+            <Tabs defaultValue={"warpcast"} className="w-full">
+              <TabsList className="flex justify-center bg-primary text-primary-foreground  bg-white py-8 md:py-4">
+                <TabsTrigger
+                  value="warpcast"
+                  className="text-md text-wrap md:text-lg  w-[50%] md:py-[1px] "
                 >
-                  {loader ? "Minting..." : "Mint Values"}
-                </Button>
-              </div>
-            )}
+                  Using your Warpcast Casts
+                </TabsTrigger>
+                <TabsTrigger
+                  value="twitter"
+                  className="text-md text-wrap md:text-lg w-[50%] md:py-[1px]"
+                >
+                  Using your Twitter Tweets
+                </TabsTrigger>{" "}
+              </TabsList>
 
-          {!loading && !isLoading && (
-            <div className="flex flex-col gap-4 items-center justify-center">
-              {(userInfo?.aiGeneratedValues === undefined ||
-                (userInfo?.aiGeneratedValues?.twitter?.length === 0 &&
-                  userInfo?.aiGeneratedValues?.warpcast?.length === 0)) && (
-                <h2 className="scroll-m-20 border-b pb-2 text-md tracking-tight first:mt-0 max-w-5xl text-center">
-                  We are building an AI model that takes your content and drills
-                  it down to Values. While this is not completely accurate, the
-                  more data we get, the better we can train the model.<br></br>
-                  <br></br> Think of this as a starting point to make your
-                  values tangible. Not the final solution. <br></br>
-                  <br></br>You can mint these values to start with. They are
-                  accurate enough to connect you to aligned people and
-                  communities.<br></br>
-                  <br></br> Once you are done, mint your Community Values and
-                  try minting manually too.
-                </h2>
-              )}
-
-              {error ? (
-                <div className="flex flex-col gap-2 justify-center">
-                  <p>Connect your account to continue</p>
-                  <div className="flex flex-row gap-2 justify-center">
-                    {!user?.twitter?.username &&
-                      error.platform === "twitter" && (
-                        <Button onClick={linkTwitter}>Link Twitter</Button>
+              <TabsContent value="twitter">
+                {userInfo?.aiGeneratedValues &&
+                  userInfo?.aiGeneratedValues?.twitter?.length > 0 &&
+                  userInfo?.aiGeneratedValues?.twitter.every((str) =>
+                    userInfo?.mintedValues?.some(
+                      (mintedValue) => mintedValue.value === str.toLowerCase()
+                    )
+                  ) && (
+                    <Alert className="bg-[#88fc03] my-2 text-black">
+                      <AlertDescription>
+                        You have already minted these value NFTs.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                {
+                  <div className="grid grid-cols-2 gap-4 md:grid-cols-5 md:gap-4 font-medium mt-4">
+                    {userInfo &&
+                      userInfo.aiGeneratedValues?.twitter?.map(
+                        (value, index) => (
+                          <Badge
+                            key={index}
+                            className="rounded-sm text-[18px] bg-transparent border border-primary text-primary"
+                          >
+                            {value}
+                          </Badge>
+                        )
                       )}
-                    {!user?.farcaster?.fid && error.platform === "warpcast" && (
-                      <Button onClick={linkFarcaster}>Link Warpcast</Button>
-                    )}
                   </div>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-2 justify-center">
-                  {userInfo?.aiGeneratedValues?.twitter?.length === 0 &&
-                    userInfo?.aiGeneratedValues?.warpcast?.length === 0 && (
-                      <p>Analyse using my data from</p>
-                    )}
-                  <div className="flex flex-row gap-2 justify-center">
-                    {userInfo?.aiGeneratedValues?.twitter?.length === 0 && (
-                      <Button
-                        onClick={() => {
-                          analyse("twitter");
-                        }}
-                      >
-                        Twitter
-                      </Button>
-                    )}
+                }
+                {!(
+                  userInfo?.aiGeneratedValues &&
+                  userInfo?.aiGeneratedValues?.twitter?.length > 0 &&
+                  userInfo?.aiGeneratedValues?.twitter.every((str) =>
+                    userInfo?.mintedValues?.some(
+                      (mintedValue) => mintedValue.value === str.toLowerCase()
+                    )
+                  )
+                ) &&
+                  userInfo?.aiGeneratedValues &&
+                  userInfo?.aiGeneratedValues?.twitter?.length > 0 && (
+                    <Button
+                      variant={"default"}
+                      className="w-full cursor-pointer mt-4"
+                      onClick={() => {
+                        batchMintValues({platform: "TWITTER"});
+                      }}
+                      disabled={loader}
+                    >
+                      {loader ? "Minting..." : "Mint Values"}
+                    </Button>
+                  )}
 
-                    {userInfo?.aiGeneratedValues?.warpcast?.length === 0 && (
-                      <Button
-                        onClick={() => {
-                          analyse("warpcast");
-                        }}
-                      >
-                        Warpcast
-                      </Button>
-                    )}
+                {!loading &&
+                  userInfo?.aiGeneratedValues &&
+                  userInfo?.aiGeneratedValues?.twitter?.length === 0 && (
+                    <div className="flex flex-col gap-4">
+                      <h2 className="scroll-m-20 border-b pb-2 text-md tracking-tight first:mt-0 max-w-5xl text-center">
+                        We are building an AI model that takes your content and
+                        drills it down to Values. While this is not completely
+                        accurate, the more data we get, the better we can train
+                        the model.<br></br>
+                        <br></br> Think of this as a starting point to make your
+                        values tangible. Not the final solution. <br></br>
+                        <br></br>You can mint these values to start with. They
+                        are accurate enough to connect you to aligned people and
+                        communities.<br></br>
+                        <br></br> Once you are done, mint your Community Values
+                        and try minting manually too.
+                      </h2>
+
+                      {error && error.platform === "INSUFFICIENT_TWEETS" && (
+                        <Alert
+                          variant={"destructive"}
+                          className=" my-2 bg-[#ff4747] text-white"
+                        >
+                          <AlertDescription>{error.message}</AlertDescription>
+                        </Alert>
+                      )}
+                      {!error && (
+                        <Button
+                          className="w-full cursor-pointer mt-4"
+                          disabled={loader}
+                          onClick={() => {
+                            analyse("twitter");
+                          }}
+                        >
+                          Analyse my values
+                        </Button>
+                      )}
+                    </div>
+                  )}
+
+                {error && error.platform === "twitter" && (
+                  <div className="flex flex-col gap-2 justify-center">
+                    <p>Connect your account to continue</p>
+                    <div className="flex flex-row gap-2 justify-center">
+                      <Button onClick={linkTwitter}>Link Twitter</Button>
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
-          )}
+                )}
+              </TabsContent>
+              <TabsContent value="warpcast">
+                {userInfo?.aiGeneratedValues &&
+                  userInfo?.aiGeneratedValues?.warpcast?.length > 0 &&
+                  userInfo?.aiGeneratedValues?.warpcast.every((str) =>
+                    userInfo?.mintedValues?.some(
+                      (mintedValue) => mintedValue.value === str.toLowerCase()
+                    )
+                  ) && (
+                    <Alert className="bg-[#88fc03] my-2 text-black">
+                      <AlertDescription>
+                        You have already minted these value NFTs.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                {
+                  <div className="grid grid-cols-2 gap-4 md:grid-cols-5 md:gap-4 font-medium mt-4">
+                    {userInfo &&
+                      userInfo.aiGeneratedValues?.warpcast?.map(
+                        (value, index) => (
+                          <Badge
+                            key={index}
+                            className="rounded-sm text-[18px] bg-transparent border border-primary text-primary"
+                          >
+                            {value}
+                          </Badge>
+                        )
+                      )}
+                  </div>
+                }
+                {!(
+                  userInfo?.aiGeneratedValues &&
+                  userInfo?.aiGeneratedValues?.warpcast?.length > 0 &&
+                  userInfo?.aiGeneratedValues?.warpcast.every((str) =>
+                    userInfo?.mintedValues?.some(
+                      (mintedValue) => mintedValue.value === str.toLowerCase()
+                    )
+                  )
+                ) &&
+                  userInfo?.aiGeneratedValues &&
+                  userInfo?.aiGeneratedValues?.warpcast?.length > 0 && (
+                    <Button
+                      variant={"default"}
+                      className="w-full cursor-pointer mt-4"
+                      onClick={() => {
+                        batchMintValues({platform: "WARPCAST"});
+                      }}
+                      disabled={loader}
+                    >
+                      {loader ? "Minting..." : "Mint Values"}
+                    </Button>
+                  )}
+
+                {!loading &&
+                  userInfo?.aiGeneratedValues &&
+                  userInfo?.aiGeneratedValues?.warpcast?.length === 0 && (
+                    <div className="flex flex-col gap-4">
+                      <h2 className="scroll-m-20 border-b pb-2 text-md tracking-tight first:mt-0 max-w-5xl text-center">
+                        We are building an AI model that takes your content and
+                        drills it down to Values. While this is not completely
+                        accurate, the more data we get, the better we can train
+                        the model.<br></br>
+                        <br></br> Think of this as a starting point to make your
+                        values tangible. Not the final solution. <br></br>
+                        <br></br>You can mint these values to start with. They
+                        are accurate enough to connect you to aligned people and
+                        communities.<br></br>
+                        <br></br> Once you are done, mint your Community Values
+                        and try minting manually too.
+                      </h2>
+                      {error && error.platform === "INSUFFICIENT_CASTS" && (
+                        <Alert
+                          variant={"destructive"}
+                          className=" my-2 bg-[#ff4747] text-white"
+                        >
+                          <AlertDescription>{error.message}</AlertDescription>
+                        </Alert>
+                      )}
+                      {!error && (
+                        <Button
+                          className="w-full cursor-pointer mt-4"
+                          disabled={loader}
+                          onClick={() => {
+                            analyse("warpcast");
+                          }}
+                        >
+                          Analyse my values
+                        </Button>
+                      )}
+                    </div>
+                  )}
+
+                {error && error.platform === "warpcast" && (
+                  <div className="flex flex-col gap-2 justify-center">
+                    <p>Connect your account to continue</p>
+                    <div className="flex flex-row gap-2 justify-center">
+                      <Button onClick={linkFarcaster}>Link Warpcast</Button>
+                    </div>
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
+          </div>
 
           {loading && (
             <div className="flex flex-col gap-4 justify-center">
