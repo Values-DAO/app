@@ -5,10 +5,23 @@ import {usePrivy} from "@privy-io/react-auth";
 import InviteCodeModal from "@/components/invite-code-modal";
 import MintPage from "@/components/mint-page";
 import {useUserContext} from "@/providers/user-context-provider";
+import useValues from "./hooks/useValues";
+import {useEffect} from "react";
 
 export default function Home() {
   const {authenticated, login, ready, user} = usePrivy();
-  const {userInfo, isLoading} = useUserContext();
+  const {userInfo, isLoading, setUserInfo} = useUserContext();
+  const {updateUser} = useValues();
+  //* redundant code
+  useEffect(() => {
+    const addTwitterHandle = async () => {
+      if (user?.twitter?.username) {
+        await updateUser({twitter: user.twitter.username});
+        setUserInfo({...userInfo, twitter: user.twitter.username});
+      }
+    };
+    addTwitterHandle();
+  }, [user]);
   return (
     <>
       {isLoading && (

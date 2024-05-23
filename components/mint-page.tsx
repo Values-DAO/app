@@ -209,6 +209,16 @@ const MintPage = () => {
     fetchData();
   }, [searchValue, userInfo]);
 
+  //* redundant code
+  useEffect(() => {
+    const addTwitterHandle = async () => {
+      if (user?.twitter?.username) {
+        await updateUser({twitter: user.twitter.username});
+        setUserInfo({...userInfo, twitter: user.twitter.username});
+      }
+    };
+    addTwitterHandle();
+  }, [user]);
   return (
     <div className="flex justify-center">
       <div className="flex flex-col md:w-[900px] w-[98vw] max-w-[98%] m-auto">
