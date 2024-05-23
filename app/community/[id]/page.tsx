@@ -167,7 +167,7 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
                     <Badge
                       key={index}
                       variant={"default"}
-                      className="rounded-sm text-[18px] "
+                      className="rounded-sm text-[18px] bg-transparent border border-primary text-primary"
                     >
                       {value}
                     </Badge>
