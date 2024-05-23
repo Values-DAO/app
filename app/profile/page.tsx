@@ -74,12 +74,21 @@ const ProfilePage = () => {
                 because that is the person you are most ||aligned with
               </p>
             </Card>
-          )} */}
+          )} */}{" "}
+          <h2 className="scroll-m-20 text-center border-b pb-2 text-3xl font-medium tracking-tight first:mt-0 max-w-5xl text-muted-foreground">
+            || minted values
+          </h2>
+          {userInfo &&
+            userInfo.mintedValues &&
+            userInfo.mintedValues.length === 0 && (
+              <Card className="mt-2">
+                <p className="text-center">No minted values yet</p>
+              </Card>
+            )}
           {userInfo &&
             userInfo.mintedValues &&
             userInfo.mintedValues.length > 0 && (
               <Card className="mt-2">
-                <p className="font-semibold p-4 text-gray-300">Minted Values</p>
                 <Table>
                   <TableHeader>
                     <TableRow>
