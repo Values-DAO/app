@@ -76,8 +76,10 @@ const useValues = () => {
         {
           ...(user?.email?.address
             ? {email: user?.email?.address}
-            : {email: String(user?.farcaster?.fid)}),
-          ...(user?.farcaster?.fid ? {farcaster: user?.farcaster?.fid} : {}),
+            : user?.farcaster?.fid
+            ? {farcaster: user?.farcaster?.fid}
+            : {}),
+
           wallets: wallets || [],
           method: "create_user",
           balance: 5,
@@ -103,11 +105,13 @@ const useValues = () => {
     balance,
     type,
     twitter,
+    farcaster,
   }: {
     values?: {value: string; txHash: string}[];
     balance?: number;
     type?: string;
     twitter?: string;
+    farcaster?: number;
   }): Promise<{user: IUser | null; message: string}> => {
     if (!user?.email?.address && !user?.farcaster?.fid)
       return {user: null, message: "No user data"};
@@ -123,6 +127,7 @@ const useValues = () => {
           ...(user?.email?.address && {email: user?.email?.address}),
           ...(user?.farcaster?.fid && {farcaster: user?.farcaster?.fid}),
           ...(twitter && {twitter}),
+          ...(farcaster && {farcaster}),
         },
         {
           headers: {

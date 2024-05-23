@@ -232,7 +232,18 @@ const ValuePage = () => {
     };
     addTwitterHandle();
   }, [user]);
+  useEffect(() => {
+    const addWarpcastAccount = async () => {
+      if (user?.farcaster?.fid) {
+        await updateUser({farcaster: user.farcaster.fid});
+        setUserInfo({...userInfo, farcaster: user.farcaster.fid});
+      }
+    };
+    addWarpcastAccount();
+  }, [user]);
 
+  console.log(userInfo);
+  console.log("user", user);
   return (
     <>
       {authenticated && (
@@ -242,7 +253,7 @@ const ValuePage = () => {
               || ai generated values
             </h2>
             <Tabs defaultValue={"warpcast"} className="w-full">
-              <TabsList className="flex justify-center bg-primary text-primary-foreground  bg-white py-8 md:py-4">
+              <TabsList className="flex justify-center bg-primary text-primary-foreground  bg-white py-4">
                 <TabsTrigger
                   value="warpcast"
                   className="text-md text-wrap md:text-lg  w-[50%] md:py-[1px] "
@@ -325,7 +336,8 @@ const ValuePage = () => {
                           <AlertDescription>{error.message}</AlertDescription>
                         </Alert>
                       )}
-                      {!error && (
+
+                      {userInfo && userInfo?.twitter && (
                         <Button
                           className="w-full cursor-pointer mt-4"
                           disabled={loader}
@@ -339,11 +351,19 @@ const ValuePage = () => {
                     </div>
                   )}
 
-                {error && error.platform === "twitter" && (
+                {((error && error.platform === "twitter") ||
+                  userInfo?.twitter === undefined) && (
                   <div className="flex flex-col gap-2 justify-center">
-                    <p>Connect your account to continue</p>
+                    <p className="text-center mt-2">
+                      Connect your account to continue
+                    </p>
                     <div className="flex flex-row gap-2 justify-center">
-                      <Button onClick={linkTwitter}>Link Twitter</Button>
+                      <Button
+                        onClick={linkTwitter}
+                        className="w-full cursor-pointer mt-4"
+                      >
+                        Link Twitter
+                      </Button>
                     </div>
                   </div>
                 )}
@@ -425,7 +445,8 @@ const ValuePage = () => {
                           <AlertDescription>{error.message}</AlertDescription>
                         </Alert>
                       )}
-                      {!error && (
+
+                      {userInfo && userInfo.farcaster && (
                         <Button
                           className="w-full cursor-pointer mt-4"
                           disabled={loader}
@@ -439,11 +460,19 @@ const ValuePage = () => {
                     </div>
                   )}
 
-                {error && error.platform === "warpcast" && (
+                {((error && error.platform === "warpcast") ||
+                  userInfo?.farcaster === undefined) && (
                   <div className="flex flex-col gap-2 justify-center">
-                    <p>Connect your account to continue</p>
+                    <p className="text-center mt-2">
+                      Connect your account to continue
+                    </p>
                     <div className="flex flex-row gap-2 justify-center">
-                      <Button onClick={linkFarcaster}>Link Warpcast</Button>
+                      <Button
+                        onClick={linkFarcaster}
+                        className="w-full cursor-pointer mt-4"
+                      >
+                        Link Warpcast
+                      </Button>
                     </div>
                   </div>
                 )}

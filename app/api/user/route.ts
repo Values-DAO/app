@@ -52,13 +52,22 @@ export async function POST(req: NextRequest) {
           return NextResponse.json({error: "User already exists", status: 400});
         }
         const codes = generateInviteCodes();
+        console.log({
+          wallets,
+          balance: 5,
+          isVerified: true,
+          inviteCodes: codes.map((inviteCode) => ({code: inviteCode})),
+
+          ...(email ? {email} : farcaster ? {farcaster} : {}),
+          mintedValues: mintedValues || [],
+        });
         const createdUser = await User.create({
           wallets,
           balance: 5,
           isVerified: true,
           inviteCodes: codes.map((inviteCode) => ({code: inviteCode})),
-          ...(farcaster ? {farcaster} : {}),
-          ...(email ? {email} : {}),
+
+          ...(email ? {email} : farcaster ? {farcaster} : {}),
           mintedValues: mintedValues || [],
         });
 
@@ -89,6 +98,9 @@ export async function POST(req: NextRequest) {
         }
         if (twitter) {
           user.twitter = twitter;
+        }
+        if (farcaster) {
+          user.farcaster = farcaster;
         }
         await user.save();
 

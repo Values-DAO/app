@@ -33,7 +33,6 @@ const userSchema = new Schema(
     },
     farcaster: {
       type: Number,
-      unique: true,
     },
     twitter: {
       type: String,
