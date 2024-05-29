@@ -224,7 +224,7 @@ const MintPage = () => {
       <div className="flex flex-col md:w-[900px] w-[98vw] max-w-[98%] m-auto">
         <ValuesWordCloud refresh={valuesAvailable} />
 
-        <Tabs className="w-[96%] m-auto">
+        <Tabs defaultValue="ai" className="w-[96%] m-auto">
           <TabsList className="flex justify-center bg-primary text-primary-foreground  bg-white py-8 md:py-4">
             <TabsTrigger
               value="ai"
