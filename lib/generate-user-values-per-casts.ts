@@ -1,8 +1,9 @@
 import {openai} from "./openai";
 
 export const generateValuesForUser = async (casts: string[]) => {
+  const content = casts.join("\n").slice(0, 33000); // assuming ~35k equates to 8k tokens
   const completion = await openai.chat.completions.create({
-    model: "gpt-4",
+    model: "gpt-4o",
     messages: [
       {
         role: "system",
@@ -11,7 +12,7 @@ export const generateValuesForUser = async (casts: string[]) => {
       },
       {
         role: "user",
-        content: casts.join("\n"),
+        content: content,
       },
     ],
   });
