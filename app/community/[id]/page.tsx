@@ -184,7 +184,7 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
                   </Button>
                 )}
 
-                {(userInfo.wallets || address) &&
+                {/* {(userInfo.wallets || address) &&
                   tokenBalance &&
                   tokenBalance > 0 && (
                     <Button
@@ -195,7 +195,11 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
                     >
                       {loader ? "Minting..." : "Mint Values"}
                     </Button>
-                  )}
+                  )} */}
+
+                <Alert className="my-8">
+                  <AlertTitle>Coming Soon!</AlertTitle>
+                </Alert>
 
                 {!user && (
                   <Button
