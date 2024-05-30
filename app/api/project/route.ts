@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
       values,
       category,
       verified,
+      id,
     } = await req.json();
     if (!name || !description || !coverImage || !contractAddress || !chainId) {
       return NextResponse.json({status: 400, error: "Missing required fields"});
@@ -42,6 +43,7 @@ export async function POST(req: NextRequest) {
       values,
       category,
       verified,
+      id,
     });
     return NextResponse.json({status: 200, message: "Success", project});
   } catch (error) {
