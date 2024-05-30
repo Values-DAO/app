@@ -3,6 +3,7 @@ import useValues from "@/app/hooks/useValues";
 import {IUser} from "@/models/user";
 import {IValuesData} from "@/types";
 import {usePrivy} from "@privy-io/react-auth";
+import axios from "axios";
 import {createContext, useContext, useEffect, useState} from "react";
 
 interface UserContextType {
@@ -69,7 +70,33 @@ export const UserContextProvider = ({
     };
     fetchValues();
   }, []);
-
+  useEffect(() => {
+    const addWalletsIfPresent = async () => {
+      try {
+        const response = await axios.post(
+          "/api/user",
+          {
+            method: "add_wallet",
+            wallets: [user?.wallet?.address],
+            ...(user?.farcaster?.fid ? {farcaster: user?.farcaster?.fid} : {}),
+            ...(user?.email?.address ? {email: user?.email?.address} : {}),
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+            },
+          }
+        );
+        console.log("response", response);
+      } catch (error) {
+        console.log("error", error);
+      }
+    };
+    if (user?.wallet?.address) {
+      addWalletsIfPresent();
+    }
+  }, [user]);
   return (
     <UserContext.Provider
       value={{

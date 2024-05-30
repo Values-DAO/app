@@ -55,6 +55,9 @@ export async function GET(req: NextRequest) {
         });
       }
       generatedValues = await generateValuesForUser(tweets);
+      if (generatedValues && generatedValues.length > 2) {
+        user.aiGeneratedValues.twitter = Array.from(generatedValues);
+      }
     } else if (fid) {
       const casts = await fetchCastsForUser(fid, 200);
       if (casts.length < 100) {
@@ -64,11 +67,11 @@ export async function GET(req: NextRequest) {
         });
       }
       generatedValues = await generateValuesForUser(casts);
+      if (generatedValues && generatedValues.length > 2) {
+        user.aiGeneratedValues.warpcast = Array.from(generatedValues);
+      }
     }
-    if (generatedValues && generatedValues.length > 2) {
-      user.aiGeneratedValues[twitter ? "twitter" : "warpcast"] =
-        Array.from(generatedValues);
-    }
+
     await user.save();
     return NextResponse.json({
       status: 200,

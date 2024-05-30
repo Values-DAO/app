@@ -14,8 +14,15 @@ import {Tabs, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 
 const ValuePage = () => {
-  const {user, authenticated, ready, login, linkTwitter, linkFarcaster} =
-    usePrivy();
+  const {
+    user,
+    authenticated,
+    ready,
+    login,
+    linkTwitter,
+    linkFarcaster,
+    linkWallet,
+  } = usePrivy();
   const {
     analyseUserAndGenerateValues,
     updateUser,
@@ -63,7 +70,6 @@ const ValuePage = () => {
 
   const analyse = async (socialMedia: string) => {
     setLoading(true);
-
     let result = null; // Use a result object to hold the function's output
 
     if (socialMedia === "twitter" && user?.twitter?.username) {
@@ -108,6 +114,14 @@ const ValuePage = () => {
   }: {
     platform: "WARPCAST" | "TWITTER";
   }) => {
+    if (!address && userInfo?.wallets?.length === 0) {
+      toast({
+        title: "Please connect a wallet",
+        description: "You need to connect a wallet to mint values",
+        variant: "destructive",
+      });
+      return;
+    }
     setLoader(true);
     const cids = await batchUploadValuesPinata({
       values:
@@ -199,10 +213,16 @@ const ValuePage = () => {
       chainId: 84532,
     });
 
-    await updateUser({
-      values: valuesMinted.map((value) => {
-        return {value: value, txHash: hash};
-      }),
+    setUserInfo({
+      ...userInfo,
+      mintedValues: [
+        ...(userInfo?.mintedValues || []), // Spread the existing mintedValues
+        ...valuesMinted.map((value) => ({
+          // Append new values
+          value: value,
+          txHash: hash,
+        })),
+      ],
     });
 
     await updateValuesBulk({
@@ -242,8 +262,6 @@ const ValuePage = () => {
     addWarpcastAccount();
   }, [user]);
 
-  console.log(userInfo);
-  console.log("user", user);
   return (
     <>
       {authenticated && (
@@ -307,7 +325,8 @@ const ValuePage = () => {
                   )
                 ) &&
                   userInfo?.aiGeneratedValues &&
-                  userInfo?.aiGeneratedValues?.twitter?.length > 0 && (
+                  userInfo?.aiGeneratedValues?.twitter?.length > 0 &&
+                  (address || (userInfo?.wallets?.length ?? 0) > 0) && (
                     <Button
                       variant={"default"}
                       className="w-full cursor-pointer mt-4"
@@ -317,6 +336,20 @@ const ValuePage = () => {
                       disabled={loader}
                     >
                       {loader ? "Minting..." : "Mint Values"}
+                    </Button>
+                  )}
+
+                {!address &&
+                  userInfo?.wallets?.length === 0 &&
+                  userInfo?.aiGeneratedValues &&
+                  userInfo?.aiGeneratedValues?.twitter?.length > 0 && (
+                    <Button
+                      variant={"default"}
+                      className="w-full cursor-pointer mt-4"
+                      onClick={linkWallet}
+                      disabled={loader}
+                    >
+                      Connect Wallet to mint
                     </Button>
                   )}
 

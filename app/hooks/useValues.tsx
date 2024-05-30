@@ -493,12 +493,6 @@ const useValues = () => {
     values: any | null;
     message: string;
   }> => {
-    if (!user?.farcaster?.fid)
-      return {
-        user: null,
-        values: null,
-        message: "No user data",
-      };
     const query =
       fid && twitter
         ? `fid=${fid}&twitter=${twitter}&twitter_userId=${user?.twitter?.subject}`
