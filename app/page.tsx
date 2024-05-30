@@ -37,12 +37,7 @@ export default function Home() {
               <div className="animate-spin rounded-full h-14 w-14 border-t-2 border-b-2 border-primary"></div>
             </div>
           )}
-          {userInfo && userInfo.isVerified === true && <MintPage />}
-          {userInfo && userInfo.isVerified === false && (
-            <div className="flex flex-col items-center px-6 mt-[40%] md:mt-[15%]">
-              <InviteCodeModal />
-            </div>
-          )}
+          {userInfo && <MintPage />}
         </>
       ) : (
         <div className="flex flex-col items-center px-6 mt-[40%] md:mt-[15%]">

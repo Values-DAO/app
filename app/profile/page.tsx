@@ -24,58 +24,9 @@ const ProfilePage = () => {
   const {userInfo, isLoading} = useUserContext();
   return (
     <div className="p-4">
-      {authenticated && userInfo && userInfo.isVerified && !isLoading && (
+      {authenticated && userInfo && !isLoading && (
         <div>
-          {/* {userInfo && userInfo?.inviteCodes!.length > 0 && (
-            <Card className="flex flex-col  gap-4 p-4">
-              <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight mb-4">
-                Invite your ||aligned friend
-              </h3>
-
-              <ul className="mt-2 mb-6 md:ml-6 list-disc [&>li]:mt-2">
-                {userInfo?.inviteCodes!.map((code, index) => {
-                  const claimed = code.claimed;
-                  if (claimed) {
-                    return (
-                      <li key={index} className="text-lg font-light ml-4">
-                        {code.code} was claimed by {code.claimedBy}
-                      </li>
-                    );
-                  }
-                  return (
-                    <li
-                      key={index}
-                      className="text-lg font-medium flex flex-row gap-4 justify-between md:justify-start"
-                    >
-                      <span className="w-24">{code.code}</span>
-
-                      <Button
-                        variant="outline"
-                        className="flex flex-row gap-2 items-center"
-                        onClick={() => {
-                          toast({
-                            title: "Copied to clipboard",
-                          });
-                          navigator.clipboard.writeText(code.code);
-                        }}
-                      >
-                        <Copy /> <span>Copy</span>
-                      </Button>
-                    </li>
-                  );
-                })}
-              </ul>
-
-              <p className="text-xl text-muted-foreground">
-                Why only one invite? <br></br>
-                <br></br>We are not here to get million random users. We are
-                giving it out only to ||aligned users and specific communities.{" "}
-                <br></br> We are giving you ONE invite only for your best friend
-                because that is the person you are most ||aligned with
-              </p>
-            </Card>
-          )} */}{" "}
-          <h2 className="scroll-m-20 text-center border-b pb-2 text-3xl font-medium tracking-tight first:mt-0 max-w-5xl text-muted-foreground">
+          <h2 className="scroll-m-20 text-center border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 text-muted-foreground mb-2">
             || minted values
           </h2>
           {userInfo &&
@@ -127,15 +78,7 @@ const ProfilePage = () => {
             )}
         </div>
       )}
-      {/* 
-      {authenticated &&
-        userInfo &&
-        userInfo.isVerified == false &&
-        !isLoading && (
-          <div className="flex flex-col items-center px-6 mt-[40%] md:mt-[15%]">
-            <InviteCodeModal />
-          </div>
-        )} */}
+
       {!authenticated && (
         <section className="w-full mt-24 md:mt-[15%]  flex flex-col items-center ">
           <span className="font-semibold  text-gray-300 text-lg">

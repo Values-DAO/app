@@ -143,7 +143,7 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
 
   return (
     <>
-      {userInfo && userInfo.isVerified && (
+      {userInfo && (
         <main className="p-4 overflow-y-auto">
           {project && (
             <section className="flex flex-col items-center md:items-start md:flex-row gap-4">
@@ -252,12 +252,6 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
             </div>
           )}
         </main>
-      )}
-
-      {userInfo && userInfo?.isVerified === false && (
-        <div className="flex flex-col items-center px-6 mt-[40%] md:mt-[15%]">
-          <InviteCodeModal />
-        </div>
       )}
     </>
   );

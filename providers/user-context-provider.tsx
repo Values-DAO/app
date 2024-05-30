@@ -40,9 +40,8 @@ export const UserContextProvider = ({
 
       if (user?.email?.address || user?.farcaster?.fid) {
         userInfo = (await fetchUser())?.user;
-        console.log("userInfo", userInfo);
       }
-      console.log("userInfo", userInfo);
+
       if (userInfo) {
         if (!userInfo?.generatedValues) {
           userInfo = {...userInfo, generatedValues: []};
@@ -50,10 +49,9 @@ export const UserContextProvider = ({
 
         setUserInfo(userInfo);
       } else {
-        console.log("Creating user");
         wallets = await fetchFarcasterUserWallets();
         const userCreated = await createUser({wallets: wallets || []});
-        console.log("userCreated", userCreated);
+
         setUserInfo(userCreated.user);
       }
     };
@@ -88,7 +86,6 @@ export const UserContextProvider = ({
             },
           }
         );
-        console.log("response", response);
       } catch (error) {
         console.log("error", error);
       }

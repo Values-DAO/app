@@ -1,5 +1,4 @@
 export const fetchUserTweets = async (twitter_userId: string) => {
-  console.log("fetching user tweets", twitter_userId);
   const tweets = [];
   let pagination_token: string | null = null;
   let pageCount = 0; // Initialize a page counter
