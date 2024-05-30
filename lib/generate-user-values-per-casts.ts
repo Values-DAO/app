@@ -8,7 +8,7 @@ export const generateValuesForUser = async (casts: string[]) => {
       {
         role: "system",
         content:
-          "Extract up to 7 single-worded first principles values from the following tweets and return them in a single string, separated by commas.",
+          "Extract up to 7 single-worded first principles values from the following tweets and return them in a single string, separated by commas. Avoid adjectives unless they directly describe a value.",
       },
       {
         role: "user",

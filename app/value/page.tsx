@@ -12,6 +12,7 @@ import {useAccount, useWriteContract} from "wagmi";
 import {TabsContent} from "@radix-ui/react-tabs";
 import {Tabs, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
+import {ToastAction} from "@/components/ui/toast";
 
 const ValuePage = () => {
   const {
@@ -199,6 +200,16 @@ const ValuePage = () => {
         title: "You already hold these Values",
         description: "View them in your wallet",
         variant: "destructive",
+        action: (
+          <ToastAction
+            altText="profile"
+            onClick={() => {
+              window.location.href = `/profile`;
+            }}
+          >
+            View
+          </ToastAction>
+        ),
       });
       return;
     }
@@ -232,11 +243,34 @@ const ValuePage = () => {
       toast({
         title: "We just dropped Value NFTs to your wallet",
         description: "View them in your wallet",
+        action: (
+          <ToastAction
+            altText="basescan"
+            onClick={() => {
+              window.open(
+                `${process.env.NEXT_PUBLIC_BASESCAN_URL}/tx/${hash}`,
+                "_blank"
+              );
+            }}
+          >
+            Basescan
+          </ToastAction>
+        ),
       });
     } else {
       toast({
         title: "You already hold these Values",
         description: "View them in your wallet",
+        action: (
+          <ToastAction
+            altText="profile"
+            onClick={() => {
+              window.location.href = `/profile`;
+            }}
+          >
+            View
+          </ToastAction>
+        ),
       });
     }
 

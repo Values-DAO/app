@@ -45,15 +45,16 @@ export async function POST(req: NextRequest) {
           "https://api.pinata.cloud/pinning/pinJSONToIPFS",
           {
             pinataContent: {
-              name: value, // Ensure you're using value.name
+              name: value,
               description:
                 "This is a value NFT generated via ValuesDAO, each NFT represents a unique Human Value.",
-              image: "generatedImage",
+              image:
+                "https://gateway.pinata.cloud/ipfs/QmX3E8eg85itRjcTHu9ZRbU2JAu1R9YPFDLYg5ijD2Gc6n",
             },
           },
           {
             headers: {
-              Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiIyZGVhNjBhOC1iYTNkLTQyMmItODkzNi1mYjQ5YWFmNjlhOWYiLCJlbWFpbCI6InNhbmtoeWFzaWRkZXNoN0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJpZCI6IkZSQTEiLCJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MX0seyJpZCI6Ik5ZQzEiLCJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MX1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiZDZkZjBlMjcyNmYxODU5NmQxODciLCJzY29wZWRLZXlTZWNyZXQiOiJhNjk1YzVmMTJhZDI5MTcwZTI0OTk4YTA2YTU3NzFlNzNhZTZjN2Q0ODk4NzU2MjQxYTEwZDY3NzQ5MjA1ZDBjIiwiaWF0IjoxNzE2MzYzMzE2fQ.steB1PRirX7T-J93BOtMjR2MvtTaxxcJDRSK35CYSpY`,
+              Authorization: `Bearer ${process.env.NEXT_PUBLIC_PINATA_JWT}`,
               "Content-Type": "application/json",
             },
           }
@@ -61,9 +62,9 @@ export async function POST(req: NextRequest) {
         const valueObject = {
           value: {
             metadata: {
-              name: value, // Ensure you're using value.name
+              name: value,
               description: `This is a value NFT generated via ValuesDAO, each NFT represents a unique Human Value. This NFT represents the value: ${value}.`,
-              image: `https://gateway.pinata.cloud/ipfs/QmetoKUn658fkYqaK5mkiurTpY3Dk3VTEoAGSbEky8PqaA`,
+              image: `https://gateway.pinata.cloud/ipfs/QmX3E8eg85itRjcTHu9ZRbU2JAu1R9YPFDLYg5ijD2Gc6n`,
             },
             cid: `https://gateway.pinata.cloud/ipfs/${response.data.IpfsHash}`,
           },
