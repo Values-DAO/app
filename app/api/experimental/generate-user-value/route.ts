@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
       generatedValues = (await generateValuesForUser(tweets)) ?? [];
     } else if (fid) {
       const casts = await fetchCastsForUser(fid, 200);
-      if (casts.length < 100) {
+      if (casts.length < 10) {
         return NextResponse.json({
           status: 400,
           error: "User has less than 100 casts",
