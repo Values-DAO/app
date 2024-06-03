@@ -61,12 +61,11 @@ export async function GET(req: NextRequest) {
         $set: {
           ...(twitter_userId
             ? {"aiGeneratedValues.twitter": Array.from(generatedValues)}
-            : {"aiGeneratedValues.farcaster": Array.from(generatedValues)}),
+            : {"aiGeneratedValues.warpcast": Array.from(generatedValues)}),
         },
       },
       {new: true, upsert: true}
     );
-
     return NextResponse.json({
       status: 200,
       user,
