@@ -8,6 +8,7 @@ export type IUser = {
   twitter?: string;
   wallets?: string[];
   mintedValues?: {value: string; txHash: string}[];
+  burntValues?: {value: string; txHash: string; burntAt: Date}[];
   balance?: number;
   invitedBy?: string;
   isVerified?: boolean;
@@ -51,7 +52,17 @@ const userSchema = new Schema(
       ],
       default: [],
     },
-    // deprecated
+    burntValues: {
+      type: [
+        {
+          value: String,
+          txHash: String,
+          burntAt: {type: Date, default: Date.now},
+        },
+      ],
+      default: [],
+    },
+    //* deprecated
     generatedValues: {
       type: [String],
     },

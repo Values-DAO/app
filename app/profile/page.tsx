@@ -19,6 +19,7 @@ import {Copy} from "lucide-react";
 import {useEffect, useState} from "react";
 import useValues from "../hooks/useValues";
 import {useUserContext} from "@/providers/user-context-provider";
+import ExperimentalBurnButtons from "@/components/ui/experimental-burn-buttons";
 const ProfilePage = () => {
   const {authenticated, login, ready, user} = usePrivy();
   const {userInfo, isLoading} = useUserContext();
@@ -29,6 +30,7 @@ const ProfilePage = () => {
           <h2 className="scroll-m-20 text-center border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 text-muted-foreground mb-2">
             || minted values
           </h2>
+          <ExperimentalBurnButtons />
           {userInfo &&
             userInfo.mintedValues &&
             userInfo.mintedValues.length === 0 && (

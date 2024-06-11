@@ -173,3 +173,84 @@ export async function GET(req: NextRequest) {
     });
   }
 }
+
+export async function PATCH(req: NextRequest) {
+  const {email, farcaster, method, values, type, txHash} = await req.json();
+  if (!email && !farcaster) {
+    return NextResponse.json({
+      error: "Email or farcaster is required",
+      status: 400,
+    });
+  }
+
+  if (Array.isArray(values) && values.length === 0) {
+    return NextResponse.json({
+      error: "Values is required",
+      status: 400,
+    });
+  }
+  if (!Array.isArray(values)) {
+    return NextResponse.json({
+      error: "Values must be an array",
+      status: 400,
+    });
+  }
+  try {
+    await connectToDatabase();
+    const apiKey = headers().get("x-api-key");
+    const {isValid, message, status} = await validateApiKey(apiKey, "WRITE");
+
+    if (!isValid) {
+      return NextResponse.json({
+        status: status,
+        error: message,
+      });
+    }
+
+    const user = await User.findOne({
+      ...(email ? {email} : farcaster ? {farcaster} : {}),
+    });
+
+    if (!user) {
+      return NextResponse.json({
+        error: "User not found",
+        user: null,
+        status: 404,
+      });
+    }
+
+    if (method === "update_user_value" && type === "burn") {
+      for (const value of values) {
+        const index = user.mintedValues.findIndex(
+          (v: any) => v.value === value
+        );
+
+        if (index !== -1) {
+          console.log("Removing value from minted values");
+          user.mintedValues.splice(index, 1);
+        }
+        user.burntValues.push({
+          value,
+          txHash: txHash || "",
+        });
+      }
+      await user.save();
+      return NextResponse.json({
+        user,
+        status: 200,
+        message: "Values burnt successfully",
+      });
+    }
+    return NextResponse.json({
+      user: null,
+      error: "Method not provided",
+      status: 405,
+    });
+  } catch (error) {
+    return NextResponse.json({
+      user: null,
+      error: error || "Internal Server Error",
+      status: 500,
+    });
+  }
+}
