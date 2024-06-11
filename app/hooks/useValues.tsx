@@ -94,11 +94,19 @@ const useValues = () => {
       );
       emailAnalytics({
         subject: "New User",
-        body: `A new  user has been created with the ${
-          user.email?.address ? `email ${user?.email?.address}` : ""
-        }  ${
-          user.farcaster?.fid ? `and farcaster id ${user?.farcaster?.fid}` : ""
-        }`,
+        body: [
+          "A new user has been created with the following details:",
+          user.email?.address ? `Email: ${user?.email?.address}` : "",
+          user.farcaster?.displayName
+            ? `Farcaster Display Name: ${user?.farcaster?.displayName}`
+            : "",
+          user.twitter?.username
+            ? `Twitter Username: ${user?.twitter?.username}`
+            : "",
+          user?.farcaster?.username
+            ? `Warpcast: https://warpcast.com/${user?.farcaster?.username}`
+            : ``,
+        ].join("\n"),
       });
       return {user: userCreated.data, message: "User created successfully"};
     } catch (error) {
@@ -147,11 +155,16 @@ const useValues = () => {
       if (values) {
         emailAnalytics({
           subject: "User minted a value",
-          body: `A user has minted a value(s). Their info: ${
-            user.email?.address ? `email ${user?.email?.address}` : ""
-          } ${
-            user.farcaster?.fid ? `farcaster id ${user?.farcaster?.fid}` : ""
-          }`,
+          body: [
+            "User has minted their values",
+            user.email?.address ? `Email: ${user?.email?.address}` : "",
+            user.farcaster?.displayName
+              ? `Farcaster Display Name: ${user?.farcaster?.displayName}`
+              : "",
+            user?.farcaster?.username
+              ? `Warpcast: https://warpcast.com/${user?.farcaster?.username}`
+              : ``,
+          ].join("\n"),
         });
       }
       return {user: response.data, message: "User updated successfully"};
@@ -527,11 +540,16 @@ const useValues = () => {
       });
       emailAnalytics({
         subject: "New user generated their values using ai",
-        body: `A new user has generated their values using ai, their info: ${
-          user?.email?.address && `email ${user?.email?.address}`
-        }  ${
-          user?.farcaster?.fid && `and farcaster id ${user?.farcaster?.fid}`
-        }`,
+        body: [
+          "user has generated their values using ai",
+          user?.email?.address ? `Email: ${user?.email?.address}` : "",
+          user?.farcaster?.displayName
+            ? `Farcaster Display Name: ${user?.farcaster?.displayName}`
+            : "",
+          user?.farcaster?.username
+            ? `Warpcast: https://warpcast.com/${user?.farcaster?.username}`
+            : ``,
+        ].join("\n"),
       });
       return {
         user: response.data.user ?? null,
