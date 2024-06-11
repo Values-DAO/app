@@ -225,7 +225,7 @@ const MintPage = () => {
         <ValuesWordCloud refresh={valuesAvailable} />
 
         <Tabs defaultValue="ai" className="w-[96%] m-auto">
-          <TabsList className="flex justify-center bg-primary text-primary-foreground  bg-white py-8 md:py-4">
+          <TabsList className="flex justify-center py-8 md:py-4 text-black">
             <TabsTrigger
               value="ai"
               className="text-md text-wrap md:text-lg font-semibold  py-[3px]"
