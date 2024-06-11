@@ -66,7 +66,7 @@ const Projects = ({limit, style}: {limit?: number; style?: string}) => {
                     <Badge
                       key={index}
                       variant="default"
-                      className="rounded-sm text-[18px] bg-transparent border border-primary text-primary"
+                      className="rounded-sm text-[18px] bg-transparent border border-primary text-primary hover:bg-transparent"
                     >
                       {value}
                     </Badge>

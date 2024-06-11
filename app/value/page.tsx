@@ -305,7 +305,7 @@ const ValuePage = () => {
               || ai generated values
             </h2>
             <Tabs defaultValue={"warpcast"} className="w-full">
-              <TabsList className="flex justify-center bg-primary text-primary-foreground  bg-white py-4">
+              <TabsList className="flex justify-center py-4 text-black">
                 <TabsTrigger
                   value="warpcast"
                   className="text-md text-wrap md:text-lg  w-[50%] md:py-[1px] "
@@ -341,7 +341,7 @@ const ValuePage = () => {
                         (value, index) => (
                           <Badge
                             key={index}
-                            className="rounded-sm text-[18px] bg-transparent border border-primary text-primary"
+                            className="rounded-sm text-[18px] bg-transparent border border-primary text-primary hover:bg-transparent"
                           >
                             {value}
                           </Badge>
@@ -456,7 +456,7 @@ const ValuePage = () => {
                         (value, index) => (
                           <Badge
                             key={index}
-                            className="rounded-sm text-[18px] bg-transparent border border-primary text-primary"
+                            className="rounded-sm text-[18px] bg-transparent border border-primary text-primary hover:bg-transparent "
                           >
                             {value}
                           </Badge>
