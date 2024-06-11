@@ -92,6 +92,14 @@ const useValues = () => {
           },
         }
       );
+      emailAnalytics({
+        subject: "New User",
+        body: `A new  user has been created with the ${
+          user.email?.address ? `email ${user?.email?.address}` : ""
+        }  ${
+          user.farcaster?.fid ? `and farcaster id ${user?.farcaster?.fid}` : ""
+        }`,
+      });
       return {user: userCreated.data, message: "User created successfully"};
     } catch (error) {
       return {
@@ -136,7 +144,16 @@ const useValues = () => {
           },
         }
       );
-
+      if (values) {
+        emailAnalytics({
+          subject: "User minted a value",
+          body: `A user has minted a value(s). Their info: ${
+            user.email?.address ? `email ${user?.email?.address}` : ""
+          } ${
+            user.farcaster?.fid ? `farcaster id ${user?.farcaster?.fid}` : ""
+          }`,
+        });
+      }
       return {user: response.data, message: "User updated successfully"};
     } catch (error) {
       return {user: null, message: error as string};
@@ -280,6 +297,8 @@ const useValues = () => {
       };
     }
   };
+
+  //* deprecated
   const validateInviteCode = async ({
     inviteCode,
   }: {
@@ -506,7 +525,14 @@ const useValues = () => {
           "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
         },
       });
-
+      emailAnalytics({
+        subject: "New user generated their values using ai",
+        body: `A new user has generated their values using ai, their info: ${
+          user?.email?.address && `email ${user?.email?.address}`
+        }  ${
+          user?.farcaster?.fid && `and farcaster id ${user?.farcaster?.fid}`
+        }`,
+      });
       return {
         user: response.data.user ?? null,
         values: response.data.user.aiGeneratedValues ?? null,
@@ -542,6 +568,33 @@ const useValues = () => {
       return {error: error || "An error occurred"};
     }
   };
+  const emailAnalytics = async ({
+    subject,
+    body,
+  }: {
+    subject: string;
+    body: string;
+  }) => {
+    try {
+      const response = await axios.post(
+        "/api/trigger-email",
+        {
+          body,
+          subject,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      return error;
+    }
+  };
   return {
     fetchUser,
     createUser,
@@ -558,6 +611,7 @@ const useValues = () => {
     fetchFarcasterUserWallets,
     analyseUserAndGenerateValues,
     batchUploadValuesPinata,
+    emailAnalytics,
   };
 };
 

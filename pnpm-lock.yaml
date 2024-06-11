@@ -41,6 +41,9 @@ dependencies:
   '@tanstack/react-query':
     specifier: ^5.32.0
     version: 5.32.0(react@18.2.0)
+  '@vercel/functions':
+    specifier: ^1.0.2
+    version: 1.0.2
   axios:
     specifier: ^1.6.8
     version: 1.6.8
@@ -74,6 +77,9 @@ dependencies:
   next:
     specifier: 14.2.3
     version: 14.2.3(@babel/core@7.24.4)(react-dom@18.2.0)(react@18.2.0)
+  nodemailer:
+    specifier: ^6.9.13
+    version: 6.9.13
   openai:
     specifier: ^4.38.5
     version: 4.38.5
@@ -4532,6 +4538,11 @@ packages:
   /@ungap/structured-clone@1.2.0:
     resolution: {integrity: sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==}
     dev: true
+
+  /@vercel/functions@1.0.2:
+    resolution: {integrity: sha512-j3udyHOv/05Y8o3WQ/ANMWa1aYagsY5B3ouImiwgYsz5z4CBUHTY5dk74oQAXYr+bgoVDpdDlmxkpnxGzKEdLQ==}
+    engines: {node: '>= 16'}
+    dev: false
 
   /@wagmi/connectors@4.1.27(@types/react@18.2.79)(@wagmi/core@2.6.18)(react-dom@18.2.0)(react-i18next@13.5.0)(react-native@0.74.0)(react@18.2.0)(typescript@5.4.5)(viem@2.9.26):
     resolution: {integrity: sha512-q9A0iNgZmKWssK593LkScRYQVu5cM+L9Mzsisup9fvNGJb/o12vLPjPBJenDzA7a4GuAk3r+qKDo09OEeH9n4w==}
@@ -9413,6 +9424,11 @@ packages:
     engines: {node: '>=0.12.0'}
     dev: false
 
+  /nodemailer@6.9.13:
+    resolution: {integrity: sha512-7o38Yogx6krdoBf3jCAqnIN4oSQFx+fMa0I7dK1D+me9kBxx12D+/33wSb+fhOCtIxvYJ+4x4IMEhmhCKfAiOA==}
+    engines: {node: '>=6.0.0'}
+    dev: false
+
   /normalize-path@3.0.0:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
     engines: {node: '>=0.10.0'}
@@ -10557,6 +10573,7 @@ packages:
 
   /rimraf@2.6.3:
     resolution: {integrity: sha512-mwqeW5XsA2qAejG46gYdENaxXjx9onRNCfn7L0duuP4hCuTIi/QO7PDK07KJfp1d+izWPrzEJDcSqBa0OZQriA==}
+    deprecated: Rimraf versions prior to v4 are no longer supported
     hasBin: true
     dependencies:
       glob: 7.2.3
