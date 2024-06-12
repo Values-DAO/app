@@ -6,6 +6,8 @@ import connectToDatabase from "@/lib/connect-to-db";
 import {fetchCastsForUser} from "@/lib/fetch-user-casts";
 import {generateValuesForUser} from "@/lib/generate-user-values-per-casts";
 import {fetchUserTweets} from "@/lib/fetch-user-tweets";
+import {sendDirectCast} from "@/lib/direct-cast";
+import axios from "axios";
 
 export async function GET(req: NextRequest) {
   try {
@@ -65,6 +67,29 @@ export async function GET(req: NextRequest) {
         },
       },
       {new: true, upsert: true}
+    );
+
+    await sendDirectCast({
+      recipientFid: user.farcaster,
+      message: [
+        "gm",
+        "We have analysed your warpcast casts and generated your values",
+        ...generatedValues.map((value) => `* ${value}`),
+        `Mint your values; https://valuesdao-frames.vercel.app/api/mint-values/${user.farcaster}`,
+      ].join("\n"),
+    });
+
+    await axios.post(
+      `api/batch-upload-pinata`,
+      {
+        values: generatedValues,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": `${process.env.NEXT_PUBLIC_NEXT_API_KEY}`,
+        },
+      }
     );
     return NextResponse.json({
       status: 200,
