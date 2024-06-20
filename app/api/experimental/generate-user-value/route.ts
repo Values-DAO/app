@@ -45,7 +45,12 @@ export async function GET(req: NextRequest) {
       generatedValues = (await generateValuesForUser(tweets)) ?? [];
     } else if (fid) {
       const casts = await fetchCastsForUser(fid, 200);
-      if (casts.length < 10) {
+      if (casts.length < 100) {
+        await sendDirectCast({
+          recipientFid: Number(fid),
+          message:
+            "You have less than 100 casts. We would require at least 100 casts to meaningfully generate your values using AI. Visit https://app.valuesdao.io to manually mint your values.",
+        });
         return NextResponse.json({
           status: 400,
           error: "User has less than 100 casts",
