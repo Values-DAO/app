@@ -80,7 +80,7 @@ export async function GET(req: NextRequest) {
     });
 
     await axios.post(
-      `api/batch-upload-pinata`,
+      `${process.env.NEXT_PUBLIC_HOST}/api/batch-upload-pinata`,
       {
         values: generatedValues,
       },
