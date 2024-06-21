@@ -64,7 +64,9 @@ export async function POST(req: NextRequest, params: any) {
   const walletClient = createWalletClient({
     chain: baseSepolia,
     transport: http(),
-    account: privateKeyToAccount(process.env.NEXT_PUBLIC_PK as `0x${string}`),
+    account: privateKeyToAccount(
+      process.env.NEXT_PUBLIC_ADMIN_WALLET_PRIVATE_KEY as `0x${string}`
+    ),
   });
   const batchUploadAndMint = async () => {
     const {data: userResponseData} = await axios.get(
