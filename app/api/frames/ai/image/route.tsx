@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
         style={{
           alignItems: "center",
           background: "#fff",
-          // backgroundImage: 'url("https://valuesdao-frames.vercel.app/bg.png")',
+          backgroundImage: 'url("https://valuesdao-frames.vercel.app/bg.png")',
           backgroundSize: "100% 100%",
           display: "flex",
           flexDirection: "column",

@@ -2,13 +2,13 @@ import axios from "axios";
 import {NextRequest, NextResponse} from "next/server";
 
 export async function GET(req: NextRequest) {
-  const imageUrl = `${process.env.NEXT_PUBLIC_HOST}/frames/ai/image?section=1`;
-  const postUrl = `${process.env.NEXT_PUBLIC_HOST}/frames/ai/`;
+  const imageUrl = `${process.env.NEXT_PUBLIC_HOST}/api/frames/ai/image?section=1`;
+  const postUrl = `${process.env.NEXT_PUBLIC_HOST}/api/frames/ai/`;
   return new NextResponse(
     `<!DOCTYPE html>
       <html>
         <head>
-          <meta property="og:title" content="Stateful Counter" />
+          <meta property="og:title" content="ValuesDAO" />
           <meta property="og:image" content="${imageUrl}" />
           <meta name="fc:frame" content="vNext" />
           <meta name="fc:frame:image" content="${imageUrl}" />
@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
   );
 }
 export async function POST(req: NextRequest) {
-  const imageUrl = `${process.env.NEXT_PUBLIC_HOST}/frames/ai/image?section=2`;
+  const imageUrl = `${process.env.NEXT_PUBLIC_HOST}/api/frames/ai/image?section=2`;
   const {
     untrustedData: {fid},
   } = await req.json();
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     `<!DOCTYPE html>
       <html>
         <head>
-          <meta property="og:title" content="Stateful Counter" />
+          <meta property="og:title" content="ValuesDAO" />
           <meta property="og:image" content="${imageUrl}" />
           <meta name="fc:frame" content="vNext" />
           <meta name="fc:frame:image" content="${imageUrl}" />
