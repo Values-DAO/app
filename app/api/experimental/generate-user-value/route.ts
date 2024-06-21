@@ -11,6 +11,7 @@ import axios from "axios";
 
 export async function GET(req: NextRequest) {
   try {
+    console.log("New request to generate user values");
     await connectToDatabase();
     const apiKey = headers().get("x-api-key");
     const {isValid, message, status} = await validateApiKey(apiKey, "READ");
@@ -27,6 +28,7 @@ export async function GET(req: NextRequest) {
     const twitter_userId = searchParams.get("twitter_userId");
 
     if (!fid && !twitter) {
+      console.log("Farcaster fid or Twitter handle is required");
       return NextResponse.json({
         status: 400,
         error: "farcaster fid or Twitter handle is required",
@@ -46,6 +48,7 @@ export async function GET(req: NextRequest) {
     } else if (fid) {
       const casts = await fetchCastsForUser(fid, 200);
       if (casts.length < 100) {
+        console.log("User has less than 100 casts", Number(fid));
         await sendDirectCast({
           recipientFid: Number(fid),
           message:
@@ -58,6 +61,15 @@ export async function GET(req: NextRequest) {
       }
       generatedValues = (await generateValuesForUser(casts)) ?? [];
     }
+    await sendDirectCast({
+      recipientFid: Number(fid),
+      message: [
+        "gm",
+        "We have analysed your warpcast casts and generated your values",
+        ...generatedValues.map((value) => `* ${value}`),
+        `Mint your values; https://valuesdao-frames.vercel.app/api/mint-values/${fid}`,
+      ].join("\n"),
+    });
     const user = await User.findOneAndUpdate(
       {
         ...(email ? {email} : {}),
@@ -73,16 +85,6 @@ export async function GET(req: NextRequest) {
       },
       {new: true, upsert: true}
     );
-
-    await sendDirectCast({
-      recipientFid: user.farcaster,
-      message: [
-        "gm",
-        "We have analysed your warpcast casts and generated your values",
-        ...generatedValues.map((value) => `* ${value}`),
-        `Mint your values; https://valuesdao-frames.vercel.app/api/mint-values/${user.farcaster}`,
-      ].join("\n"),
-    });
 
     await axios.post(
       `${process.env.NEXT_PUBLIC_HOST}/api/batch-upload-pinata`,
