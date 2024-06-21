@@ -4,16 +4,15 @@ import {ImageResponse} from "next/og";
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   const section = searchParams.get("section");
-  const values = searchParams.get("values")?.split(",");
-  console.log("Values", values);
-  console.log("Section", section);
+  let values: any | string[] = searchParams.get("values")?.split(",") ?? [];
+
   return new ImageResponse(
     (
       <div
         style={{
           alignItems: "center",
           background: "#fff",
-          backgroundImage: 'url("https://valuesdao-frames.vercel.app/bg.png")',
+          // backgroundImage: 'url("https://valuesdao-frames.vercel.app/bg.png")',
           backgroundSize: "100% 100%",
           display: "flex",
           flexDirection: "column",
@@ -25,7 +24,7 @@ export async function GET(req: NextRequest) {
         }}
       >
         <img
-          src={`http://localhost:3003/logo.png`}
+          src={`${process.env.NEXT_PUBLIC_HOST}/logo.png`}
           style={{
             width: "260px",
             height: "160px",
@@ -120,7 +119,7 @@ export async function GET(req: NextRequest) {
               }}
             >
               {values &&
-                values.map((value) => {
+                values.map((value: any) => {
                   return (
                     <p
                       key={value}

@@ -6,24 +6,19 @@ import {getAddressForFid} from "frames.js";
 import {privateKeyToAccount} from "viem/accounts";
 import {baseSepolia} from "viem/chains";
 
-const walletClient = createWalletClient({
-  chain: baseSepolia,
-  transport: http(),
-  account: privateKeyToAccount(process.env.NEXT_PUBLIC_PK as `0x${string}`),
-});
-
-export async function GET(req: NextRequest, params: any) {
-  const fid = params.params.fid;
+export async function GET(req: any) {
+  const searchParams = req.nextUrl.searchParams;
+  const fid = searchParams.get("fid");
   let values: string[] | undefined;
   let imageUrl = "";
 
   console.log("Fetching user values for", fid);
-  try {
+  const fetchValues = async () => {
     console.log(`${process.env.NEXT_PUBLIC_HOST}/api/user?fid=${fid}`);
-    const user = await fetch(
+
+    const {data} = await axios.get(
       `${process.env.NEXT_PUBLIC_HOST}/api/user?fid=${fid}`,
       {
-        method: "GET",
         headers: {
           "Content-Type": "application/json",
           "x-api-key": `${process.env.NEXT_PUBLIC_NEXT_API_KEY}`,
@@ -31,25 +26,24 @@ export async function GET(req: NextRequest, params: any) {
       }
     );
 
-    const data = await user.json();
-    console.log(data);
-    values = data.user.aiGeneratedValues.warpcast;
-    if (values) {
-      imageUrl = `${
-        process.env.NEXT_PUBLIC_HOST
-      }/frames/ai/image?section=3&values=${values.join(",")}`;
-    }
-  } catch (error) {
-    console.error(error);
+    return data?.user?.aiGeneratedValues?.warpcast;
+  };
+
+  values = await fetchValues();
+  if (values && values.length > 0) {
+    imageUrl = `${
+      process.env.NEXT_PUBLIC_HOST
+    }/frames/ai/image?section=4&values=${values.join(",")}`;
   }
+  console.log(values);
   return new NextResponse(
     `<!DOCTYPE html>
       <html>
         <head>
           <meta property="og:title" content="ValuesDAO" />
-          <meta property="og:image" content="${imageUrl}" />
+          <meta property="og:image" content="${imageUrl ?? " "}" />
           <meta name="fc:frame" content="vNext" />
-          <meta name="fc:frame:image" content="${imageUrl}" />
+          <meta name="fc:frame:image" content="${imageUrl ?? ""}" />
           <meta name="fc:frame:button:1" content="Mint" />,
         </head>
         <body></body>
@@ -62,36 +56,38 @@ export async function GET(req: NextRequest, params: any) {
     }
   );
 }
-export async function POST(req: NextRequest, params: any) {
+export async function POST(req: NextRequest) {
   const imageUrl = `${process.env.NEXT_PUBLIC_HOST}/frames/ai/image?section=4`;
-  const fid = params.params.fid;
+  const searchParams = req.nextUrl.searchParams;
+  const fid = searchParams.get("fid");
+
+  const walletClient = createWalletClient({
+    chain: baseSepolia,
+    transport: http(),
+    account: privateKeyToAccount(process.env.NEXT_PUBLIC_PK as `0x${string}`),
+  });
   const batchUploadAndMint = async () => {
-    const userResponse = await fetch(
+    const {data: userResponseData} = await axios.get(
       `${process.env.NEXT_PUBLIC_HOST}/api/user?fid=${fid}`,
       {
-        method: "GET",
         headers: {
           "Content-Type": "application/json",
           "x-api-key": `${process.env.NEXT_PUBLIC_NEXT_API_KEY}`,
         },
       }
     );
-
-    const userResponseData = await userResponse.json();
     console.log(userResponseData);
     const userValues = userResponseData.user.aiGeneratedValues.warpcast;
-    const response = await fetch(
+    const {data} = await axios.post(
       `${process.env.NEXT_PUBLIC_HOST}/api/batch-upload-pinata`,
+      {values: userValues},
       {
-        method: "POST",
         headers: {
           "Content-Type": "application/json",
           "x-api-key": `${process.env.NEXT_PUBLIC_NEXT_API_KEY}`,
         },
-        body: JSON.stringify({values: userValues}),
       }
     );
-    const data = await response.json();
     //* change this fid
     const address = await getAddressForFid({
       fid: Number(fid),
@@ -118,7 +114,7 @@ export async function POST(req: NextRequest, params: any) {
           <meta property="og:image" content="${imageUrl}" />
           <meta name="fc:frame" content="vNext" />
           <meta name="fc:frame:image" content="${imageUrl}" />
-         
+
           <meta name="fc:frame:button:1" content="View on Basescan" />
           <meta name="fc:frame:button:1:action" content="link" />
           <meta name="fc:frame:button:1:target" content="${`https://sepolia.basescan.org/tx/${hash}`}" />
