@@ -62,7 +62,7 @@ export async function GET(req: NextRequest, params: any) {
         "gm",
         "We have analysed your warpcast casts and generated your values",
         ...generatedValues.map((value) => `* ${value}`),
-        `Mint your values; ${process.env.NEXT_PUBLIC_HOST}/frames/ai/mint-values/fid=${fid}`,
+        `Mint your values; ${process.env.NEXT_PUBLIC_HOST}/frames/ai/mint-values/${fid}`,
       ].join("\n"),
     });
 
