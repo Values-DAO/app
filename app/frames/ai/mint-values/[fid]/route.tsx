@@ -41,7 +41,6 @@ export async function GET(req: NextRequest, params: any) {
     }
   } catch (error) {
     console.error(error);
-    return null;
   }
   return new NextResponse(
     `<!DOCTYPE html>
