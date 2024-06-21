@@ -33,10 +33,10 @@ export async function POST(req: NextRequest) {
   try {
     console.log("Generating values for user", fid);
     console.log(
-      `${process.env.NEXT_PUBLIC_HOST}/api/experimental/generate-user-value?fid=${fid}`
+      `${process.env.NEXT_PUBLIC_HOST}/api/experimental/generate-user-value/${fid}`
     );
     axios.get(
-      `${process.env.NEXT_PUBLIC_HOST}/api/experimental/generate-user-value?fid=${fid}`
+      `${process.env.NEXT_PUBLIC_HOST}/api/experimental/generate-user-value/${fid}`
     );
     console.log("Generated values for user", fid);
   } catch (error) {
