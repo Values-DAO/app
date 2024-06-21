@@ -8,12 +8,11 @@ import {generateValuesForUser} from "@/lib/generate-user-values-per-casts";
 import {sendDirectCast} from "@/lib/direct-cast";
 import axios from "axios";
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest, params: any) {
   try {
+    const fid = params.params.fid;
     console.log("New request to generate user values");
     await connectToDatabase();
-    const searchParams = req.nextUrl.searchParams;
-    const fid = searchParams.get("fid");
 
     if (!fid) {
       console.log("Farcaster fid is required");
