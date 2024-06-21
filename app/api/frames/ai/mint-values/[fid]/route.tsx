@@ -6,9 +6,9 @@ import {getAddressForFid} from "frames.js";
 import {privateKeyToAccount} from "viem/accounts";
 import {baseSepolia} from "viem/chains";
 
-export async function GET(req: any) {
-  const searchParams = req.nextUrl.searchParams;
-  const fid = searchParams.get("fid");
+export async function GET(req: any, params: any) {
+  const fid = params.params.fid;
+
   let values: string[] | undefined;
   let imageUrl = "";
 
@@ -56,10 +56,10 @@ export async function GET(req: any) {
     }
   );
 }
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest, params: any) {
   const imageUrl = `${process.env.NEXT_PUBLIC_HOST}/frames/ai/image?section=4`;
-  const searchParams = req.nextUrl.searchParams;
-  const fid = searchParams.get("fid");
+
+  const fid = params.params.fid;
 
   const walletClient = createWalletClient({
     chain: baseSepolia,
