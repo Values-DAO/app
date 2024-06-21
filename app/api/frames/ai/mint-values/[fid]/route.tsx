@@ -33,7 +33,7 @@ export async function GET(req: any, params: any) {
   if (values && values.length > 0) {
     imageUrl = `${
       process.env.NEXT_PUBLIC_HOST
-    }api/frames/ai/image?section=4&values=${values.join(",")}`;
+    }/api/frames/ai/image?section=4&values=${values.join(",")}`;
   }
   console.log(values);
   return new NextResponse(
@@ -57,7 +57,7 @@ export async function GET(req: any, params: any) {
   );
 }
 export async function POST(req: NextRequest, params: any) {
-  const imageUrl = `${process.env.NEXT_PUBLIC_HOST}/frames/ai/image?section=4`;
+  const imageUrl = `${process.env.NEXT_PUBLIC_HOST}/api/frames/ai/image?section=4`;
 
   const fid = params.params.fid;
 
