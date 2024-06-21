@@ -37,8 +37,6 @@ export async function POST(req: NextRequest) {
     for (const value of values) {
       // Changed to for...of loop
       if (existingNames.includes(value.toLowerCase())) {
-        // Convert to lowercase for case-insensitive comparison
-        console.log("Existing value:", value);
       } else {
         // upload new values to the database and pinata
         const response = await axios.post(

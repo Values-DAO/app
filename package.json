@@ -25,6 +25,7 @@
     "axios": "^1.6.8",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "frames.js": "^0.17.0",
     "graphql": "^16.8.1",
     "graphql-request": "^6.1.0",
     "input-otp": "^1.2.4",
