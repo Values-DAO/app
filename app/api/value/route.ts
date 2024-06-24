@@ -73,6 +73,8 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
+  const searchParams = req.nextUrl.searchParams;
+  const valueName = searchParams.get("name");
   await connectToDatabase();
   const apiKey = headers().get("x-api-key");
   const {isValid, message, status} = await validateApiKey(apiKey, "READ");
@@ -83,6 +85,25 @@ export async function GET(req: NextRequest) {
     });
   }
   try {
+    if (valueName) {
+      const value = await Value.findOne({name: valueName});
+      if (!value) {
+        return NextResponse.json({
+          status: 404,
+          error: "Value not found",
+          value: null,
+        });
+      }
+      return NextResponse.json({
+        status: 200,
+        value: {
+          name: value.name,
+          minters: value.minters,
+          cid: value.value.cid,
+          metadata: value.value.metadata,
+        },
+      });
+    }
     const values = await Value.find({}, {__v: 0, _id: 0, "value._id": 0});
 
     const formattedValues = values.reduce((acc, item) => {
