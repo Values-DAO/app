@@ -7,7 +7,7 @@ export type IUser = {
   farcaster?: number;
   twitter?: string;
   wallets?: string[];
-  mintedValues?: {value: string; txHash: string}[];
+  mintedValues?: {value: string; txHash: string; weightage?: Number}[];
   balance?: number;
   invitedBy?: string;
   isVerified?: boolean;
@@ -47,6 +47,7 @@ const userSchema = new Schema(
         {
           value: String,
           txHash: String,
+          weightage: Number,
         },
       ],
       default: [],

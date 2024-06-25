@@ -118,6 +118,23 @@ export async function POST(req: NextRequest) {
         }
         await user.save();
         return NextResponse.json({user, status: 200});
+      case "update_minted_value":
+        if (!user) {
+          return NextResponse.json({
+            user: null,
+            error: "User not found",
+            status: 404,
+          });
+        }
+
+        const {value, weightage} = await req.json();
+        const existingValue = mintedValues?.find((v: any) => v.value === value);
+        if (existingValue) {
+          existingValue.weightage = Number(weightage);
+        }
+
+        await user.save();
+        return NextResponse.json({user, status: 200});
       default:
         return NextResponse.json({error: "Invalid method", status: 400});
     }

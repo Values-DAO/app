@@ -31,6 +31,7 @@ import {NFT_CONTRACT_ABI, NFT_CONTRACT_ADDRESS} from "@/lib/constants";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import ValuePage from "@/app/value/page";
 import Projects from "./projects";
+import useMint from "@/app/hooks/useMint";
 
 const MintPage = () => {
   const {updateUser, updateValue, addWallet} = useValues();
@@ -52,7 +53,7 @@ const MintPage = () => {
 
   const [showGenerateNewValueCard, setShowGenerateNewValueCard] =
     useState(false);
-
+  const {mintHandler} = useMint();
   const mintValue = async ({value, key}: {value: any; key: string}) => {
     if (!value || !key || !userInfo) return;
     const walletToUse = address ?? userInfo.wallets?.[0];
@@ -71,11 +72,21 @@ const MintPage = () => {
         [key]: true,
       }));
       try {
+        console.log({
+          abi: NFT_CONTRACT_ABI,
+          address: NFT_CONTRACT_ADDRESS,
+          functionName: "safeMint",
+          args: [getAddress(walletToUse), value.cid, key],
+          account: privateKeyToAccount(
+            process.env.NEXT_PUBLIC_ADMIN_WALLET_PRIVATE_KEY as `0x${string}`
+          ),
+          chainId: 84532,
+        });
         const hash = await writeContractAsync({
           abi: NFT_CONTRACT_ABI,
           address: NFT_CONTRACT_ADDRESS,
           functionName: "safeMint",
-          args: [getAddress(walletToUse), value.cid],
+          args: [getAddress(walletToUse), value.cid, key],
           account: privateKeyToAccount(
             process.env.NEXT_PUBLIC_ADMIN_WALLET_PRIVATE_KEY as `0x${string}`
           ),
@@ -251,6 +262,18 @@ const MintPage = () => {
             </h2>
             <div className="flex flex-row justify-between items-center ">
               <p className="p-4">Balance: ${userInfo?.balance ?? 0}</p>
+              <Button
+                onClick={async () => {
+                  await mintHandler({
+                    values: ["mindset"],
+                    userIdentity:
+                      user?.email?.address || user?.farcaster?.fid || "",
+                    walletAddresses: userInfo?.wallets || [],
+                  });
+                }}
+              >
+                test
+              </Button>
             </div>
             <div className="relative ">
               <Input

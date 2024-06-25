@@ -6,7 +6,9 @@ import {headers} from "next/headers";
 import {NextRequest, NextResponse} from "next/server";
 
 export async function POST(req: NextRequest) {
-  const {values} = await req.json();
+  const {values, weightages} = await req.json();
+  console.log("Values:", values);
+  console.log("Weightages:", weightages);
   await connectToDatabase();
   const apiKey = headers().get("x-api-key");
   const {isValid, message, status} = await validateApiKey(apiKey, "WRITE");
@@ -36,18 +38,31 @@ export async function POST(req: NextRequest) {
     // Check each value in the input array
     for (const value of values) {
       // Changed to for...of loop
-      if (existingNames.includes(value.toLowerCase())) {
+      if (
+        existingNames.includes(value.toLowerCase()) &&
+        weightages === undefined
+      ) {
       } else {
         // upload new values to the database and pinata
         const response = await axios.post(
           "https://api.pinata.cloud/pinning/pinJSONToIPFS",
           {
             pinataContent: {
-              name: value,
+              name: `${value}`,
               description:
                 "This is a value NFT generated via ValuesDAO, each NFT represents a unique Human Value.",
               image:
                 "https://gateway.pinata.cloud/ipfs/QmX3E8eg85itRjcTHu9ZRbU2JAu1R9YPFDLYg5ijD2Gc6n",
+              attributes: [
+                {
+                  trait_type: "Weight",
+                  value: weightages
+                    ? weightages[values.indexOf(value)] === 0
+                      ? 1
+                      : weightages[values.indexOf(value)]
+                    : 1,
+                },
+              ],
             },
           },
           {

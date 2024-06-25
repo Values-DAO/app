@@ -6,6 +6,13 @@ import {createConfig, WagmiProvider} from "@privy-io/wagmi";
 import {mainnet, base, baseSepolia, polygon, optimism} from "viem/chains";
 import {http} from "wagmi";
 
+import {createPublicClient} from "viem";
+
+export const viemPublicClient = createPublicClient({
+  chain: baseSepolia,
+  transport: http(process.env.NEXT_PUBLIC_BASE_SEPOLIA_RPC || ""),
+});
+
 export const config = createConfig({
   chains: [mainnet, base, baseSepolia, polygon, optimism],
   transports: {
