@@ -2,8 +2,8 @@ import axios from "axios";
 import {NextRequest, NextResponse} from "next/server";
 
 export async function GET(req: NextRequest) {
-  const imageUrl = `${process.env.NEXT_PUBLIC_HOST}/api/frames/ai/image?section=1`;
-  const postUrl = `${process.env.NEXT_PUBLIC_HOST}/api/frames/ai/`;
+  const imageUrl = `${process.env.NEXT_PUBLIC_HOST}/api/v2/frames/ai/image?section=1`;
+  const postUrl = `${process.env.NEXT_PUBLIC_HOST}/api/v2/frames/ai/`;
   return new NextResponse(
     `<!DOCTYPE html>
       <html>
@@ -26,17 +26,16 @@ export async function GET(req: NextRequest) {
   );
 }
 export async function POST(req: NextRequest) {
-  const imageUrl = `${process.env.NEXT_PUBLIC_HOST}/api/frames/ai/image?section=2`;
+  const imageUrl = `${process.env.NEXT_PUBLIC_HOST}/api/v2/frames/ai/image?section=2`;
   const {
     untrustedData: {fid},
   } = await req.json();
   try {
-    console.log("Generating values for user", fid);
-    console.log(
-      `${process.env.NEXT_PUBLIC_HOST}/api/experimental/generate-user-value/${fid}`
-    );
-    axios.get(
-      `${process.env.NEXT_PUBLIC_HOST}/api/experimental/generate-user-value/${fid}`
+    axios.post(
+      `${process.env.NEXT_PUBLIC_HOST}/api/v2/frames/ai/value-generator-handler`,
+      {
+        fid,
+      }
     );
     console.log("Generated values for user", fid);
   } catch (error) {

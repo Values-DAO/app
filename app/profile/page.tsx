@@ -1,24 +1,10 @@
 "use client";
 
-import InviteCodeModal from "@/components/invite-code-modal";
-import {Button} from "@/components/ui/button";
 import {Card} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {toast} from "@/components/ui/use-toast";
-import {IUser} from "@/models/user";
 import {usePrivy} from "@privy-io/react-auth";
-import {Copy} from "lucide-react";
-import {useEffect, useState} from "react";
-import useValues from "../hooks/useValues";
 import {useUserContext} from "@/providers/user-context-provider";
+import {Button} from "@/components/ui/button";
+import ValueBadge from "@/components/ui/value-badge";
 const ProfilePage = () => {
   const {authenticated, login, ready, user} = usePrivy();
   const {userInfo, isLoading} = useUserContext();
@@ -27,55 +13,25 @@ const ProfilePage = () => {
       {authenticated && userInfo && !isLoading && (
         <div>
           <h2 className="scroll-m-20 text-center border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 text-muted-foreground mb-2">
-            || minted values
+            || profile
           </h2>
-          {userInfo &&
-            userInfo.mintedValues &&
-            userInfo.mintedValues.length === 0 && (
-              <Card className="mt-2">
-                <p className="text-center">No minted values yet</p>
-              </Card>
-            )}
-          {userInfo &&
-            userInfo.mintedValues &&
-            userInfo.mintedValues.length > 0 && (
-              <Card className="mt-2">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[30%]"> Values</TableHead>
-                      <TableHead className="w-full">tx hash</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {userInfo.mintedValues.map((value: any, index: number) => (
-                      <TableRow key={index}>
-                        <TableCell className="font-medium truncate w-[30%]">
-                          {value.value}
-                        </TableCell>
-                        <TableCell className="font-medium truncate">
-                          <Button
-                            variant="link"
-                            className="m-0 p-0 h-2"
-                            onClick={() => {
-                              window.open(
-                                `${process.env.NEXT_PUBLIC_BASESCAN_URL}/tx/${value.txHash}`,
-                                "_blank"
-                              );
-                            }}
-                          >
-                            {`${value.txHash.substring(
-                              0,
-                              5
-                            )}...${value.txHash.slice(-5)}`}
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </Card>
-            )}
+
+          <div>
+            <h3>
+              <span className="font-semibold">Hello</span>{" "}
+              {user?.farcaster?.displayName}
+            </h3>
+            <div className="flex flex-wrap flex-row gap-2 my-4 font-medium">
+              {userInfo.mintedValues &&
+                userInfo.mintedValues.map((value) => (
+                  <ValueBadge
+                    key={value.value}
+                    value={value.value}
+                    weight={value.weightage!.toString()}
+                  />
+                ))}
+            </div>
+          </div>
         </div>
       )}
 

@@ -2,22 +2,21 @@ import mongoose, {Schema, models} from "mongoose";
 
 export type IUser = {
   name?: string;
-  username?: string;
+  profileNft?: Number;
   email?: string;
   farcaster?: number;
   twitter?: string;
   wallets?: string[];
-  mintedValues?: {value: string; txHash: string; weightage?: Number}[];
+  mintedValues?: {value: string; weightage?: Number}[];
   balance?: number;
-  invitedBy?: string;
-  isVerified?: boolean;
-  totalInvites?: number;
-  inviteCodes?: {code: string; claimedBy: string; claimed: boolean}[];
-  generatedValues?: string[];
   aiGeneratedValues?: {
     twitter: string[];
     warpcast: string[];
   };
+
+  profileNftHash?: string;
+  profileNftIpfs?: string;
+  communitiesMinted?: string[];
 };
 
 const userSchema = new Schema(
@@ -25,9 +24,10 @@ const userSchema = new Schema(
     name: {
       type: String,
     },
-    username: {
-      type: String,
+    profileNft: {
+      type: Number,
     },
+
     email: {
       type: String,
     },
@@ -46,16 +46,12 @@ const userSchema = new Schema(
       type: [
         {
           value: String,
-          txHash: String,
           weightage: Number,
         },
       ],
       default: [],
     },
-    // deprecated
-    generatedValues: {
-      type: [String],
-    },
+
     aiGeneratedValues: {
       twitter: {
         type: [String],
@@ -70,34 +66,18 @@ const userSchema = new Schema(
       type: Number,
       default: 0,
     },
-    invitedBy: {
+    profileNftHash: {
       type: String,
     },
-    isVerified: {
-      type: Boolean,
-      default: false,
+    profileNftIpfs: {
+      type: String,
     },
-    totalInvites: {
-      type: Number,
-      default: 0,
-    },
-    inviteCodes: {
-      type: [
-        {
-          code: String,
-          claimedBy: {
-            type: String,
-            required: false,
-          },
-          claimed: {
-            type: Boolean,
-            default: false,
-          },
-        },
-      ],
+    communitiesMinted: {
+      type: [String],
       default: [],
     },
   },
+
   {timestamps: true}
 );
 // Middleware to ensure uniqueness of wallets

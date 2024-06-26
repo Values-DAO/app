@@ -105,7 +105,7 @@ export async function GET(req: NextRequest) {
                 flexDirection: "column",
               }}
             >
-              || ai generated values
+              || your values
             </div>
             <div
               style={{

@@ -32,23 +32,21 @@ const Navbar = () => {
         <Button variant={"link"} className="text-md" asChild>
           <Link href={"/"}>Home</Link>
         </Button>
-        <Button variant={"link"} className="text-md" asChild>
+        {/* <Button variant={"link"} className="text-md" asChild>
           <Link href={"/farcaster-meetup"}>Farcaster Meetup SF</Link>
-        </Button>
+        </Button> */}
         {/* <Button variant={"link"} className="text-md" asChild>
           <Link href={"/farcon-aligned"}>Farcon</Link>
         </Button> */}
         <Button variant={"link"} className="text-md" asChild>
+          <Link href={"/community"}>Communities</Link>
+        </Button>{" "}
+        <Button variant={"link"} className="text-md" asChild>
           <Link href={"/profile"}>Profile</Link>
         </Button>
-        <Button variant={"link"} className="text-md" asChild>
-          <Link href={"/community"}>Communities</Link>
-        </Button>
-
         {/* <Button variant={"link"} className="text-md" asChild>
           <Link href={"/mint"}>Mint a Value</Link>
         </Button> */}
-
         {ready && authenticated ? (
           <Button variant={"default"} onClick={logout}>
             Logout
@@ -70,23 +68,21 @@ const Navbar = () => {
             <DropdownMenuItem asChild className="cursor-pointer">
               <Link href={"/"}>Home</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild className="cursor-pointer">
+            {/* <DropdownMenuItem asChild className="cursor-pointer">
               <Link href={"/farcaster-meetup"}>Farcaster Meetup SF</Link>
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
             {/* <DropdownMenuItem asChild className="cursor-pointer">
               <Link href={"/farcon-aligned"}>Farcon</Link>
             </DropdownMenuItem> */}
             <DropdownMenuItem asChild className="cursor-pointer">
+              <Link href={"/community"}>Communities</Link>
+            </DropdownMenuItem>{" "}
+            <DropdownMenuItem asChild className="cursor-pointer">
               <Link href={"/profile"}>Profile</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild className="cursor-pointer">
-              <Link href={"/community"}>Communities</Link>
-            </DropdownMenuItem>
-
             {/* <DropdownMenuItem asChild className="cursor-pointer">
               <Link href={"/mint"}>Mint a Value</Link>
             </DropdownMenuItem> */}
-
             {authenticated ? (
               <DropdownMenuItem
                 className="cursor-pointer"

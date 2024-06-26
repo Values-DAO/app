@@ -13,6 +13,9 @@ import {TabsContent} from "@radix-ui/react-tabs";
 import {Tabs, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 import {ToastAction} from "@/components/ui/toast";
+import useValuesHook from "../hooks/useValuesHook";
+import axios from "axios";
+import ValueBadge from "@/components/ui/value-badge";
 
 const ValuePage = () => {
   const {
@@ -24,19 +27,9 @@ const ValuePage = () => {
     linkFarcaster,
     linkWallet,
   } = usePrivy();
-  const {
-    analyseUserAndGenerateValues,
-    updateUser,
-    batchUploadValuesPinata,
-    updateValuesBulk,
-    fetchAllValues,
-  } = useValues();
-  const {
-    userInfo,
-    setUserInfo,
+  const {analyseUserAndGenerateValues, mintHandler} = useValuesHook();
 
-    setValuesAvailable,
-  } = useUserContext();
+  const {userInfo, setUserInfo} = useUserContext();
   const [loading, setLoading] = useState(false);
   const [loaderText, setLoaderText] = useState("Analyzing your values");
   const [error, setError] = useState<{
@@ -46,7 +39,7 @@ const ValuePage = () => {
   const {address} = useAccount();
   const {writeContractAsync} = useWriteContract();
   const [loader, setLoader] = useState(false);
-
+  const [valueRecommendation, setValueRecommendation] = useState<string[]>([]);
   const loaderTexts: string[] = [
     "Analyzing your social content...",
     "Extracting values from your interactions...",
@@ -54,7 +47,19 @@ const ValuePage = () => {
     "Mapping your social values...",
     "Interpreting the essence of your online presence...",
   ];
+  useEffect(() => {
+    const fetchValueRecs = async () => {
+      const response = await axios.get("/api/v2/value/", {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+        },
+      });
+      setValueRecommendation(response.data.values);
+    };
 
+    fetchValueRecs();
+  }, []);
   useEffect(() => {
     if (loading) {
       const intervalId = setInterval(() => {
@@ -110,192 +115,6 @@ const ValuePage = () => {
     setLoading(false);
   };
 
-  const batchMintValues = async ({
-    platform,
-  }: {
-    platform: "WARPCAST" | "TWITTER";
-  }) => {
-    if (!address && userInfo?.wallets?.length === 0) {
-      toast({
-        title: "Please connect a wallet",
-        description: "You need to connect a wallet to mint values",
-        variant: "destructive",
-      });
-      return;
-    }
-    setLoader(true);
-    const cids = await batchUploadValuesPinata({
-      values:
-        platform === "TWITTER"
-          ? userInfo?.aiGeneratedValues?.twitter ?? []
-          : platform === "WARPCAST"
-          ? userInfo?.aiGeneratedValues?.warpcast ?? []
-          : [],
-    });
-    const response = await fetchAllValues();
-
-    setValuesAvailable(response.values);
-
-    await mintValues({
-      platform,
-      valuesAvailable: response.values,
-    });
-    setLoader(false);
-  };
-
-  const mintValues = async ({
-    platform,
-    valuesAvailable,
-  }: {
-    platform: "WARPCAST" | "TWITTER";
-    valuesAvailable: any;
-  }) => {
-    const wallets = [...(userInfo?.wallets ?? []), address!];
-    if (!wallets) {
-      toast({
-        title: "Please connect a wallet",
-        description: "You need to connect a wallet to mint values",
-        variant: "destructive",
-      });
-      return;
-    }
-    setLoader(true);
-
-    const cidsToMint = [];
-    const valuesMinted = [];
-    const valuesToMint =
-      platform === "WARPCAST"
-        ? userInfo?.aiGeneratedValues?.warpcast
-        : userInfo?.aiGeneratedValues?.twitter;
-    if (!valuesToMint) {
-      setLoader(false);
-      return;
-    }
-
-    if (
-      userInfo?.aiGeneratedValues &&
-      (userInfo?.aiGeneratedValues?.twitter?.length > 0 ||
-        userInfo?.aiGeneratedValues?.warpcast?.length > 0)
-    )
-      for (const value of valuesToMint) {
-        if (!userInfo) return;
-        const existingValue = valuesAvailable![value.toLowerCase()];
-
-        if (existingValue) {
-          if (
-            existingValue.minters?.includes(
-              (userInfo?.email || userInfo?.farcaster?.toString()) as string
-            )
-          ) {
-            continue;
-          }
-
-          cidsToMint.push(existingValue.cid);
-          valuesMinted.push(value.toLowerCase());
-        }
-      }
-    if (cidsToMint.length === 0) {
-      setLoader(false);
-      toast({
-        title: "You already hold these Values",
-        description: "View them in your wallet",
-        variant: "destructive",
-        action: (
-          <ToastAction
-            altText="profile"
-            onClick={() => {
-              window.location.href = `/profile`;
-            }}
-          >
-            View
-          </ToastAction>
-        ),
-      });
-      return;
-    }
-    const hash = await writeContractAsync({
-      abi: NFT_CONTRACT_ABI,
-      address: NFT_CONTRACT_ADDRESS,
-      functionName: "batchMint",
-      args: [wallets[0], cidsToMint],
-      account: privateKeyToAccount(
-        process.env.NEXT_PUBLIC_ADMIN_WALLET_PRIVATE_KEY as `0x${string}`
-      ),
-      chainId: 84532,
-    });
-
-    setUserInfo({
-      ...userInfo,
-      mintedValues: [
-        ...(userInfo?.mintedValues || []), // Spread the existing mintedValues
-        ...valuesMinted.map((value) => ({
-          // Append new values
-          value: value,
-          txHash: hash,
-        })),
-      ],
-    });
-
-    await updateValuesBulk({
-      values: valuesMinted,
-    });
-    if (hash) {
-      toast({
-        title: "We just dropped Value NFTs to your wallet",
-        description: "View them in your wallet",
-        action: (
-          <ToastAction
-            altText="basescan"
-            onClick={() => {
-              window.open(
-                `${process.env.NEXT_PUBLIC_BASESCAN_URL}/tx/${hash}`,
-                "_blank"
-              );
-            }}
-          >
-            Basescan
-          </ToastAction>
-        ),
-      });
-    } else {
-      toast({
-        title: "You already hold these Values",
-        description: "View them in your wallet",
-        action: (
-          <ToastAction
-            altText="profile"
-            onClick={() => {
-              window.location.href = `/profile`;
-            }}
-          >
-            View
-          </ToastAction>
-        ),
-      });
-    }
-
-    setLoader(false);
-  };
-
-  useEffect(() => {
-    const addTwitterHandle = async () => {
-      if (user?.twitter?.username) {
-        await updateUser({twitter: user.twitter.username});
-        setUserInfo({...userInfo, twitter: user.twitter.username});
-      }
-    };
-    addTwitterHandle();
-  }, [user]);
-  useEffect(() => {
-    const addWarpcastAccount = async () => {
-      if (user?.farcaster?.fid) {
-        await updateUser({farcaster: user.farcaster.fid});
-        setUserInfo({...userInfo, farcaster: user.farcaster.fid});
-      }
-    };
-    addWarpcastAccount();
-  }, [user]);
-
   return (
     <>
       {authenticated && (
@@ -335,16 +154,11 @@ const ValuePage = () => {
                     </Alert>
                   )}
                 {
-                  <div className="grid grid-cols-2 gap-4 md:grid-cols-5 md:gap-4 font-medium mt-4">
+                  <div className="flex flex-row flex-wrap gap-2 font-medium mt-4">
                     {userInfo &&
                       userInfo.aiGeneratedValues?.twitter?.map(
                         (value, index) => (
-                          <Badge
-                            key={index}
-                            className="rounded-sm text-[18px] bg-transparent border border-primary text-primary hover:bg-transparent"
-                          >
-                            {value}
-                          </Badge>
+                          <ValueBadge key={index} value={value} />
                         )
                       )}
                   </div>
@@ -364,8 +178,15 @@ const ValuePage = () => {
                     <Button
                       variant={"default"}
                       className="w-full cursor-pointer mt-4"
-                      onClick={() => {
-                        batchMintValues({platform: "TWITTER"});
+                      onClick={async () => {
+                        const response = await mintHandler({
+                          values: userInfo?.aiGeneratedValues?.twitter?.map(
+                            (value) => ({
+                              name: value,
+                              weightage: "1",
+                            })
+                          )!,
+                        });
                       }}
                       disabled={loader}
                     >
@@ -440,7 +261,8 @@ const ValuePage = () => {
                   userInfo?.aiGeneratedValues?.warpcast?.length > 0 &&
                   userInfo?.aiGeneratedValues?.warpcast.every((str) =>
                     userInfo?.mintedValues?.some(
-                      (mintedValue) => mintedValue.value === str.toLowerCase()
+                      (mintedValue) =>
+                        mintedValue.value.toLowerCase() === str.toLowerCase()
                     )
                   ) && (
                     <Alert className="bg-[#88fc03] my-2 text-black">
@@ -450,16 +272,11 @@ const ValuePage = () => {
                     </Alert>
                   )}
                 {
-                  <div className="grid grid-cols-2 gap-4 md:grid-cols-5 md:gap-4 font-medium mt-4">
+                  <div className="flex flex-row flex-wrap gap-2 font-medium mt-4">
                     {userInfo &&
                       userInfo.aiGeneratedValues?.warpcast?.map(
                         (value, index) => (
-                          <Badge
-                            key={index}
-                            className="rounded-sm text-[18px] bg-transparent border border-primary text-primary hover:bg-transparent "
-                          >
-                            {value}
-                          </Badge>
+                          <ValueBadge key={index} value={value} />
                         )
                       )}
                   </div>
@@ -469,7 +286,8 @@ const ValuePage = () => {
                   userInfo?.aiGeneratedValues?.warpcast?.length > 0 &&
                   userInfo?.aiGeneratedValues?.warpcast.every((str) =>
                     userInfo?.mintedValues?.some(
-                      (mintedValue) => mintedValue.value === str.toLowerCase()
+                      (mintedValue) =>
+                        mintedValue.value.toLowerCase() === str.toLowerCase()
                     )
                   )
                 ) &&
@@ -478,8 +296,15 @@ const ValuePage = () => {
                     <Button
                       variant={"default"}
                       className="w-full cursor-pointer mt-4"
-                      onClick={() => {
-                        batchMintValues({platform: "WARPCAST"});
+                      onClick={async () => {
+                        const response = await mintHandler({
+                          values: userInfo?.aiGeneratedValues?.warpcast?.map(
+                            (value) => ({
+                              name: value,
+                              weightage: "1",
+                            })
+                          )!,
+                        });
                       }}
                       disabled={loader}
                     >
