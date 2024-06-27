@@ -9,6 +9,7 @@ import {createWalletClient, http} from "viem";
 import {baseSepolia} from "viem/chains";
 import {privateKeyToAccount} from "viem/accounts";
 import Value from "@/models/value";
+import {fetchAllNFTsValuesDAO} from "@/lib/fetch-all-nfts-valuesdao";
 const viemWalletClient = createWalletClient({
   chain: baseSepolia,
   transport: http(),
@@ -73,7 +74,7 @@ export async function POST(req: NextRequest) {
               `${process.env.NEXT_PUBLIC_HOST}/api/v2/ipfs`,
               {
                 values: [],
-                tokenId: (await User.countDocuments()) + 1,
+                tokenId: await fetchAllNFTsValuesDAO(),
               },
               {
                 headers: {
@@ -96,7 +97,7 @@ export async function POST(req: NextRequest) {
             balance: 5,
             ...(email ? {email} : farcaster ? {farcaster} : {}),
             mintedValues: [],
-            profileNft: Number(await User.countDocuments()) + 1,
+            profileNft: await fetchAllNFTsValuesDAO(),
             profileNftHash: hash,
             profileNftIpfs: IPFS_CID,
           });
@@ -134,7 +135,7 @@ export async function POST(req: NextRequest) {
               `${process.env.NEXT_PUBLIC_HOST}/api/v2/ipfs`,
               {
                 values: values.length > 0 ? values : [],
-                tokenId: (await User.countDocuments()) + 1,
+                tokenId: await fetchAllNFTsValuesDAO(),
               },
               {
                 headers: {
@@ -153,7 +154,7 @@ export async function POST(req: NextRequest) {
 
             user.profileNftHash = hash;
             user.profileNftIpfs = IPFS_CID;
-            user.profileNft = Number(await User.countDocuments()) + 1;
+            user.profileNft = await fetchAllNFTsValuesDAO();
             user.wallet = Array.from(new Set([...user.wallets, ...wallets]));
 
             await user.save();
@@ -240,7 +241,7 @@ export async function POST(req: NextRequest) {
                 name: v.value,
                 newWeightage: v.weightage,
               })),
-              tokenId: user.profileNft - 1,
+              tokenId: user.profileNft,
             },
             {
               headers: {
@@ -248,17 +249,12 @@ export async function POST(req: NextRequest) {
               },
             }
           );
-          console.log({
-            abi: NFT_CONTRACT_ABI,
-            address: NFT_CONTRACT_ADDRESS,
-            functionName: "updateTokenURI",
-            args: [user.profileNft - 1, cid],
-          });
+
           const hash = await viemWalletClient.writeContract({
             abi: NFT_CONTRACT_ABI,
             address: NFT_CONTRACT_ADDRESS,
             functionName: "updateTokenURI",
-            args: [user.profileNft - 1, cid],
+            args: [user.profileNft, cid],
           });
 
           user.profileNftHash = hash;

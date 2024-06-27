@@ -13,13 +13,15 @@ import {
 
 import {VerifiedIcon} from "lucide-react";
 import ValueBadge from "./ui/value-badge";
+import {Skeleton} from "./ui/skeleton";
 
 const Projects = ({limit, style}: {limit?: number; style?: string}) => {
   const [projects, setProjects] = React.useState<IProject[]>([]);
-  console.log(projects);
+  const [loader, setLoader] = React.useState<boolean>(true);
   useEffect(() => {
     async function fetchProjects() {
-      const res = await fetch(`/api/project?limit=${limit}`, {
+      setLoader(true);
+      const res = await fetch(`/api/v2/community?limit=${limit}`, {
         headers: {
           "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
         },
@@ -27,6 +29,7 @@ const Projects = ({limit, style}: {limit?: number; style?: string}) => {
       const data = await res.json();
 
       setProjects(data.projects);
+      setLoader(false);
     }
     fetchProjects();
   }, []);
@@ -75,6 +78,22 @@ const Projects = ({limit, style}: {limit?: number; style?: string}) => {
           ))}
         </TableBody>
       </Table>
+      {loader && (
+        <div className="flex flex-col gap-2">
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-[75%]" />
+          </div>{" "}
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-[75%]" />
+          </div>{" "}
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-[75%]" />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

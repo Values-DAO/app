@@ -6,7 +6,7 @@ import {Button} from "@/components/ui/button";
 import {useAccount, useDisconnect, useWriteContract} from "wagmi";
 
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
-import {RocketIcon, WandSparklesIcon} from "lucide-react";
+import {RocketIcon, Twitter, WandSparklesIcon} from "lucide-react";
 
 import {toast} from "@/components/ui/use-toast";
 import {usePrivy} from "@privy-io/react-auth";
@@ -19,7 +19,17 @@ import useValuesHook from "@/app/hooks/useValuesHook";
 import ValueBadge from "@/components/ui/value-badge";
 import {ToastAction} from "@/components/ui/toast";
 import {NFT_CONTRACT_ADDRESS} from "@/constants";
-
+import Link from "next/link";
+import Image from "next/image";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 interface pageProps {
   params: {id: string};
 }
@@ -34,6 +44,8 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
   const {disconnect} = useDisconnect();
   const [project, setProject] = useState<IProject | null>(null);
   const [loader, setLoader] = useState(false);
+  const [onMintingSuccessful, setOnMintingSuccessful] = useState(false);
+
   const [tokenBalance, setTokenBalance] = useState<number | null | undefined>(
     undefined
   );
@@ -177,6 +189,7 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
                         });
                         setLoader(false);
                         if (response) {
+                          setOnMintingSuccessful(true);
                           toast({
                             title: "Minted Successfully.",
 
@@ -184,9 +197,9 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
                               <ToastAction
                                 onClick={() => {
                                   window.open(
-                                    `https://testnets.opensea.io/assets/base-sepolia/${NFT_CONTRACT_ADDRESS}/${
-                                      Number(userInfo?.profileNft) - 1
-                                    }`,
+                                    `https://testnets.opensea.io/assets/base-sepolia/${NFT_CONTRACT_ADDRESS}/${Number(
+                                      userInfo?.profileNft
+                                    )}`,
                                     "_blank"
                                   );
                                 }}
@@ -195,6 +208,12 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
                                 View on Opensea
                               </ToastAction>
                             ),
+                          });
+                        } else if (!response) {
+                          toast({
+                            title: "Minting Failed.",
+                            description: "Please try again later.",
+                            variant: "destructive",
                           });
                         }
                       }}
@@ -240,6 +259,57 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
               <Skeleton className="w-full m-auto h-[30px] rounded-md" />
               <Skeleton className="w-full m-auto h-[30px] rounded-md" />
             </div>
+          )}
+
+          {onMintingSuccessful && (
+            <AlertDialog open={onMintingSuccessful}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    Value Minted Successfully.{" "}
+                  </AlertDialogTitle>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel
+                    onClick={() => {
+                      setOnMintingSuccessful(false);
+                    }}
+                  >
+                    Close
+                  </AlertDialogCancel>
+                  <div className="flex flex-row gap-2">
+                    <Link
+                      href="https://warpcast.com/~/compose?text=I%20just%20minted%20my%20values%20on%20ValuesDAO.%20Check%20if%20you%27re%20aligned%20with%20me%2C%20anon%3F%20&embeds[]=https://app.valuesdao.io"
+                      target="_blank"
+                    >
+                      <Button className="flex flex-row w-full">
+                        Share
+                        <Image
+                          src="/white-purple.png"
+                          width={20}
+                          height={20}
+                          alt="farcaster"
+                          className="mx-2"
+                        />
+                      </Button>
+                    </Link>
+                    <Link
+                      href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fapp.valuesdao.io%2F&text=I%20just%20minted%20my%20values%20on%20ValuesDAO.%20Check%20if%20you%27re%20aligned%20with%20me%2C%20anon%3F"
+                      target="_blank"
+                    >
+                      <Button className="flex flex-row w-full">
+                        Tweet
+                        <Twitter
+                          strokeWidth={0}
+                          fill="#1DA1F2"
+                          className="h-6 w-6 ml-2"
+                        />
+                      </Button>
+                    </Link>
+                  </div>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           )}
         </main>
       )}

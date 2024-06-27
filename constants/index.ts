@@ -1,6 +1,6 @@
 export const NFT_CONTRACT_ADDRESS =
   process.env.NEXT_PUBLIC_APP_ENV === "staging"
-    ? "0xf2344631195E711c090ba4d8e7cF4Ebf217d49D5"
+    ? "0x6613c7e5a5FaaE496AaEeC9C85562D9128FeDF4a"
     : "0x68cf79739AFF49b7bc74e9F7f3571E867410B3Fc";
 
 export const NFT_CONTRACT_ABI = [

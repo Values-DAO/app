@@ -2,20 +2,30 @@
 import {Button} from "@/components/ui/button";
 import {usePrivy} from "@privy-io/react-auth";
 import React, {useState, useEffect} from "react";
-import useValues from "../hooks/useValues";
+
 import {useUserContext} from "@/providers/user-context-provider";
-import {Badge} from "@/components/ui/badge";
-import {privateKeyToAccount} from "viem/accounts";
-import {NFT_CONTRACT_ABI, NFT_CONTRACT_ADDRESS} from "@/lib/constants";
-import {toast} from "@/components/ui/use-toast";
+
 import {useAccount, useWriteContract} from "wagmi";
 import {TabsContent} from "@radix-ui/react-tabs";
 import {Tabs, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
-import {ToastAction} from "@/components/ui/toast";
+import {Alert, AlertDescription} from "@/components/ui/alert";
+
 import useValuesHook from "../hooks/useValuesHook";
 import axios from "axios";
 import ValueBadge from "@/components/ui/value-badge";
+import {Twitter} from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import Link from "next/link";
+import Image from "next/image";
+import {toast} from "@/components/ui/use-toast";
 
 const ValuePage = () => {
   const {
@@ -37,9 +47,8 @@ const ValuePage = () => {
     message: string;
   } | null>(null);
   const {address} = useAccount();
-  const {writeContractAsync} = useWriteContract();
+  const [onMintingSuccessful, setOnMintingSuccessful] = useState(false);
   const [loader, setLoader] = useState(false);
-  const [valueRecommendation, setValueRecommendation] = useState<string[]>([]);
   const loaderTexts: string[] = [
     "Analyzing your social content...",
     "Extracting values from your interactions...",
@@ -47,19 +56,19 @@ const ValuePage = () => {
     "Mapping your social values...",
     "Interpreting the essence of your online presence...",
   ];
-  useEffect(() => {
-    const fetchValueRecs = async () => {
-      const response = await axios.get("/api/v2/value/", {
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
-        },
-      });
-      setValueRecommendation(response.data.values);
-    };
+  // useEffect(() => {
+  //   const fetchValueRecs = async () => {
+  //     const response = await axios.get("/api/v2/value/", {
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+  //       },
+  //     });
+  //     setValueRecommendation(response.data.values);
+  //   };
 
-    fetchValueRecs();
-  }, []);
+  //   fetchValueRecs();
+  // }, []);
   useEffect(() => {
     if (loading) {
       const intervalId = setInterval(() => {
@@ -114,7 +123,7 @@ const ValuePage = () => {
     }
     setLoading(false);
   };
-
+  console.log(userInfo);
   return (
     <>
       {authenticated && (
@@ -140,11 +149,12 @@ const ValuePage = () => {
               </TabsList>
 
               <TabsContent value="twitter">
-                {userInfo?.aiGeneratedValues &&
+                {userInfo?.aiGeneratedValues?.twitter &&
                   userInfo?.aiGeneratedValues?.twitter?.length > 0 &&
                   userInfo?.aiGeneratedValues?.twitter.every((str) =>
                     userInfo?.mintedValues?.some(
-                      (mintedValue) => mintedValue.value === str.toLowerCase()
+                      (mintedValue) =>
+                        mintedValue.value.toLowerCase() === str.toLowerCase()
                     )
                   ) && (
                     <Alert className="bg-[#88fc03] my-2 text-black">
@@ -168,31 +178,39 @@ const ValuePage = () => {
                   userInfo?.aiGeneratedValues?.twitter?.length > 0 &&
                   userInfo?.aiGeneratedValues?.twitter.every((str) =>
                     userInfo?.mintedValues?.some(
-                      (mintedValue) => mintedValue.value === str.toLowerCase()
+                      (mintedValue) =>
+                        mintedValue.value.toLowerCase() === str.toLowerCase()
                     )
                   )
-                ) &&
-                  userInfo?.aiGeneratedValues &&
-                  userInfo?.aiGeneratedValues?.twitter?.length > 0 &&
-                  (address || (userInfo?.wallets?.length ?? 0) > 0) && (
-                    <Button
-                      variant={"default"}
-                      className="w-full cursor-pointer mt-4"
-                      onClick={async () => {
-                        const response = await mintHandler({
-                          values: userInfo?.aiGeneratedValues?.twitter?.map(
-                            (value) => ({
-                              name: value,
-                              weightage: "1",
-                            })
-                          )!,
+                ) && (
+                  <Button
+                    variant={"default"}
+                    className="w-full cursor-pointer mt-4"
+                    onClick={async () => {
+                      setLoader(true);
+                      const response = await mintHandler({
+                        values: userInfo?.aiGeneratedValues?.twitter?.map(
+                          (value) => ({
+                            name: value,
+                            weightage: "1",
+                          })
+                        )!,
+                      });
+                      setLoader(false);
+                      if (response) setOnMintingSuccessful(true);
+                      else if (!response) {
+                        toast({
+                          title: "Minting Failed.",
+                          description: "Please try again later",
+                          variant: "destructive",
                         });
-                      }}
-                      disabled={loader}
-                    >
-                      {loader ? "Minting..." : "Mint Values"}
-                    </Button>
-                  )}
+                      }
+                    }}
+                    disabled={loader}
+                  >
+                    {loader ? "Minting..." : "Mint Values"}
+                  </Button>
+                )}
 
                 {!address &&
                   userInfo?.wallets?.length === 0 &&
@@ -239,7 +257,7 @@ const ValuePage = () => {
                     </div>
                   )}
 
-                {((error && error.platform === "twitter") ||
+                {(!user?.twitter?.username ||
                   userInfo?.twitter === undefined) && (
                   <div className="flex flex-col gap-2 justify-center">
                     <p className="text-center mt-2">
@@ -257,7 +275,7 @@ const ValuePage = () => {
                 )}
               </TabsContent>
               <TabsContent value="warpcast">
-                {userInfo?.aiGeneratedValues &&
+                {userInfo?.aiGeneratedValues?.warpcast &&
                   userInfo?.aiGeneratedValues?.warpcast?.length > 0 &&
                   userInfo?.aiGeneratedValues?.warpcast.every((str) =>
                     userInfo?.mintedValues?.some(
@@ -290,30 +308,30 @@ const ValuePage = () => {
                         mintedValue.value.toLowerCase() === str.toLowerCase()
                     )
                   )
-                ) &&
-                  userInfo?.aiGeneratedValues &&
-                  userInfo?.aiGeneratedValues?.warpcast?.length > 0 && (
-                    <Button
-                      variant={"default"}
-                      className="w-full cursor-pointer mt-4"
-                      onClick={async () => {
-                        const response = await mintHandler({
-                          values: userInfo?.aiGeneratedValues?.warpcast?.map(
-                            (value) => ({
-                              name: value,
-                              weightage: "1",
-                            })
-                          )!,
-                        });
-                      }}
-                      disabled={loader}
-                    >
-                      {loader ? "Minting..." : "Mint Values"}
-                    </Button>
-                  )}
+                ) && (
+                  <Button
+                    variant={"default"}
+                    className="w-full cursor-pointer mt-4"
+                    onClick={async () => {
+                      setLoader(true);
+                      const response = await mintHandler({
+                        values: userInfo?.aiGeneratedValues?.warpcast?.map(
+                          (value) => ({
+                            name: value,
+                            weightage: "1",
+                          })
+                        )!,
+                      });
+                      setLoader(false);
+                      console.log(response);
+                    }}
+                    disabled={loader}
+                  >
+                    {loader ? "Minting..." : "Mint Values"}
+                  </Button>
+                )}
 
-                {!loading &&
-                  userInfo?.aiGeneratedValues &&
+                {userInfo?.aiGeneratedValues &&
                   userInfo?.aiGeneratedValues?.warpcast?.length === 0 && (
                     <div className="flex flex-col gap-4">
                       <h2 className="scroll-m-20 border-b pb-2 text-md tracking-tight first:mt-0 max-w-5xl text-center">
@@ -352,8 +370,7 @@ const ValuePage = () => {
                     </div>
                   )}
 
-                {((error && error.platform === "warpcast") ||
-                  userInfo?.farcaster === undefined) && (
+                {!user?.farcaster?.fid && (
                   <div className="flex flex-col gap-2 justify-center">
                     <p className="text-center mt-2">
                       Connect your account to continue
@@ -378,6 +395,56 @@ const ValuePage = () => {
                 {loaderText}
               </h2>
             </div>
+          )}
+          {onMintingSuccessful && (
+            <AlertDialog open={onMintingSuccessful}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    Value Minted Successfully.{" "}
+                  </AlertDialogTitle>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel
+                    onClick={() => {
+                      setOnMintingSuccessful(false);
+                    }}
+                  >
+                    Close
+                  </AlertDialogCancel>
+                  <div className="flex flex-row gap-2">
+                    <Link
+                      href="https://warpcast.com/~/compose?text=I%20just%20minted%20my%20values%20on%20ValuesDAO.%20Check%20if%20you%27re%20aligned%20with%20me%2C%20anon%3F%20&embeds[]=https://app.valuesdao.io"
+                      target="_blank"
+                    >
+                      <Button className="flex flex-row w-full">
+                        Share
+                        <Image
+                          src="/white-purple.png"
+                          width={20}
+                          height={20}
+                          alt="farcaster"
+                          className="mx-2"
+                        />
+                      </Button>
+                    </Link>
+                    <Link
+                      href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fapp.valuesdao.io%2F&text=I%20just%20minted%20my%20values%20on%20ValuesDAO.%20Check%20if%20you%27re%20aligned%20with%20me%2C%20anon%3F"
+                      target="_blank"
+                    >
+                      <Button className="flex flex-row w-full">
+                        Tweet
+                        <Twitter
+                          strokeWidth={0}
+                          fill="#1DA1F2"
+                          className="h-6 w-6 ml-2"
+                        />
+                      </Button>
+                    </Link>
+                  </div>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           )}
         </div>
       )}

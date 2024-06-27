@@ -21,6 +21,17 @@ const ProfilePage = () => {
               <span className="font-semibold">Hello</span>{" "}
               {user?.farcaster?.displayName}
             </h3>
+            <h3>
+              <span className="font-semibold">View your Profile NFT</span>
+              <Button variant="link" className="text-lg font-bold" asChild>
+                <a
+                  href={`https://testnets.opensea.io/assets/base-sepolia/0x6613c7e5a5faae496aaeec9c85562d9128fedf4a/${userInfo.profileNft}`}
+                  target="_blank"
+                >
+                  on OpenSea
+                </a>
+              </Button>
+            </h3>
             <div className="flex flex-wrap flex-row gap-2 my-4 font-medium">
               {userInfo.mintedValues &&
                 userInfo.mintedValues.map((value) => (

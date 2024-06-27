@@ -1,5 +1,5 @@
 "use client";
-import useValues from "@/app/hooks/useValues";
+
 import useValuesHook from "@/app/hooks/useValuesHook";
 import {IUser} from "@/models/user";
 import {usePrivy} from "@privy-io/react-auth";
@@ -27,7 +27,6 @@ export const UserContextProvider = ({
   const [values, setValues] = useState([]);
   const {fetchUser, createUser, fetchFarcasterUserWallets} = useValuesHook();
   useEffect(() => {
-    console.log("user", user);
     if (!authenticated) return;
     setLoading(true);
 
@@ -36,8 +35,6 @@ export const UserContextProvider = ({
       let wallets;
 
       if (!user?.email?.address && !user?.farcaster?.fid) {
-        console.log("coudlnt fine");
-        console.log("auth", authenticated);
         return;
       }
       userInfo = (await fetchUser())?.user;
@@ -72,18 +69,10 @@ export const UserContextProvider = ({
 
   useEffect(() => {
     const addWalletsIfPresent = async () => {
-      console.log("user from addwallets", user);
       if (!user) return;
       try {
         const wallets = await fetchFarcasterUserWallets();
-        console.log("Wallets", wallets);
-        console.log({
-          method: "add_wallet",
-          wallets: [user?.wallet?.address, ...wallets],
-          ...(user?.farcaster?.fid ? {farcaster: user?.farcaster?.fid} : {}),
-          ...(user?.email?.address ? {email: user?.email?.address} : {}),
-        });
-        console.log("user from function", user);
+
         const response = await axios.post(
           "/api/v2/user",
           {
@@ -99,8 +88,6 @@ export const UserContextProvider = ({
             },
           }
         );
-
-        console.log(response);
       } catch (error) {
         console.log("error", error);
       }
@@ -110,7 +97,7 @@ export const UserContextProvider = ({
       console.log("triggered twitter update", user?.twitter?.username);
       if (!user || !user?.twitter?.username) return;
       try {
-        console.log("user", user);
+        if (userInfo?.twitter) return;
         const response = await axios.post(
           "/api/v2/user",
           {
@@ -137,7 +124,7 @@ export const UserContextProvider = ({
     const updateWarpcastHandle = async () => {
       if (!user || !user?.farcaster?.fid) return;
       try {
-        console.log("user", user);
+        if (userInfo?.farcaster) return;
         const response = await axios.post(
           "/api/v2/user",
           {
@@ -171,7 +158,7 @@ export const UserContextProvider = ({
       const {
         data: {values},
       } = await axios.get(`${process.env.NEXT_PUBLIC_HOST}/api/v2/value`);
-      console.log(values);
+
       setValues(values);
     };
 

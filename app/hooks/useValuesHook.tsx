@@ -211,7 +211,7 @@ const useValuesHook = () => {
             "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
           },
         });
-
+        console.log("mintHandler Response", data);
         if (data.status === 200) {
           emailAnalytics({
             subject: "User minted Value(s)",

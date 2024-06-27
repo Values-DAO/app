@@ -56,10 +56,6 @@ const HomeComponent = () => {
     filter();
   }, [searchValue]);
 
-  useEffect(() => {
-    console.log("filteredData", filteredData);
-  }, [filteredData]);
-
   return (
     <div className="flex justify-center">
       <div className="flex flex-col md:w-[900px] w-[98vw] max-w-[98%] m-auto">
@@ -140,6 +136,7 @@ const HomeComponent = () => {
                                   });
                                   if (response) {
                                     console.log(response);
+                                    setUserInfo(response.user);
                                     toast({
                                       title: "Minted Successfully.",
 
@@ -147,9 +144,9 @@ const HomeComponent = () => {
                                         <ToastAction
                                           onClick={() => {
                                             window.open(
-                                              `https://testnets.opensea.io/assets/base-sepolia/${NFT_CONTRACT_ADDRESS}/${
-                                                Number(userInfo?.profileNft) - 1
-                                              }`,
+                                              `https://testnets.opensea.io/assets/base-sepolia/${NFT_CONTRACT_ADDRESS}/${Number(
+                                                userInfo?.profileNft
+                                              )}`,
                                               "_blank"
                                             );
                                           }}
@@ -165,6 +162,7 @@ const HomeComponent = () => {
                                       balance: Number(userInfo?.balance) - 1,
                                     });
                                   } else if (!response) {
+                                    console.log(response);
                                     toast({
                                       title: "Minting Failed.",
                                       description: "Please try again later",
@@ -197,85 +195,88 @@ const HomeComponent = () => {
                         );
                       })}
 
-                    {filteredData && filteredData.length === 0 && (
-                      <div className="w-full h-14 px-3 flex items-center hover:bg-gray-300/20 hover:cursor-pointer rounded-sm">
-                        <span> {searchValue}</span>
+                    {filteredData &&
+                      searchValue.length > 0 &&
+                      filteredData.length === 0 && (
+                        <div className="w-full h-14 px-3 flex items-center hover:bg-gray-300/20 hover:cursor-pointer rounded-sm">
+                          <span> {searchValue}</span>
 
-                        {address ||
-                        (userInfo &&
-                          userInfo.wallets &&
-                          userInfo.wallets?.length > 0) ? (
-                          <Button
-                            variant="default"
-                            className="ml-auto h-8 w-32"
-                            disabled={loading[searchValue]}
-                            onClick={async () => {
-                              setLoading({
-                                ...loading,
-                                [searchValue]: true,
-                              });
-                              const response = await mintHandler({
-                                values: [{name: searchValue, weightage: "1"}],
-                              });
-                              if (response) {
-                                console.log(response);
-                                setOnMintingSuccessful(true);
-
-                                toast({
-                                  title: "Minted Successfully.",
-
-                                  action: (
-                                    <ToastAction
-                                      onClick={() => {
-                                        window.open(
-                                          `https://testnets.opensea.io/assets/base-sepolia/${NFT_CONTRACT_ADDRESS}/${
-                                            Number(userInfo?.profileNft) - 1
-                                          }`,
-                                          "_blank"
-                                        );
-                                      }}
-                                      altText="View in Opensea"
-                                    >
-                                      View on Opensea
-                                    </ToastAction>
-                                  ),
+                          {address ||
+                          (userInfo &&
+                            userInfo.wallets &&
+                            userInfo.wallets?.length > 0) ? (
+                            <Button
+                              variant="default"
+                              className="ml-auto h-8 w-32"
+                              disabled={loading[searchValue]}
+                              onClick={async () => {
+                                setLoading({
+                                  ...loading,
+                                  [searchValue]: true,
                                 });
+                                const response = await mintHandler({
+                                  values: [{name: searchValue, weightage: "1"}],
+                                });
+                                if (response) {
+                                  console.log(response);
+                                  setOnMintingSuccessful(true);
+                                  setUserInfo(response.user);
 
-                                setUserInfo({
-                                  ...userInfo,
-                                  balance: Number(userInfo?.balance) - 1,
+                                  toast({
+                                    title: "Minted Successfully.",
+
+                                    action: (
+                                      <ToastAction
+                                        onClick={() => {
+                                          window.open(
+                                            `https://testnets.opensea.io/assets/base-sepolia/${NFT_CONTRACT_ADDRESS}/${Number(
+                                              userInfo?.profileNft
+                                            )}`,
+                                            "_blank"
+                                          );
+                                        }}
+                                        altText="View in Opensea"
+                                      >
+                                        View on Opensea
+                                      </ToastAction>
+                                    ),
+                                  });
+
+                                  setUserInfo({
+                                    ...userInfo,
+                                    balance: Number(userInfo?.balance) - 1,
+                                  });
+                                } else if (!response) {
+                                  toast({
+                                    title: "Minting Failed.",
+                                    description: "Please try again later",
+                                    variant: "destructive",
+                                  });
+                                }
+                                setLoading({
+                                  ...loading,
+                                  [searchValue]: false,
                                 });
-                              } else if (!response) {
-                                toast({
-                                  title: "Minting Failed.",
-                                  description: "Please try again later",
-                                  variant: "destructive",
-                                });
-                              }
-                              setLoading({
-                                ...loading,
-                                [searchValue]: false,
-                              });
-                            }}
-                          >
-                            {loading[searchValue] ? (
-                              <div className="flex flex-row gap-2">
-                                Minting{" "}
-                                <div className="animate-spin rounded-full h-6 w-6 border-4 border-dashed border-white"></div>
-                              </div>
-                            ) : (
-                              "Mint"
-                            )}
-                          </Button>
-                        ) : (
-                          <div className="ml-auto">
-                            <Button variant="default" onClick={linkWallet}>
-                              Connect Wallet
+                              }}
+                            >
+                              {loading[searchValue] ? (
+                                <div className="flex flex-row gap-2">
+                                  Minting{" "}
+                                  <div className="animate-spin rounded-full h-6 w-6 border-4 border-dashed border-white"></div>
+                                </div>
+                              ) : (
+                                "Mint"
+                              )}
                             </Button>
-                          </div>
-                        )}
-                      </div>
-                    )}
+                          ) : (
+                            <div className="ml-auto">
+                              <Button variant="default" onClick={linkWallet}>
+                                Connect Wallet
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      )}
 
                     {searchValue.length === 0 && (
                       <div className="flex justify-center items-center p-4">
