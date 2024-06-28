@@ -69,6 +69,7 @@ const ValuePage = () => {
 
   //   fetchValueRecs();
   // }, []);
+
   useEffect(() => {
     if (loading) {
       const intervalId = setInterval(() => {
@@ -132,19 +133,19 @@ const ValuePage = () => {
             <h2 className="scroll-m-20 text-center border-b pb-2 text-3xl font-medium tracking-tight first:mt-0 max-w-5xl text-muted-foreground">
               || ai generated values
             </h2>
-            <Tabs defaultValue={"warpcast"} className="w-full">
+            <Tabs defaultValue={"twitter"} className="w-full">
               <TabsList className="flex justify-center py-4 text-black">
                 <TabsTrigger
-                  value="warpcast"
+                  value="twitter"
                   className="text-md text-wrap md:text-lg  w-[50%] md:py-[1px] "
                 >
-                  Warpcast
+                  Twitter
                 </TabsTrigger>
                 <TabsTrigger
-                  value="twitter"
+                  value="warpcast"
                   className="text-md text-wrap md:text-lg w-[50%] md:py-[1px]"
                 >
-                  Twitter
+                  Warpcast
                 </TabsTrigger>{" "}
               </TabsList>
 
@@ -173,44 +174,42 @@ const ValuePage = () => {
                       )}
                   </div>
                 }
-                {!(
-                  userInfo?.aiGeneratedValues &&
-                  userInfo?.aiGeneratedValues?.twitter?.length > 0 &&
-                  userInfo?.aiGeneratedValues?.twitter.every((str) =>
-                    userInfo?.mintedValues?.some(
-                      (mintedValue) =>
-                        mintedValue.value.toLowerCase() === str.toLowerCase()
-                    )
-                  )
-                ) && (
-                  <Button
-                    variant={"default"}
-                    className="w-full cursor-pointer mt-4"
-                    onClick={async () => {
-                      setLoader(true);
-                      const response = await mintHandler({
-                        values: userInfo?.aiGeneratedValues?.twitter?.map(
-                          (value) => ({
-                            name: value,
-                            weightage: "1",
-                          })
-                        )!,
-                      });
-                      setLoader(false);
-                      if (response) setOnMintingSuccessful(true);
-                      else if (!response) {
-                        toast({
-                          title: "Minting Failed.",
-                          description: "Please try again later",
-                          variant: "destructive",
+                {!userInfo?.communitiesMinted?.includes("twitter") &&
+                  userInfo?.aiGeneratedValues?.twitter &&
+                  userInfo?.aiGeneratedValues?.twitter?.length > 0 && (
+                    <Button
+                      variant={"default"}
+                      className="w-full cursor-pointer mt-4"
+                      onClick={async () => {
+                        setLoader(true);
+                        const response = await mintHandler({
+                          values: userInfo?.aiGeneratedValues?.twitter?.map(
+                            (value) => ({
+                              name: value,
+                              weightage: "1",
+                            })
+                          )!,
+                          type: "community",
+                          communityId: "twitter",
                         });
-                      }
-                    }}
-                    disabled={loader}
-                  >
-                    {loader ? "Minting..." : "Mint Values"}
-                  </Button>
-                )}
+                        setLoader(false);
+                        console.log(response);
+                        if (response) {
+                          setUserInfo(response.user);
+                          setOnMintingSuccessful(true);
+                        } else if (!response) {
+                          toast({
+                            title: "Minting Failed.",
+                            description: "Please try again later",
+                            variant: "destructive",
+                          });
+                        }
+                      }}
+                      disabled={loader}
+                    >
+                      {loader ? "Minting..." : "Mint Values"}
+                    </Button>
+                  )}
 
                 {!address &&
                   userInfo?.wallets?.length === 0 &&
@@ -243,7 +242,7 @@ const ValuePage = () => {
                         </Alert>
                       )}
 
-                      {userInfo && userInfo?.twitter && (
+                      {userInfo && userInfo?.twitter && !loading && (
                         <Button
                           className="w-full cursor-pointer mt-4"
                           disabled={loader}
@@ -299,37 +298,42 @@ const ValuePage = () => {
                       )}
                   </div>
                 }
-                {!(
-                  userInfo?.aiGeneratedValues &&
-                  userInfo?.aiGeneratedValues?.warpcast?.length > 0 &&
-                  userInfo?.aiGeneratedValues?.warpcast.every((str) =>
-                    userInfo?.mintedValues?.some(
-                      (mintedValue) =>
-                        mintedValue.value.toLowerCase() === str.toLowerCase()
-                    )
-                  )
-                ) && (
-                  <Button
-                    variant={"default"}
-                    className="w-full cursor-pointer mt-4"
-                    onClick={async () => {
-                      setLoader(true);
-                      const response = await mintHandler({
-                        values: userInfo?.aiGeneratedValues?.warpcast?.map(
-                          (value) => ({
-                            name: value,
-                            weightage: "1",
-                          })
-                        )!,
-                      });
-                      setLoader(false);
-                      console.log(response);
-                    }}
-                    disabled={loader}
-                  >
-                    {loader ? "Minting..." : "Mint Values"}
-                  </Button>
-                )}
+                {!userInfo?.communitiesMinted?.includes("warpcast") &&
+                  userInfo?.aiGeneratedValues?.warpcast &&
+                  userInfo.aiGeneratedValues.warpcast.length > 0 && (
+                    <Button
+                      variant={"default"}
+                      className="w-full cursor-pointer mt-4"
+                      onClick={async () => {
+                        setLoader(true);
+                        const response = await mintHandler({
+                          values: userInfo?.aiGeneratedValues?.warpcast?.map(
+                            (value) => ({
+                              name: value,
+                              weightage: "1",
+                            })
+                          )!,
+                          type: "community",
+                          communityId: "warpcast",
+                        });
+                        setLoader(false);
+                        if (response) {
+                          setUserInfo(response.user);
+                          setOnMintingSuccessful(true);
+                        } else if (!response) {
+                          toast({
+                            title: "Minting Failed.",
+                            description: "Please try again later",
+                            variant: "destructive",
+                          });
+                        }
+                        console.log(response);
+                      }}
+                      disabled={loader}
+                    >
+                      {loader ? "Minting..." : "Mint Values"}
+                    </Button>
+                  )}
 
                 {userInfo?.aiGeneratedValues &&
                   userInfo?.aiGeneratedValues?.warpcast?.length === 0 && (
@@ -356,7 +360,7 @@ const ValuePage = () => {
                         </Alert>
                       )}
 
-                      {userInfo && userInfo.farcaster && (
+                      {userInfo && userInfo.farcaster && !loading && (
                         <Button
                           className="w-full cursor-pointer mt-4"
                           disabled={loader}

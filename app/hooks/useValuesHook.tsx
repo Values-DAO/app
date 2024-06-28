@@ -62,8 +62,10 @@ const useValuesHook = () => {
 
   const createUser = async ({
     wallets,
+    twitter,
   }: {
     wallets?: string[];
+    twitter?: string;
   }): Promise<{user: IUser | null; message: string}> => {
     if (!user?.email?.address && !user?.farcaster?.fid)
       return {user: null, message: "No user data"};
@@ -82,6 +84,7 @@ const useValuesHook = () => {
           method: "create_user",
           balance: 5,
           mintedValues: [],
+          twitter,
         },
         {
           headers: {

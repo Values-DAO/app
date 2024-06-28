@@ -5,9 +5,22 @@ import {usePrivy} from "@privy-io/react-auth";
 import {useUserContext} from "@/providers/user-context-provider";
 import {Button} from "@/components/ui/button";
 import ValueBadge from "@/components/ui/value-badge";
+import {useEffect, useState} from "react";
+import useValuesHook from "../hooks/useValuesHook";
 const ProfilePage = () => {
   const {authenticated, login, ready, user} = usePrivy();
-  const {userInfo, isLoading} = useUserContext();
+  const {userInfo, isLoading, setUserInfo} = useUserContext();
+  const [userData, setUserData] = useState(null);
+  const {fetchUser} = useValuesHook();
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const user = (await fetchUser()).user;
+      if (user) setUserInfo(user);
+    };
+
+    fetchUserData();
+  }, [user]);
+
   return (
     <div className="p-4">
       {authenticated && userInfo && !isLoading && (
@@ -45,11 +58,10 @@ const ProfilePage = () => {
           </div>
         </div>
       )}
-
-      {!authenticated && (
-        <section className="w-full mt-24 md:mt-[15%]  flex flex-col items-center ">
-          <span className="font-semibold  text-gray-300 text-lg">
-            Login to view
+      {ready && !authenticated && (
+        <section className="w-full mt-24  flex flex-col items-center ">
+          <span className="scroll-m-20 text-lg font-semibold tracking-tight ">
+            Login to view your profile
           </span>
           <Button
             variant="default"
@@ -61,6 +73,15 @@ const ProfilePage = () => {
           </Button>
         </section>
       )}
+      {!ready ||
+        (isLoading && (
+          <section className="w-full mt-24  flex flex-col items-center ">
+            <div className="flex flex-col items-center justify-center h-[60vh]">
+              <div className="animate-spin rounded-full h-14 w-14 border-t-2 border-b-2 border-primary"></div>
+              <span>Loading</span>
+            </div>
+          </section>
+        ))}
     </div>
   );
 };

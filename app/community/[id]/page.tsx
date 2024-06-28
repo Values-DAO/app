@@ -36,7 +36,7 @@ interface pageProps {
 
 const ProjectsPage: React.FC<pageProps> = ({params}) => {
   const {user, authenticated, login, linkWallet} = usePrivy();
-  const {userInfo} = useUserContext();
+  const {userInfo, setUserInfo} = useUserContext();
 
   const {fetchCommunityProjects, isAHolderOfToken, mintHandler} =
     useValuesHook();
@@ -78,6 +78,14 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
 
   return (
     <>
+      {" "}
+      {loader && !project && (
+        <div className="w-[90vw] m-auto flex flex-col gap-4">
+          <Skeleton className="w-full h-[320px] rounded-md" />
+          <Skeleton className="w-full m-auto h-[30px] rounded-md" />
+          <Skeleton className="w-full m-auto h-[30px] rounded-md" />
+        </div>
+      )}
       {userInfo && (
         <main className="p-4 overflow-y-auto">
           {project && (
@@ -127,6 +135,7 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
                 {authenticated &&
                   tokenBalance != null &&
                   tokenBalance != undefined &&
+                  balanceLoader === false &&
                   tokenBalance <= 0 && (
                     <Alert className="my-8">
                       <WandSparklesIcon className="h-4 w-4" />
@@ -158,6 +167,7 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
                 {authenticated &&
                   tokenBalance != null &&
                   tokenBalance > 0 &&
+                  balanceLoader === false &&
                   !userInfo?.communitiesMinted?.includes(id!) && (
                     <Alert className="my-8">
                       <RocketIcon className="h-4 w-4" />
@@ -189,6 +199,7 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
                         });
                         setLoader(false);
                         if (response) {
+                          setUserInfo(response.user);
                           setOnMintingSuccessful(true);
                           toast({
                             title: "Minted Successfully.",
@@ -232,14 +243,16 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
                       </AlertTitle>
                     </Alert>
                   )}
-                {authenticated && tokenBalance == null && (
-                  <Alert className="my-8">
-                    <WandSparklesIcon className="h-4 w-4" />
-                    <AlertTitle className="leading-2">
-                      Fetching token balance errored
-                    </AlertTitle>
-                  </Alert>
-                )}
+                {authenticated &&
+                  tokenBalance == null &&
+                  balanceLoader === false && (
+                    <Alert className="my-8">
+                      <WandSparklesIcon className="h-4 w-4" />
+                      <AlertTitle className="leading-2">
+                        Fetching token balance errored
+                      </AlertTitle>
+                    </Alert>
+                  )}
 
                 {authenticated && balanceLoader && (
                   <Alert className="my-8">
@@ -251,14 +264,6 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
                 )}
               </div>
             </section>
-          )}
-
-          {loader && !project && (
-            <div className="w-[90vw] m-auto flex flex-col gap-4">
-              <Skeleton className="w-full h-[320px] rounded-md" />
-              <Skeleton className="w-full m-auto h-[30px] rounded-md" />
-              <Skeleton className="w-full m-auto h-[30px] rounded-md" />
-            </div>
           )}
 
           {onMintingSuccessful && (

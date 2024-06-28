@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
           description:
             "This is a value NFT generated via ValuesDAO, each NFT represents a ValuesDAO Profile.",
           image:
-            "https://gateway.pinata.cloud/ipfs/QmX3E8eg85itRjcTHu9ZRbU2JAu1R9YPFDLYg5ijD2Gc6n",
+            "https://tomato-left-possum-965.mypinata.cloud/ipfs/QmX3E8eg85itRjcTHu9ZRbU2JAu1R9YPFDLYg5ijD2Gc6n",
           attributes: values.map((value) => ({
             trait_type:
               value.name.toString().charAt(0).toUpperCase() +
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
     );
 
     return NextResponse.json({
-      cid: `https://gateway.pinata.cloud/ipfs/${data.IpfsHash}`,
+      cid: `https://tomato-left-possum-965.mypinata.cloud/ipfs/${data.IpfsHash}`,
       message: "success",
       status: 200,
     });

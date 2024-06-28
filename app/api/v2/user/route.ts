@@ -100,6 +100,7 @@ export async function POST(req: NextRequest) {
             profileNft: await fetchAllNFTsValuesDAO(),
             profileNftHash: hash,
             profileNftIpfs: IPFS_CID,
+            twitter: twitter,
           });
           return NextResponse.json(createdUser);
         } catch (error) {
@@ -213,7 +214,7 @@ export async function POST(req: NextRequest) {
         if (values) {
           console.log("values", values);
           for (const value of values) {
-            if (!allValues.includes(value.name)) {
+            if (!allValues.includes(value.name.toLowerCase())) {
               await Value.create({name: value.name});
             }
             const existingValue = user.mintedValues?.find(

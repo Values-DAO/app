@@ -8,11 +8,13 @@ import HomeComponent from "@/components/home-component";
 export default function Home() {
   const {authenticated, login, ready, user} = usePrivy();
   const {userInfo, isLoading} = useUserContext();
+
   return (
     <>
       {isLoading && (
-        <div className="flex items-center justify-center h-[60vh]">
+        <div className="flex flex-col items-center justify-center h-[60vh]">
           <div className="animate-spin rounded-full h-14 w-14 border-t-2 border-b-2 border-primary"></div>
+          <span>Setting up your profile</span>
         </div>
       )}
 
@@ -43,6 +45,8 @@ export default function Home() {
           </Button>
         </div>
       )}
+
+      {}
     </>
   );
 }

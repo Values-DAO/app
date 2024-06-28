@@ -33,14 +33,15 @@ export const UserContextProvider = ({
     const isUserExist = async () => {
       let userInfo: IUser | null | undefined = null;
       let wallets;
-
+      setLoading(true);
       if (!user?.email?.address && !user?.farcaster?.fid) {
+        setLoading(false);
         return;
       }
       userInfo = (await fetchUser())?.user;
 
       if (userInfo) {
-        console.log(userInfo);
+        console.log("user exists", userInfo);
         setUserInfo(userInfo);
       } else {
         const wallets = await fetchFarcasterUserWallets();
@@ -57,12 +58,16 @@ export const UserContextProvider = ({
                 ? [user.wallet.address.toLowerCase()]
                 : []),
             ] || [],
+          twitter: user?.twitter?.username as string,
         });
-        console.log(userCreated.user);
+
+        console.log("user created", userCreated.user);
+
         setUserInfo(userCreated.user);
       }
+
+      setLoading(false);
     };
-    setLoading(false);
 
     isUserExist();
   }, [user]);
@@ -113,9 +118,6 @@ export const UserContextProvider = ({
             },
           }
         );
-        console.log("twitter response", response);
-        setUserInfo({...userInfo, twitter: user?.twitter?.username});
-        console.log(response);
       } catch (error) {
         console.log("error", error);
       }
@@ -140,9 +142,6 @@ export const UserContextProvider = ({
             },
           }
         );
-
-        setUserInfo({...userInfo, farcaster: user?.farcaster?.fid});
-        console.log(response);
       } catch (error) {
         console.log("error", error);
       }
