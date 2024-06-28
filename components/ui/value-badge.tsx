@@ -7,8 +7,8 @@ const ValueBadge = ({value, weight}: {value: string; weight?: string}) => {
 
   return (
     <Badge
-      variant="default"
-      className="rounded-sm text-[18px] text-nowrap w-fit"
+      variant="outline"
+      className="rounded-sm text-[18px] text-nowrap w-fit border-2 border-primary"
     >
       {capitalizedValue} {weight && `(${weight})`}
     </Badge>

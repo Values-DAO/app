@@ -81,7 +81,7 @@ const HomeComponent = () => {
           className="w-[95%] m-auto"
         >
           <AccordionItem value="ai">
-            <AccordionTrigger className="scroll-m-20 text-2xl font-semibold tracking-tight">
+            <AccordionTrigger className="scroll-m-20 text-2xl font-semibold tracking-tight bg-gray-300 px-4">
               <div className="flex flex-row gap-2 items-center justify-center">
                 <TbCircleNumber1Filled /> AI Value Analysis
                 {userInfo?.aiGeneratedValues?.twitter &&
@@ -99,15 +99,15 @@ const HomeComponent = () => {
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="community">
-            <AccordionTrigger className="scroll-m-20 text-2xl font-semibold tracking-tight">
+            <AccordionTrigger className="scroll-m-20 text-2xl font-semibold tracking-tight bg-gray-300 px-4">
               <div className="flex flex-row gap-2 items-center justify-center">
                 <TbCircleNumber2Filled />
 
-                <div className="flex flex-col  md:flex-row">
+                <div className="flex flex-col  md:flex-row gap-2 items-center">
                   <span>Community Mint</span>
                   {userInfo?.communitiesMinted &&
                   userInfo?.communitiesMinted?.length > 0 ? (
-                    <Badge className="bg-green-300 text-black w-fit">
+                    <Badge className="bg-green-300 text-black w-fit h-fit">
                       Minted values from{" "}
                       {userInfo?.communitiesMinted?.length -
                         (userInfo?.communitiesMinted?.includes("warpcast")
@@ -119,7 +119,7 @@ const HomeComponent = () => {
                       communities
                     </Badge>
                   ) : (
-                    <Badge className="w-fit">Pending</Badge>
+                    <Badge className="w-fit h-fit">Pending</Badge>
                   )}
                 </div>
               </div>
@@ -132,21 +132,19 @@ const HomeComponent = () => {
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="manual">
-            <AccordionTrigger className="scroll-m-20 text-2xl font-semibold tracking-tight">
+            <AccordionTrigger className="scroll-m-20 text-2xl font-semibold tracking-tight bg-gray-300 px-4">
               <div className="flex flex-row gap-2 items-center justify-center">
                 <TbCircleNumber3Filled /> Manual Mint
                 {userInfo?.mintedValues &&
-                userInfo?.mintedValues?.length > 0 ? (
-                  <Badge className="bg-green-300 text-black">
-                    {" "}
-                    {userInfo?.mintedValues?.length} Values minted
-                  </Badge>
+                userInfo?.mintedValues?.length > 0 &&
+                userInfo.balance === 0 ? (
+                  <Badge className="bg-green-300 text-black">Completed</Badge>
                 ) : (
                   <Badge>Pending</Badge>
                 )}
               </div>
             </AccordionTrigger>
-            <AccordionContent className="py-12">
+            <AccordionContent className="py-12 px-2">
               <h2 className="scroll-m-20 py-4 text-center border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 max-w-5xl text-muted-foreground mb-2">
                 || manual mint
               </h2>
@@ -346,7 +344,7 @@ const HomeComponent = () => {
 
                       {searchValue.length === 0 && (
                         <div className="flex justify-center items-center p-4">
-                          <span className="font-semibold  text-gray-300 text-lg">
+                          <span className="font-semibold  text-gray-700 text-lg">
                             Type out your values and mint them
                           </span>{" "}
                         </div>

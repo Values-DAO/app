@@ -11,9 +11,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import {VerifiedIcon} from "lucide-react";
+import {SquareArrowOutUpRight, VerifiedIcon} from "lucide-react";
 import ValueBadge from "./ui/value-badge";
 import {Skeleton} from "./ui/skeleton";
+import Link from "next/link";
+import {Button} from "./ui/button";
 
 const Projects = ({limit, style}: {limit?: number; style?: string}) => {
   const [projects, setProjects] = React.useState<IProject[]>([]);
@@ -42,9 +44,9 @@ const Projects = ({limit, style}: {limit?: number; style?: string}) => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Values</TableHead>
-            <TableHead>Verified</TableHead>
+            <TableHead className="font-bold">Name</TableHead>
+            <TableHead className="font-bold">Values</TableHead>
+            <TableHead className="font-bold">Verified</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -60,7 +62,7 @@ const Projects = ({limit, style}: {limit?: number; style?: string}) => {
               }}
             >
               <TableCell>
-                <div className="relative text-medium">{project.name}</div>
+                <div className="relative font-semibold">{project.name}</div>
               </TableCell>
               <TableCell>
                 <div className="flex flex-row flex-wrap gap-2">
@@ -78,6 +80,18 @@ const Projects = ({limit, style}: {limit?: number; style?: string}) => {
           ))}
         </TableBody>
       </Table>
+      {!loader && limit && limit < 4 && (
+        <Button
+          asChild
+          variant={"link"}
+          className="text-lg flex items-center justify-center mt-4"
+        >
+          <Link href="/community">
+            Show all communities
+            <SquareArrowOutUpRight className="ml-2" />
+          </Link>
+        </Button>
+      )}
       {loader && (
         <div className="flex flex-col gap-2">
           <div className="space-y-2">
