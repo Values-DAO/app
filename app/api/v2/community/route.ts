@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
     const id = req.nextUrl.searchParams.get("id");
     if (id) {
       const project = await Project.findOne({id}, {__v: 0, _id: 0});
-      console.log(project);
+
       return NextResponse.json({status: 200, message: "Success", project});
     }
     const projects = await Project.find({}, {__v: 0, _id: 0}).limit(

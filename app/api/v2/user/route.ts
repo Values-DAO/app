@@ -59,7 +59,6 @@ export async function POST(req: NextRequest) {
     switch (method) {
       case "create_user":
         if (user) {
-          console.log("user exits");
           return NextResponse.json({error: "User already exists", status: 400});
         }
 
@@ -173,7 +172,6 @@ export async function POST(req: NextRequest) {
           });
         }
       case "update_profile":
-        console.log("update_profile");
         if (!user) {
           return NextResponse.json({
             user: null,
@@ -192,7 +190,7 @@ export async function POST(req: NextRequest) {
         );
 
         const allValues = allValuesInDB.map((value) => value.name);
-        console.log("allValues", allValues);
+
         if (type === "manual" && user.balance < values.length) {
           return NextResponse.json({
             status: 400,
@@ -212,7 +210,6 @@ export async function POST(req: NextRequest) {
         }
         // values =[{name:"humility", weightage:1}]
         if (values) {
-          console.log("values", values);
           for (const value of values) {
             if (!allValues.includes(value.name.toLowerCase())) {
               await Value.create({name: value.name});
@@ -232,7 +229,7 @@ export async function POST(req: NextRequest) {
           }
           if (type === "manual") user.balance = user.balance - values.length;
           if (type === "community") user.communitiesMinted.push(communityId);
-          console.log("user", user);
+
           const {
             data: {cid},
           } = await axios.post(

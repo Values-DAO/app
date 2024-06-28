@@ -1,6 +1,5 @@
 "use client";
 
-import {Card} from "@/components/ui/card";
 import {usePrivy} from "@privy-io/react-auth";
 import {useUserContext} from "@/providers/user-context-provider";
 import {Button} from "@/components/ui/button";
@@ -11,7 +10,7 @@ import {NFT_CONTRACT_ADDRESS} from "@/constants";
 const ProfilePage = () => {
   const {authenticated, login, ready, user} = usePrivy();
   const {userInfo, isLoading, setUserInfo} = useUserContext();
-  const [userData, setUserData] = useState(null);
+
   const {fetchUser} = useValuesHook();
   useEffect(() => {
     const fetchUserData = async () => {

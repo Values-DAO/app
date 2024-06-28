@@ -248,7 +248,6 @@ const useValuesHook = () => {
   const fetchCommunityProjects = async ({id}: {id: string}) => {
     if (!id) return;
     try {
-      console.log("fetching community projects");
       const projectData = await axios.get(`/api/v2/community?id=${id}`, {
         headers: {
           "Content-Type": "application/json",

@@ -34,7 +34,7 @@ const Projects = ({limit, style}: {limit?: number; style?: string}) => {
     fetchProjects();
   }, []);
   return (
-    <div className="p-4">
+    <div className="p-4 py-12">
       <h2 className="scroll-m-20 text-center border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 text-muted-foreground mb-2">
         || community mint
       </h2>

@@ -124,11 +124,11 @@ const ValuePage = () => {
     }
     setLoading(false);
   };
-  console.log(userInfo);
+
   return (
     <>
       {authenticated && (
-        <div className="py-4 flex flex-col min-h-[80vh] gap-4">
+        <div className="py-12 flex flex-col gap-4">
           <div className="flex flex-col gap-4">
             <h2 className="scroll-m-20 text-center border-b pb-2 text-3xl font-medium tracking-tight first:mt-0 max-w-5xl text-muted-foreground">
               || ai generated values
@@ -193,7 +193,7 @@ const ValuePage = () => {
                           communityId: "twitter",
                         });
                         setLoader(false);
-                        console.log(response);
+
                         if (response) {
                           setUserInfo(response.user);
                           setOnMintingSuccessful(true);
@@ -327,7 +327,6 @@ const ValuePage = () => {
                             variant: "destructive",
                           });
                         }
-                        console.log(response);
                       }}
                       disabled={loader}
                     >

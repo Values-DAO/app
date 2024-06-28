@@ -41,7 +41,6 @@ export const UserContextProvider = ({
       userInfo = (await fetchUser())?.user;
 
       if (userInfo) {
-        console.log("user exists", userInfo);
         setUserInfo(userInfo);
       } else {
         const wallets = await fetchFarcasterUserWallets();
@@ -60,8 +59,6 @@ export const UserContextProvider = ({
             ] || [],
           twitter: user?.twitter?.username as string,
         });
-
-        console.log("user created", userCreated.user);
 
         setUserInfo(userCreated.user);
       }
@@ -99,7 +96,6 @@ export const UserContextProvider = ({
     };
 
     const updatetwitterHandle = async () => {
-      console.log("triggered twitter update", user?.twitter?.username);
       if (!user || !user?.twitter?.username) return;
       try {
         if (userInfo?.twitter) return;
