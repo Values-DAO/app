@@ -3,6 +3,8 @@ import Value from "@/models/value";
 import {NextRequest, NextResponse} from "next/server";
 
 export async function GET(req: NextRequest) {
+  const searchParams = req.nextUrl.searchParams;
+  const withCount = searchParams.get("withCount");
   try {
     await connectToDatabase();
     const values = await Value.find(
@@ -14,6 +16,16 @@ export async function GET(req: NextRequest) {
         updatedAt: 0,
       }
     );
+    if (withCount) {
+      return NextResponse.json({
+        values: values.map((value) => ({
+          name: value.name,
+          timesMinted: value.timesMinted,
+        })),
+
+        status: 200,
+      });
+    }
     return NextResponse.json({
       values: values.map((value) => value.name),
       status: 200,

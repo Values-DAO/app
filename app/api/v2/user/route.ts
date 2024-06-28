@@ -214,6 +214,11 @@ export async function POST(req: NextRequest) {
             if (!allValues.includes(value.name.toLowerCase())) {
               await Value.create({name: value.name});
             }
+            const valueInDB = await Value.findOne({name: value.name});
+            if (valueInDB) {
+              valueInDB.timesMinted = valueInDB.timesMinted + 1;
+              await valueInDB.save();
+            }
             const existingValue = user.mintedValues?.find(
               (v: any) => v.value === value.name
             );

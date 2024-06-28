@@ -1,4 +1,7 @@
 "use client";
+import {useUserContext} from "@/providers/user-context-provider";
+import axios from "axios";
+
 import React, {useEffect, useState} from "react";
 import ReactWordcloud from "react-wordcloud";
 interface Word {
@@ -10,32 +13,24 @@ interface WordCloudProps {
 }
 const ValuesWordCloud: React.FC<WordCloudProps> = ({refresh}) => {
   const [words, setWords] = useState<Word[]>([]);
+  const {userInfo} = useUserContext();
   const fetchWords = async () => {
-    const response = await fetch("/api/value", {
+    const {data} = await axios.get("/api/v2/value?withCount=true", {
       headers: {
         "Content-Type": "application/json",
         "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
       },
     });
-    const data = await response.json();
-    if (data) {
-      const words: Word[] = [];
-
-      for (const key in data) {
-        if (Object.prototype.hasOwnProperty.call(data, key)) {
-          const text = key;
-          const value = data[key].minters.length + 1;
-          words.push({text, value});
-        }
-      }
-
-      setWords(words);
-    }
+    const words = data.values.map((value: any) => ({
+      text: value.name,
+      value: value.timesMinted,
+    }));
+    setWords(words);
   };
 
   useEffect(() => {
     fetchWords();
-  }, [refresh]);
+  }, [refresh, userInfo]);
 
   return (
     <div className="h-[250px] w-[96%] m-auto flex justify-center">

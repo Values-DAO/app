@@ -72,7 +72,7 @@ const HomeComponent = () => {
   return (
     <div className="flex justify-center">
       <div className="flex flex-col md:w-[900px] w-[98vw] max-w-[98%] m-auto">
-        {/* <ValuesWordCloud refresh={valuesRecommendation} /> */}
+        <ValuesWordCloud refresh={valuesRecommendation} />
 
         <Accordion type="single" collapsible defaultValue={"ai"}>
           <AccordionItem value="ai">
