@@ -7,6 +7,7 @@ import {Button} from "@/components/ui/button";
 import ValueBadge from "@/components/ui/value-badge";
 import {useEffect, useState} from "react";
 import useValuesHook from "../hooks/useValuesHook";
+import {NFT_CONTRACT_ADDRESS} from "@/constants";
 const ProfilePage = () => {
   const {authenticated, login, ready, user} = usePrivy();
   const {userInfo, isLoading, setUserInfo} = useUserContext();
@@ -38,7 +39,7 @@ const ProfilePage = () => {
               <span className="font-semibold">View your Profile NFT</span>
               <Button variant="link" className="text-lg font-bold" asChild>
                 <a
-                  href={`https://testnets.opensea.io/assets/base-sepolia/0x6613c7e5a5faae496aaeec9c85562d9128fedf4a/${userInfo.profileNft}`}
+                  href={`https://testnets.opensea.io/assets/base-sepolia/${NFT_CONTRACT_ADDRESS}/${userInfo.profileNft}`}
                   target="_blank"
                 >
                   on OpenSea
