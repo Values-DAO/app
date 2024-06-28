@@ -22,9 +22,10 @@ const Navbar = () => {
         <Image
           src={"/logo.png"}
           alt="logo"
-          width={300}
-          height={150}
-          className="w-[220px] h-[100px] md:h-[80px] cursor-pointer"
+          width={30}
+          height={15}
+          layout="responsive"
+          className="w-[200px] h-[100px] md:w-[300px] md:h-[150px] cursor-pointer"
         />
       </Link>
 

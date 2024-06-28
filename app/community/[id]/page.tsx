@@ -79,13 +79,15 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
   return (
     <>
       {" "}
-      {loader && !project && (
-        <div className="w-[90vw] m-auto flex flex-col gap-4">
-          <Skeleton className="w-full h-[320px] rounded-md" />
-          <Skeleton className="w-full m-auto h-[30px] rounded-md" />
-          <Skeleton className="w-full m-auto h-[30px] rounded-md" />
-        </div>
-      )}
+      {loader ||
+        !project ||
+        (!userInfo && (
+          <div className="w-[90vw] m-auto flex flex-col gap-4">
+            <Skeleton className="w-full h-[320px] rounded-md" />
+            <Skeleton className="w-full m-auto h-[30px] rounded-md" />
+            <Skeleton className="w-full m-auto h-[30px] rounded-md" />
+          </div>
+        ))}
       {userInfo && (
         <main className="p-4 overflow-y-auto">
           {project && (
