@@ -74,7 +74,12 @@ const HomeComponent = () => {
       <div className="flex flex-col md:w-[900px] w-[98vw] max-w-[98%] m-auto">
         <ValuesWordCloud refresh={valuesRecommendation} />
 
-        <Accordion type="single" collapsible defaultValue={"ai"}>
+        <Accordion
+          type="single"
+          collapsible
+          defaultValue={"ai"}
+          className="w-[95%] m-auto"
+        >
           <AccordionItem value="ai">
             <AccordionTrigger className="scroll-m-20 text-2xl font-semibold tracking-tight">
               <div className="flex flex-row gap-2 items-center justify-center">

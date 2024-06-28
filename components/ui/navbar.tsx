@@ -19,13 +19,10 @@ const Navbar = () => {
   return (
     <div className="flex flex-row justify-between items-center  p-4 md:p-6 relative">
       <Link href="/">
-        <Image
+        <img
           src={"/logo.png"}
           alt="logo"
-          width={30}
-          height={15}
-          layout="responsive"
-          className="w-[200px] h-[100px] md:w-[300px] md:h-[150px] cursor-pointer"
+          className="w-[200px] h-[40px] md:w-[300px] md:h-[60px] cursor-pointer"
         />
       </Link>
 
