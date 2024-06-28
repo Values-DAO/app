@@ -70,7 +70,7 @@ const HomeComponent = () => {
   }, [searchValue]);
 
   return (
-    <div className="flex justify-center">
+    <div className="flex justify-center mb-12">
       <div className="flex flex-col md:w-[900px] w-[98vw] max-w-[98%] m-auto">
         <ValuesWordCloud refresh={valuesRecommendation} />
 
@@ -101,23 +101,27 @@ const HomeComponent = () => {
           <AccordionItem value="community">
             <AccordionTrigger className="scroll-m-20 text-2xl font-semibold tracking-tight">
               <div className="flex flex-row gap-2 items-center justify-center">
-                <TbCircleNumber2Filled /> Community Mint
-                {userInfo?.communitiesMinted &&
-                userInfo?.communitiesMinted?.length > 0 ? (
-                  <Badge className="bg-green-300 text-black">
-                    Minted values from{" "}
-                    {userInfo?.communitiesMinted?.length -
-                      (userInfo?.communitiesMinted?.includes("warpcast")
-                        ? 1
-                        : 0) -
-                      (userInfo?.communitiesMinted?.includes("twitter")
-                        ? 1
-                        : 0)}{" "}
-                    communities
-                  </Badge>
-                ) : (
-                  <Badge>Pending</Badge>
-                )}
+                <TbCircleNumber2Filled />
+
+                <div className="flex flex-col  md:flex-row">
+                  <span>Community Mint</span>
+                  {userInfo?.communitiesMinted &&
+                  userInfo?.communitiesMinted?.length > 0 ? (
+                    <Badge className="bg-green-300 text-black w-fit">
+                      Minted values from{" "}
+                      {userInfo?.communitiesMinted?.length -
+                        (userInfo?.communitiesMinted?.includes("warpcast")
+                          ? 1
+                          : 0) -
+                        (userInfo?.communitiesMinted?.includes("twitter")
+                          ? 1
+                          : 0)}{" "}
+                      communities
+                    </Badge>
+                  ) : (
+                    <Badge className="w-fit">Pending</Badge>
+                  )}
+                </div>
               </div>
             </AccordionTrigger>
             <AccordionContent>
