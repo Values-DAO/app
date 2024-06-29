@@ -67,15 +67,17 @@ const ProfilePage = () => {
               </TableHeader>
               <TableBody>
                 {userInfo.mintedValues &&
-                  userInfo.mintedValues.map((value) => (
-                    <TableRow key={value.value}>
-                      <TableCell className="font-medium">
-                        <ValueBadge value={value.value} />
-                      </TableCell>
+                  userInfo.mintedValues
+                    .sort((a, b) => Number(b.weightage) - Number(a.weightage))
+                    .map((value) => (
+                      <TableRow key={value.value}>
+                        <TableCell className="font-medium">
+                          <ValueBadge value={value.value} />
+                        </TableCell>
 
-                      <TableCell>{Number(value?.weightage) ?? 1}</TableCell>
-                    </TableRow>
-                  ))}
+                        <TableCell>{Number(value?.weightage) ?? 1}</TableCell>
+                      </TableRow>
+                    ))}
               </TableBody>
             </Table>
           </div>
