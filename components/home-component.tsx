@@ -81,7 +81,7 @@ const HomeComponent = () => {
           className="w-[95%] m-auto"
         >
           <AccordionItem value="ai">
-            <AccordionTrigger className="scroll-m-20 text-2xl font-semibold tracking-tight bg-gray-300 px-4">
+            <AccordionTrigger className="scroll-m-20 text-2xl font-semibold tracking-tight bg-gray-300 px-4 rounded-t-lg">
               <div className="flex flex-row gap-2 items-center justify-center">
                 <TbCircleNumber1Filled /> AI Value Analysis
                 {userInfo?.aiGeneratedValues?.twitter &&
@@ -103,7 +103,7 @@ const HomeComponent = () => {
               <div className="flex flex-row gap-2 items-center justify-center">
                 <TbCircleNumber2Filled />
 
-                <div className="flex flex-col  md:flex-row gap-2 items-center">
+                <div className="flex flex-row flex-wrap gap-2 items-center">
                   <span>Community Mint</span>
                   {userInfo?.communitiesMinted &&
                   userInfo?.communitiesMinted?.length > 0 ? (
@@ -132,7 +132,7 @@ const HomeComponent = () => {
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="manual">
-            <AccordionTrigger className="scroll-m-20 text-2xl font-semibold tracking-tight bg-gray-300 px-4">
+            <AccordionTrigger className="scroll-m-20 text-2xl font-semibold tracking-tight bg-gray-300 px-4 rounded-b-lg">
               <div className="flex flex-row gap-2 items-center justify-center">
                 <TbCircleNumber3Filled /> Manual Mint
                 {userInfo?.mintedValues &&
@@ -144,7 +144,7 @@ const HomeComponent = () => {
                 )}
               </div>
             </AccordionTrigger>
-            <AccordionContent className="py-12 px-2">
+            <AccordionContent className="py-12 px-4">
               <h2 className="scroll-m-20 py-4 text-center border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 max-w-5xl text-muted-foreground mb-2">
                 || manual mint
               </h2>

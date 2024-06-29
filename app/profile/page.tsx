@@ -7,6 +7,19 @@ import ValueBadge from "@/components/ui/value-badge";
 import {useEffect, useState} from "react";
 import useValuesHook from "../hooks/useValuesHook";
 import {NFT_CONTRACT_ADDRESS} from "@/constants";
+import {Link as LinkIcon} from "lucide-react";
+import Link from "next/link";
+
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
 const ProfilePage = () => {
   const {authenticated, login, ready, user} = usePrivy();
   const {userInfo, isLoading, setUserInfo} = useUserContext();
@@ -30,31 +43,41 @@ const ProfilePage = () => {
           </h2>
 
           <div>
-            <h3>
-              <span className="font-semibold">Hello</span>{" "}
-              {user?.farcaster?.displayName}
+            <h3 className="flex items-center gap-2">
+              <span className="font-semibold">
+                Hello {user?.farcaster?.displayName}
+              </span>{" "}
+              <Link
+                href={`https://testnets.opensea.io/assets/base-sepolia/${NFT_CONTRACT_ADDRESS}/${userInfo.profileNft}`}
+                target="_blank"
+              >
+                <LinkIcon className="m-0 p-0 text-primary" size={"18px"} />
+              </Link>
             </h3>
-            <h3>
-              <span className="font-semibold">View your Profile NFT</span>
-              <Button variant="link" className="text-lg font-bold" asChild>
-                <a
-                  href={`https://testnets.opensea.io/assets/base-sepolia/${NFT_CONTRACT_ADDRESS}/${userInfo.profileNft}`}
-                  target="_blank"
-                >
-                  on OpenSea
-                </a>
-              </Button>
-            </h3>
-            <div className="flex flex-wrap flex-row gap-2 my-4 font-medium">
-              {userInfo.mintedValues &&
-                userInfo.mintedValues.map((value) => (
-                  <ValueBadge
-                    key={value.value}
-                    value={value.value}
-                    weight={value.weightage!.toString()}
-                  />
-                ))}
-            </div>
+
+            <Table className="border-[1px] border-gray-400   m-auto mt-4">
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[100px] md:w-[200px] max-w-[400px]">
+                    Value
+                  </TableHead>
+
+                  <TableHead>Weight</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {userInfo.mintedValues &&
+                  userInfo.mintedValues.map((value) => (
+                    <TableRow key={value.value}>
+                      <TableCell className="font-medium">
+                        <ValueBadge value={value.value} />
+                      </TableCell>
+
+                      <TableCell>{Number(value?.weightage) ?? 1}</TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
           </div>
         </div>
       )}
