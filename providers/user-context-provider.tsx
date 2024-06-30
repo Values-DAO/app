@@ -1,7 +1,7 @@
 "use client";
-import useValues from "@/app/hooks/useValues";
+
+import useValuesHook from "@/app/hooks/useValuesHook";
 import {IUser} from "@/models/user";
-import {IValuesData} from "@/types";
 import {usePrivy} from "@privy-io/react-auth";
 import axios from "axios";
 import {createContext, useContext, useEffect, useState} from "react";
@@ -10,8 +10,7 @@ interface UserContextType {
   userInfo: IUser | null;
   setUserInfo: (userInfo: IUser) => void;
   isLoading: boolean;
-  valuesAvailable: IValuesData | null;
-  setValuesAvailable: (values: IValuesData) => void;
+  valuesRecommendation: string[];
 }
 export const UserContext = createContext<UserContextType | undefined>(
   undefined
@@ -23,13 +22,10 @@ export const UserContextProvider = ({
   children: React.ReactNode;
 }) => {
   const [userInfo, setUserInfo] = useState<IUser | null>(null);
-  const [valuesAvailable, setValuesAvailable] = useState<IValuesData | null>(
-    null
-  );
   const [isLoading, setLoading] = useState(false);
   const {authenticated, user} = usePrivy();
-  const {fetchUser, createUser, fetchFarcasterUserWallets, fetchAllValues} =
-    useValues();
+  const [values, setValues] = useState([]);
+  const {fetchUser, createUser, fetchFarcasterUserWallets} = useValuesHook();
   useEffect(() => {
     if (!authenticated) return;
     setLoading(true);
@@ -37,45 +33,94 @@ export const UserContextProvider = ({
     const isUserExist = async () => {
       let userInfo: IUser | null | undefined = null;
       let wallets;
-
-      if (user?.email?.address || user?.farcaster?.fid) {
-        userInfo = (await fetchUser())?.user;
+      setLoading(true);
+      if (!user?.email?.address && !user?.farcaster?.fid) {
+        setLoading(false);
+        return;
       }
+      userInfo = (await fetchUser())?.user;
 
       if (userInfo) {
-        if (!userInfo?.generatedValues) {
-          userInfo = {...userInfo, generatedValues: []};
-        }
-
         setUserInfo(userInfo);
       } else {
-        wallets = await fetchFarcasterUserWallets();
-        const userCreated = await createUser({wallets: wallets || []});
+        const wallets = await fetchFarcasterUserWallets();
+
+        const userCreated = await createUser({
+          wallets:
+            [
+              ...new Set(
+                wallets
+                  .filter((wallet) => wallet)
+                  .map((wallet) => wallet.toLowerCase())
+              ),
+              ...(user?.wallet?.address
+                ? [user.wallet.address.toLowerCase()]
+                : []),
+            ] || [],
+          twitter: user?.twitter?.username as string,
+        });
 
         setUserInfo(userCreated.user);
       }
+
+      setLoading(false);
     };
-    setLoading(false);
 
     isUserExist();
   }, [user]);
 
   useEffect(() => {
-    const fetchValues = async () => {
-      const response = await fetchAllValues();
-
-      setValuesAvailable(response.values);
-    };
-    fetchValues();
-  }, []);
-  useEffect(() => {
     const addWalletsIfPresent = async () => {
+      if (!user) return;
       try {
-        const response = await axios.post(
-          "/api/user",
+        const wallets = await fetchFarcasterUserWallets();
+
+        await axios.post(
+          `/api/v2/user`,
+          {
+            method: "mint_profile",
+            wallets: [user?.wallet?.address, ...wallets],
+            ...(user?.farcaster?.fid ? {farcaster: user?.farcaster?.fid} : {}),
+            ...(user?.email?.address ? {email: user?.email?.address} : {}),
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+            },
+          }
+        );
+
+        const {data} = await axios.post(
+          "/api/v2/user",
           {
             method: "add_wallet",
-            wallets: [user?.wallet?.address],
+            wallets: [user?.wallet?.address, ...wallets],
+            ...(user?.farcaster?.fid ? {farcaster: user?.farcaster?.fid} : {}),
+            ...(user?.email?.address ? {email: user?.email?.address} : {}),
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+            },
+          }
+        );
+        setUserInfo(data.user);
+      } catch (error) {
+        console.log("error", error);
+      }
+    };
+
+    const updatetwitterHandle = async () => {
+      if (!user || !user?.twitter?.username) return;
+      try {
+        if (userInfo?.twitter) return;
+        const response = await axios.post(
+          "/api/v2/user",
+          {
+            method: "update_twitter",
+            twitter: user?.twitter?.username,
             ...(user?.farcaster?.fid ? {farcaster: user?.farcaster?.fid} : {}),
             ...(user?.email?.address ? {email: user?.email?.address} : {}),
           },
@@ -90,18 +135,55 @@ export const UserContextProvider = ({
         console.log("error", error);
       }
     };
-    if (user?.wallet?.address) {
-      addWalletsIfPresent();
-    }
+
+    const updateWarpcastHandle = async () => {
+      if (!user || !user?.farcaster?.fid) return;
+      try {
+        if (userInfo?.farcaster) return;
+        const response = await axios.post(
+          "/api/v2/user",
+          {
+            method: "update_farcaster",
+
+            ...(user?.farcaster?.fid ? {farcaster: user?.farcaster?.fid} : {}),
+            ...(user?.email?.address ? {email: user?.email?.address} : {}),
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+            },
+          }
+        );
+      } catch (error) {
+        console.log("error", error);
+      }
+    };
+    updatetwitterHandle();
+    updateWarpcastHandle();
+    addWalletsIfPresent();
   }, [user]);
+
+  useEffect(() => {
+    const getAllValues = async () => {
+      //basically value recommendations array
+      const {
+        data: {values},
+      } = await axios.get(`${process.env.NEXT_PUBLIC_HOST}/api/v2/value`);
+
+      setValues(values);
+    };
+
+    getAllValues();
+  }, []);
+
   return (
     <UserContext.Provider
       value={{
         userInfo,
         setUserInfo,
         isLoading,
-        valuesAvailable,
-        setValuesAvailable,
+        valuesRecommendation: values,
       }}
     >
       {children}

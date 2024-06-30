@@ -6,6 +6,22 @@ import {createConfig, WagmiProvider} from "@privy-io/wagmi";
 import {mainnet, base, baseSepolia, polygon, optimism} from "viem/chains";
 import {http} from "wagmi";
 
+import {createPublicClient, createWalletClient} from "viem";
+import {privateKeyToAccount} from "viem/accounts";
+
+export const viemPublicClient = createPublicClient({
+  chain: baseSepolia,
+  transport: http(process.env.NEXT_PUBLIC_BASE_SEPOLIA_RPC || ""),
+});
+
+export const viemWalletClient = createWalletClient({
+  chain: baseSepolia,
+  transport: http(),
+  account: privateKeyToAccount(
+    process.env.NEXT_PUBLIC_ADMIN_WALLET_PRIVATE_KEY as `0x${string}`
+  ),
+});
+
 export const config = createConfig({
   chains: [mainnet, base, baseSepolia, polygon, optimism],
   transports: {

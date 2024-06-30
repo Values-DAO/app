@@ -21,7 +21,7 @@ export async function POST(req: any) {
     });
   }
   try {
-    await mongoose.connect(process.env.MONGODB_URI || "");
+    await mongoose.connect(process.env.NEW_MONGODB_URI || "");
     const {permissions} = await req.json();
 
     const key = crypto.randomBytes(32).toString("hex");

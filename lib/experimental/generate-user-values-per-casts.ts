@@ -1,6 +1,6 @@
-import {openai} from "./openai";
+import {openai} from "../openai";
 
-export const generateValuesForUser = async (casts: string[]) => {
+export const generateValuesForUserExp = async (casts: string[]) => {
   const content = casts.join("\n").slice(0, 30000); // assuming ~35k equates to 8k tokens
   const completion = await openai.chat.completions.create({
     model: "gpt-4o",
@@ -79,7 +79,7 @@ Please follow these steps:
 
 8. Give me a list of their values in descending order of weightage
 
-Your final output should be consist only of the JSON like {value:weightage}.`,
+Your final output should be consist only of the comma-separated list of values.`,
       },
       {
         role: "user",
@@ -88,10 +88,7 @@ Your final output should be consist only of the JSON like {value:weightage}.`,
     ],
   });
 
-  let values: any = completion.choices[0].message.content
-    ?.replace("```json", "")
-    .replace("```", "");
-  values = JSON.parse(values!);
-  values = Object.keys(values).slice(0, 7);
+  let values = completion.choices[0].message.content;
+  // values = values?.map((value: string) => value.trim());
   return values;
 };
