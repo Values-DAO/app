@@ -8,49 +8,23 @@ import {fetchUserTweets} from "@/lib/fetch-user-tweets";
 import {GetFIDForUsername} from "@/lib/get-username-fid";
 import {generateValuesForUserExp} from "@/lib/experimental/generate-user-values-per-casts";
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest, params: any) {
   try {
     await connectToDatabase();
 
-    const searchParams = req.nextUrl.searchParams;
-    const email = searchParams.get("email");
-    const twitter = searchParams.get("twitter");
-    const username = searchParams.get("username");
-    const twitter_userId = searchParams.get("twitter_userId");
+    const username = params.params.username;
 
-    if (!username && !twitter) {
+    if (!username) {
       return NextResponse.json({
         status: 400,
         error: "farcaster fid or Twitter handle is required",
       });
     }
-    let user;
-    let fid = await GetFIDForUsername(username as string);
-    user = await User.findOne({
-      ...(email ? {email} : {}),
-      ...(twitter ? {twitter} : {}),
-      ...(fid ? {farcaster: fid} : {}),
-    });
 
-    if (!user) {
-      user = await User.create({
-        ...(email ? {email} : {}),
-        ...(twitter ? {twitter} : {}),
-        ...(fid ? {farcaster: fid} : {}),
-      });
-    }
+    let fid = await GetFIDForUsername(username as string);
 
     let generatedValues: any | undefined = undefined;
-    if (twitter && twitter_userId) {
-      const tweets = await fetchUserTweets(twitter_userId);
-      if (tweets.length < 100) {
-        return NextResponse.json({
-          status: 400,
-          error: "User has less than 100 tweets",
-        });
-      }
-      generatedValues = await generateValuesForUserExp(tweets);
-    } else if (fid) {
+    if (fid) {
       const casts = await fetchCastsForUser(fid, 200);
       if (casts.length < 100) {
         return NextResponse.json({
