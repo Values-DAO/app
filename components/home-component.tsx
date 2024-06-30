@@ -68,7 +68,7 @@ const HomeComponent = () => {
     };
     filter();
   }, [searchValue]);
-  console.log(user);
+
   return (
     <div className="flex justify-center mb-12">
       {!user?.farcaster?.fid &&
