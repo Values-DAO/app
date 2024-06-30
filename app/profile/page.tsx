@@ -50,7 +50,7 @@ const ProfilePage = () => {
                 Hello {user?.farcaster?.displayName}
               </span>{" "}
               <Link
-                href={`https://testnets.opensea.io/assets/base-sepolia/${NFT_CONTRACT_ADDRESS}/${userInfo.profileNft}`}
+                href={`https://opensea.io/assets/base/${NFT_CONTRACT_ADDRESS}/${userInfo.profileNft}`}
                 target="_blank"
               >
                 <LinkIcon className="m-0 p-0 text-primary" size={"18px"} />
