@@ -106,7 +106,7 @@ export const UserContextProvider = ({
             },
           }
         );
-        setUserInfo(data.user);
+        if (data.status === 200) setUserInfo(data.user);
       } catch (error) {
         console.log("error", error);
       }
