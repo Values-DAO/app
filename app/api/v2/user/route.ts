@@ -96,9 +96,11 @@ export async function POST(req: NextRequest) {
             balance: 5,
             ...(email ? {email} : farcaster ? {farcaster} : {}),
             mintedValues: [],
-            profileNft: await fetchAllNFTsValuesDAO(),
-            profileNftHash: hash,
-            profileNftIpfs: IPFS_CID,
+            ...(wallets.length > 0 && {
+              profileNft: await fetchAllNFTsValuesDAO(),
+              profileNftHash: hash,
+              profileNftIpfs: IPFS_CID,
+            }),
             twitter: twitter,
           });
           return NextResponse.json(createdUser);
@@ -151,6 +153,8 @@ export async function POST(req: NextRequest) {
               functionName: "safeMint",
               args: [wallets[0], cid],
             });
+
+            console.log("hash", hash);
 
             user.profileNftHash = hash;
             user.profileNftIpfs = IPFS_CID;

@@ -68,9 +68,18 @@ const HomeComponent = () => {
     };
     filter();
   }, [searchValue]);
-
+  console.log(user);
   return (
     <div className="flex justify-center mb-12">
+      {!user?.farcaster?.fid &&
+        (!user?.wallet?.address || userInfo?.wallets?.length === 0) && (
+          <div className="fixed inset-0 h-screen w-screen bg-white gap-4 bg-opacity-90 backdrop-filter backdrop-blur-md flex flex-col items-center justify-center overflow-hidden">
+            <p className="leading-7 [&:not(:first-child)]:mt-6 font-semibold">
+              Connect your wallet to mint your values.
+            </p>
+            <Button onClick={linkWallet}>Link Wallet</Button>
+          </div>
+        )}
       <div className="flex flex-col md:w-[900px] w-[98vw] max-w-[98%] m-auto">
         <ValuesWordCloud refresh={valuesRecommendation} />
         <div className="w-[95%] m-auto mb-4">

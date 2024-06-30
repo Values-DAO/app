@@ -75,7 +75,23 @@ export const UserContextProvider = ({
       try {
         const wallets = await fetchFarcasterUserWallets();
 
-        const response = await axios.post(
+        await axios.post(
+          `/api/v2/user`,
+          {
+            method: "mint_profile",
+            wallets: [user?.wallet?.address, ...wallets],
+            ...(user?.farcaster?.fid ? {farcaster: user?.farcaster?.fid} : {}),
+            ...(user?.email?.address ? {email: user?.email?.address} : {}),
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+            },
+          }
+        );
+
+        const {data} = await axios.post(
           "/api/v2/user",
           {
             method: "add_wallet",
@@ -90,6 +106,7 @@ export const UserContextProvider = ({
             },
           }
         );
+        setUserInfo(data.user);
       } catch (error) {
         console.log("error", error);
       }

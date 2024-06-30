@@ -146,7 +146,7 @@ const useValuesHook = () => {
     }
   };
   const fetchFarcasterUserWallets = async (): Promise<string[]> => {
-    if (!user?.farcaster?.fid) return [];
+    if (!user?.farcaster?.fid && !user?.email?.address) return [];
 
     const query = gql`
       query MyQuery {
