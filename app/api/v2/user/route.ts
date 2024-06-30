@@ -6,15 +6,15 @@ import connectToDatabase from "@/lib/connect-to-db";
 import axios from "axios";
 import {NFT_CONTRACT_ABI, NFT_CONTRACT_ADDRESS} from "@/constants";
 import {createWalletClient, http} from "viem";
-import {baseSepolia} from "viem/chains";
+import {base, baseSepolia} from "viem/chains";
 import {privateKeyToAccount} from "viem/accounts";
 import Value from "@/models/value";
 import {fetchAllNFTsValuesDAO} from "@/lib/fetch-all-nfts-valuesdao";
 const viemWalletClient = createWalletClient({
-  chain: baseSepolia,
+  chain: base,
   transport: http(),
   account: privateKeyToAccount(
-    process.env.NEXT_PUBLIC_ADMIN_WALLET_PRIVATE_KEY as `0x${string}`
+    process.env.ADMIN_WALLET_PRIVATE_KEY as `0x${string}`
   ),
 });
 export async function POST(req: NextRequest) {

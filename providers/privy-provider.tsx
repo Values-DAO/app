@@ -14,14 +14,6 @@ export const viemPublicClient = createPublicClient({
   transport: http(process.env.NEXT_PUBLIC_BASE_SEPOLIA_RPC || ""),
 });
 
-export const viemWalletClient = createWalletClient({
-  chain: baseSepolia,
-  transport: http(),
-  account: privateKeyToAccount(
-    process.env.NEXT_PUBLIC_ADMIN_WALLET_PRIVATE_KEY as `0x${string}`
-  ),
-});
-
 export const config = createConfig({
   chains: [mainnet, base, baseSepolia, polygon, optimism],
   transports: {
