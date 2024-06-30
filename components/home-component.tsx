@@ -225,7 +225,7 @@ const HomeComponent = () => {
                                           <ToastAction
                                             onClick={() => {
                                               window.open(
-                                                `https://testnets.opensea.io/assets/base-sepolia/${NFT_CONTRACT_ADDRESS}/${Number(
+                                                `https://opensea.io/assets/base/${NFT_CONTRACT_ADDRESS}/${Number(
                                                   userInfo?.profileNft
                                                 )}`,
                                                 "_blank"
@@ -313,7 +313,7 @@ const HomeComponent = () => {
                                         <ToastAction
                                           onClick={() => {
                                             window.open(
-                                              `https://testnets.opensea.io/assets/base-sepolia/${NFT_CONTRACT_ADDRESS}/${Number(
+                                              `https://opensea.io/assets/base/${NFT_CONTRACT_ADDRESS}/${Number(
                                                 userInfo?.profileNft
                                               )}`,
                                               "_blank"
