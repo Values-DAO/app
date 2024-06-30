@@ -116,7 +116,7 @@ export const UserContextProvider = ({
       if (!user || !user?.twitter?.username) return;
       try {
         if (userInfo?.twitter) return;
-        const response = await axios.post(
+        const {data} = await axios.post(
           "/api/v2/user",
           {
             method: "update_twitter",
@@ -131,6 +131,7 @@ export const UserContextProvider = ({
             },
           }
         );
+        if (data.status === 200) setUserInfo(data.user);
       } catch (error) {
         console.log("error", error);
       }
@@ -140,7 +141,7 @@ export const UserContextProvider = ({
       if (!user || !user?.farcaster?.fid) return;
       try {
         if (userInfo?.farcaster) return;
-        const response = await axios.post(
+        const {data} = await axios.post(
           "/api/v2/user",
           {
             method: "update_farcaster",
@@ -155,6 +156,7 @@ export const UserContextProvider = ({
             },
           }
         );
+        if (data.status === 200) setUserInfo(data.user);
       } catch (error) {
         console.log("error", error);
       }
