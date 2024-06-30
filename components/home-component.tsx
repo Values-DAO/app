@@ -73,7 +73,17 @@ const HomeComponent = () => {
     <div className="flex justify-center mb-12">
       <div className="flex flex-col md:w-[900px] w-[98vw] max-w-[98%] m-auto">
         <ValuesWordCloud refresh={valuesRecommendation} />
-
+        <div className="w-[95%] m-auto mb-4">
+          <p className="leading-7 [&:not(:first-child)]:mt-6 text-center">
+            We are here to help you identify your Values. Your Values are
+            aggregated with weightages.<br></br> There is no single way to
+            define them. We have 3 modes and the aggregation of these 3 will be
+            useful at this stage. <br></br>Slowly, we are training our AI model
+            to get more accurate.<br></br> We suggest you use all available
+            steps to get closest to your actual values. In a year or so, we will
+            be able to define your Values more accurately.
+          </p>
+        </div>
         <Accordion
           type="single"
           collapsible
@@ -83,7 +93,9 @@ const HomeComponent = () => {
           <AccordionItem value="ai">
             <AccordionTrigger className="scroll-m-20 text-2xl font-semibold tracking-tight bg-gray-300 px-4 rounded-t-lg">
               <div className="flex flex-row gap-2 items-center justify-center">
-                <TbCircleNumber1Filled /> AI Value Analysis
+                <span className="flex flex-row gap-2 items-center">
+                  Step <TbCircleNumber1Filled /> AI Value Analysis
+                </span>{" "}
                 {userInfo?.aiGeneratedValues?.twitter &&
                 userInfo?.aiGeneratedValues?.warpcast &&
                 userInfo.aiGeneratedValues.twitter.length > 0 &&
@@ -101,10 +113,10 @@ const HomeComponent = () => {
           <AccordionItem value="community">
             <AccordionTrigger className="scroll-m-20 text-2xl font-semibold tracking-tight bg-gray-300 px-4">
               <div className="flex flex-row gap-2 items-center justify-center">
-                <TbCircleNumber2Filled />
-
                 <div className="flex flex-row flex-wrap gap-2 items-center">
-                  <span>Community Mint</span>
+                  <span className="flex flex-row gap-2 items-center">
+                    Step <TbCircleNumber2Filled /> Community Mint
+                  </span>{" "}
                   {userInfo?.communitiesMinted &&
                   userInfo?.communitiesMinted?.length > 0 ? (
                     <Badge className="bg-green-300 text-black w-fit h-fit">
@@ -134,7 +146,9 @@ const HomeComponent = () => {
           <AccordionItem value="manual">
             <AccordionTrigger className="scroll-m-20 text-2xl font-semibold tracking-tight bg-gray-300 px-4 rounded-b-lg">
               <div className="flex flex-row gap-2 items-center justify-center">
-                <TbCircleNumber3Filled /> Manual Mint
+                <span className="flex flex-row gap-2 items-center">
+                  Step <TbCircleNumber3Filled /> Manual Mint
+                </span>{" "}
                 {userInfo?.mintedValues &&
                 userInfo?.mintedValues?.length > 0 &&
                 userInfo.balance === 0 ? (
@@ -144,13 +158,10 @@ const HomeComponent = () => {
                 )}
               </div>
             </AccordionTrigger>
-            <AccordionContent className="py-12 px-4">
-              <h2 className="scroll-m-20 py-4 text-center border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 max-w-5xl text-muted-foreground mb-2">
-                || manual mint
-              </h2>
+            <AccordionContent className="p-4">
               {userInfo && userInfo.balance !== undefined && (
                 <div className="flex flex-row justify-between items-center ">
-                  <p className="p-4">Balance: ${userInfo.balance}</p>
+                  <p className="p-4">Balance: {userInfo.balance} $FTC</p>
                 </div>
               )}
               <div className="relative ">

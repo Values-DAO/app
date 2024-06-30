@@ -36,24 +36,34 @@ const Projects = ({limit, style}: {limit?: number; style?: string}) => {
     fetchProjects();
   }, []);
   return (
-    <div className="p-4 py-12">
-      <h2 className="scroll-m-20 text-center border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 text-muted-foreground mb-2">
-        || community mint
-      </h2>
+    <div className="p-4">
+      {!limit && (
+        <h2 className="scroll-m-20 text-center border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 text-muted-foreground mb-2">
+          || community mint
+        </h2>
+      )}
+
+      <p className="leading-7 [&:not(:first-child)]:mt-6 text-center">
+        Every community will define their Values in the future. We are dropping
+        those to your ValuesDAO profile.<br></br> For communities that have
+        defined values, we have verified checkmark. For the ones who haven’t, we
+        generate their Values via our AI engine. <br></br>If you are a community
+        leader / builder, fill this form to add your Values.
+      </p>
 
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="font-bold">Name</TableHead>
-            <TableHead className="font-bold">Values</TableHead>
-            <TableHead className="font-bold">Verified</TableHead>
+            <TableHead className="font-bold text-black">Name</TableHead>
+            <TableHead className="font-bold text-black">Values</TableHead>
+            <TableHead className="font-bold text-black">Verified</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {projects.map((project) => (
             <TableRow
               key={project.id}
-              className="cursor-pointer relative group"
+              className="cursor-pointer relative group text-[19px]"
               onClick={() => {
                 window.location.href = `/community/${project.name.replace(
                   /\s/g,

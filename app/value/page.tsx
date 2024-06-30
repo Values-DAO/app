@@ -130,11 +130,8 @@ const ValuePage = () => {
       {authenticated && (
         <div className="py-12 flex flex-col gap-4">
           <div className="flex flex-col gap-4">
-            <h2 className="scroll-m-20 text-center border-b pb-2 text-3xl font-medium tracking-tight first:mt-0 max-w-5xl text-muted-foreground">
-              || ai generated values
-            </h2>
             <Tabs defaultValue={"twitter"} className="w-full">
-              <TabsList className="flex justify-center py-4 text-black">
+              <TabsList className="flex justify-center py-2 text-black">
                 <TabsTrigger
                   value="twitter"
                   className="text-md text-wrap md:text-lg  w-[50%] md:py-[1px] "
@@ -158,7 +155,7 @@ const ValuePage = () => {
                         mintedValue.value.toLowerCase() === str.toLowerCase()
                     )
                   ) && (
-                    <Alert className="bg-[#88fc03] my-2 text-black">
+                    <Alert className="bg-green-300 my-2 text-black">
                       <AlertDescription>
                         You have already minted these value NFTs.
                       </AlertDescription>
@@ -229,9 +226,19 @@ const ValuePage = () => {
                   userInfo?.aiGeneratedValues &&
                   userInfo?.aiGeneratedValues?.twitter?.length === 0 && (
                     <div className="flex flex-col gap-4">
-                      <h2 className="scroll-m-20 border-b pb-2 text-md tracking-tight first:mt-0 max-w-5xl text-center">
-                        super early feature, still in development
-                      </h2>
+                      <p className="leading-7 [&:not(:first-child)]:mt-6 text-center">
+                        We are building an AI model that takes your content and
+                        drills it down to Values. While this is not completely
+                        accurate, the more data we get, the better we can train
+                        the model.
+                        <br></br> Think of this as a starting point to make your
+                        values tangible. Not the final solution.
+                        <br></br>You can mint these values to start with. They
+                        are accurate enough to connect you to aligned people and
+                        communities.
+                        <br></br> Once you are done, mint your Community Values
+                        and try minting manually too.
+                      </p>
 
                       {error && error.platform === "INSUFFICIENT_TWEETS" && (
                         <Alert
@@ -259,7 +266,7 @@ const ValuePage = () => {
                 {(!user?.twitter?.username ||
                   userInfo?.twitter === undefined) && (
                   <div className="flex flex-col gap-2 justify-center">
-                    <p className="text-center mt-2">
+                    <p className="text-center font-semibold mt-2">
                       Connect your account to continue
                     </p>
                     <div className="flex flex-row gap-2 justify-center">
@@ -282,7 +289,7 @@ const ValuePage = () => {
                         mintedValue.value.toLowerCase() === str.toLowerCase()
                     )
                   ) && (
-                    <Alert className="bg-[#88fc03] my-2 text-black">
+                    <Alert className="bg-green-300 my-2 text-black">
                       <AlertDescription>
                         You have already minted these value NFTs.
                       </AlertDescription>
@@ -337,19 +344,19 @@ const ValuePage = () => {
                 {userInfo?.aiGeneratedValues &&
                   userInfo?.aiGeneratedValues?.warpcast?.length === 0 && (
                     <div className="flex flex-col gap-4">
-                      <h2 className="scroll-m-20 border-b pb-2 text-md tracking-tight first:mt-0 max-w-5xl text-center">
+                      <p className="leading-7 [&:not(:first-child)]:mt-6 text-center">
                         We are building an AI model that takes your content and
                         drills it down to Values. While this is not completely
                         accurate, the more data we get, the better we can train
-                        the model.<br></br>
+                        the model.
                         <br></br> Think of this as a starting point to make your
-                        values tangible. Not the final solution. <br></br>
+                        values tangible. Not the final solution.
                         <br></br>You can mint these values to start with. They
                         are accurate enough to connect you to aligned people and
-                        communities.<br></br>
+                        communities.
                         <br></br> Once you are done, mint your Community Values
                         and try minting manually too.
-                      </h2>
+                      </p>
                       {error && error.platform === "INSUFFICIENT_CASTS" && (
                         <Alert
                           variant={"destructive"}
@@ -375,7 +382,7 @@ const ValuePage = () => {
 
                 {!user?.farcaster?.fid && (
                   <div className="flex flex-col gap-2 justify-center">
-                    <p className="text-center mt-2">
+                    <p className="text-center font-semibold mt-2">
                       Connect your account to continue
                     </p>
                     <div className="flex flex-row gap-2 justify-center">
