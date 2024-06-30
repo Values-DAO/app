@@ -71,7 +71,7 @@ export const UserContextProvider = ({
 
   useEffect(() => {
     const addWalletsIfPresent = async () => {
-      if (!user) return;
+      if (!user?.wallet?.address) return;
       try {
         const wallets = await fetchFarcasterUserWallets();
 
