@@ -71,15 +71,18 @@ Please follow these steps:
 2. For each tweet, think about what it might reveal about the person's values, beliefs, and priorities. Consider both explicit statements and implicit meanings.
 
 3. As you analyze the tweets, keep the list of human values in mind. Look for connections between the content of the tweets and these values.
-4. After analyzingzing all tweets, determine which of the given values are most strongly held by this person based on the evidence in their tweets.
+4. After analyzing all tweets, determine which of the given values are most strongly held by this person based on the evidence in their tweets.
 
 5. Assign weightage from 1 to 100 based on how important each value. This is based on tweet content as well.
 
-7. Provide your response as a single string with each identified value separated by a comma with the associated weightage. Do not include explanations or justifications in your final output.
+6. Do not include explanations or justifications in your final output.
 
-8. Give me a list of their values in descending order of weightage
+7. Give me a list of their values in descending order of weightage
 
-Your final output should be consist only of the JSON like {value:weightage}.`,
+Your final output should be always an JSON and has to follow the format below: 
+interface UserValues {
+    [key: string]: number;
+}`,
       },
       {
         role: "user",
