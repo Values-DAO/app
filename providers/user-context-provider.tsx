@@ -79,7 +79,11 @@ export const UserContextProvider = ({
           `/api/v2/user`,
           {
             method: "mint_profile",
-            wallets: [user?.wallet?.address, ...wallets],
+            wallets: [
+              ...(user?.wallet?.address ? [user.wallet.address] : []),
+              ,
+              ...wallets,
+            ],
             ...(user?.farcaster?.fid ? {farcaster: user?.farcaster?.fid} : {}),
             ...(user?.email?.address ? {email: user?.email?.address} : {}),
           },
@@ -95,7 +99,11 @@ export const UserContextProvider = ({
           "/api/v2/user",
           {
             method: "add_wallet",
-            wallets: [user?.wallet?.address, ...wallets],
+            wallets: [
+              ...(user?.wallet?.address ? [user.wallet.address] : []),
+              ,
+              ...wallets,
+            ],
             ...(user?.farcaster?.fid ? {farcaster: user?.farcaster?.fid} : {}),
             ...(user?.email?.address ? {email: user?.email?.address} : {}),
           },
