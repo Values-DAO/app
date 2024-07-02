@@ -38,6 +38,7 @@ export async function POST(req: NextRequest) {
       type,
       communityId,
       twitter,
+      side,
     } = await req.json();
     if (!method) {
       return NextResponse.json({error: "Method is required", status: 400});
@@ -310,9 +311,9 @@ export async function POST(req: NextRequest) {
             status: 404,
           });
         }
-        const {fid} = await req.json();
-        if (fid) {
-          user.farcaster = fid;
+
+        if (farcaster) {
+          user.farcaster = farcaster;
           await user.save();
 
           return NextResponse.json({user, status: 200, message: "Success"});
@@ -331,7 +332,7 @@ export async function POST(req: NextRequest) {
             status: 404,
           });
         }
-        const {side} = await req.json();
+
         if (side) {
           user.balance = side === "plus" ? user.balance + 1 : user.balance - 1;
           await user.save();
