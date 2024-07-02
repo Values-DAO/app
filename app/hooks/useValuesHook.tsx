@@ -338,19 +338,26 @@ const useValuesHook = () => {
           "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
         },
       });
-      emailAnalytics({
-        subject: "New user generated their values using ai",
-        body: [
-          "user has generated their values using ai",
-          user?.email?.address ? `Email: ${user?.email?.address}` : "",
-          user?.farcaster?.displayName
-            ? `Farcaster Display Name: ${user?.farcaster?.displayName}`
-            : "",
-          user?.farcaster?.username
-            ? `Warpcast: https://warpcast.com/${user?.farcaster?.username}`
-            : ``,
-        ].join("\n"),
-      });
+      if (response.data.user && response.data.user.aiGeneratedValues)
+        emailAnalytics({
+          subject: "New user generated their values using ai",
+          body: [
+            "user has generated their values using ai",
+            user?.email?.address ? `Email: ${user?.email?.address}` : "",
+            user?.farcaster?.displayName
+              ? `Farcaster Display Name: ${user?.farcaster?.displayName}`
+              : "",
+            user?.farcaster?.username
+              ? `Warpcast: https://warpcast.com/${user?.farcaster?.username}`
+              : ``,
+            `Warpcast values: ${JSON.stringify(
+              response.data.user.aiGeneratedValues.warpcast
+            )}`,
+            `Twitter values: ${JSON.stringify(
+              response.data.user.aiGeneratedValues.twitter
+            )}`,
+          ].join("\n"),
+        });
       return {
         user: response.data.user ?? null,
         values: response.data.user.aiGeneratedValues ?? null,

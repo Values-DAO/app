@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     let user;
     if (email) {
       user = await User.findOne({email});
-    } else if (farcaster) {
+    } else {
       user = await User.findOne({farcaster});
     }
 
@@ -93,16 +93,17 @@ export async function POST(req: NextRequest) {
           }
 
           const createdUser = await User.create({
-            wallets,
+            wallets: wallets || [],
             balance: 5,
-            ...(email ? {email} : farcaster ? {farcaster} : {}),
+            ...(email && {email}),
             mintedValues: [],
             ...(wallets.length > 0 && {
               profileNft: await fetchAllNFTsValuesDAO(),
               profileNftHash: hash,
               profileNftIpfs: IPFS_CID,
             }),
-            twitter: twitter,
+            ...(twitter && {twitter}),
+            ...(farcaster && {farcaster}),
           });
           return NextResponse.json(createdUser);
         } catch (error) {
