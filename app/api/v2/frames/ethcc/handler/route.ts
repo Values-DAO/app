@@ -21,7 +21,16 @@ export async function POST(req: any) {
       }
     );
 
-    console.log("data", data);
+    if (data.status === 400) {
+      await sendDirectCast({
+        recipientFid: Number(fid),
+        message: `gm\nYou have less than 100 casts. We need atleast 100 casts to meaningfully generate your values. Please cast more to generate your values.`,
+      });
+      return NextResponse.json({
+        status: 400,
+        error: "User has less than 100 casts",
+      });
+    }
 
     if (data.status === 200) {
       console.log("Generated values for user", fid);
