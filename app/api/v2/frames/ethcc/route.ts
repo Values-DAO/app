@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
           <meta name="fc:frame:post_url" content="${postUrl}" />
           <meta name="fc:frame:button:1" content="Analyse my values" />,
                 
-          <meta name="fc:frame:button:2" content="More about ValuesDAO" />
+          <meta name="fc:frame:button:2" content="About ValuesDAO" />
           <meta name="fc:frame:button:2:action" content="link" />
           <meta name="fc:frame:button:2:target" content="https://docs.google.com/document/d/1rNvqD6PxvFHRavaP-I-7_Oq6xqFPSVf_CqqXLWe3ze0/edit" />
         </head>
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
           <meta name="fc:frame:post_url" content="${postUrl}" />
           <meta name="fc:frame:button:1" content="Analyse my values" />,
                 
-          <meta name="fc:frame:button:2" content="More about ValuesDAO" />
+          <meta name="fc:frame:button:2" content="About ValuesDAO" />
           <meta name="fc:frame:button:2:action" content="link" />
           <meta name="fc:frame:button:2:target" content="https://docs.google.com/document/d/1rNvqD6PxvFHRavaP-I-7_Oq6xqFPSVf_CqqXLWe3ze0/edit" />
         </head>
