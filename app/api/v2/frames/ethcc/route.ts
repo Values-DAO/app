@@ -16,9 +16,9 @@ export async function GET(req: NextRequest) {
           <meta name="fc:frame:post_url" content="${postUrl}" />
           <meta name="fc:frame:button:1" content="Analyse my values" />,
                 
-          <meta name="fc:frame:button:2" content="About ValuesDAO" />
+          <meta name="fc:frame:button:2" content="How does this work?" />
           <meta name="fc:frame:button:2:action" content="link" />
-          <meta name="fc:frame:button:2:target" content="https://docs.google.com/document/d/1rNvqD6PxvFHRavaP-I-7_Oq6xqFPSVf_CqqXLWe3ze0/edit" />
+          <meta name="fc:frame:button:2:target" content="https://app.valuesdao.io/ethcc" />
         </head>
         <body></body>
       </html>`,
@@ -54,9 +54,9 @@ export async function POST(req: NextRequest) {
           <meta name="fc:frame:post_url" content="${postUrl}" />
           <meta name="fc:frame:button:1" content="Analyse my values" />,
                 
-          <meta name="fc:frame:button:2" content="About ValuesDAO" />
+          <meta name="fc:frame:button:2" content="How does this work?" />
           <meta name="fc:frame:button:2:action" content="link" />
-          <meta name="fc:frame:button:2:target" content="https://docs.google.com/document/d/1rNvqD6PxvFHRavaP-I-7_Oq6xqFPSVf_CqqXLWe3ze0/edit" />
+          <meta name="fc:frame:button:2:target" content="https://app.valuesdao.io/ethcc" />
         </head>
         <body></body>
       </html>`,
@@ -85,10 +85,9 @@ export async function POST(req: NextRequest) {
           <meta name="fc:frame:image" content="${imageUrl}" />
          
       
-          <meta name="fc:frame:button:1" content="Click to cast" />
+          <meta name="fc:frame:button:1" content="Share" />
           <meta name="fc:frame:button:1:action" content="link" />
-          <meta name="fc:frame:button:1:target" content="https://warpcast.com/~/compose?text=I%20just%20minted%20my%20values%20at%20ValuesDAO,%20if%20you%20are%20coming%20to%20ETHCC,%20mint%20your%20values%20and%20find%20your%20aligned%20folks%20&embeds[]=${process.env.NEXT_PUBLIC_HOST}/api/v2/frames/ethcc" />
-      
+          <meta name="fc:frame:button:1:target" content="https://warpcast.com/~/compose?text=I%20just%20minted%20my%20Values%0A%0ATo%20find%20value-aligned%20folks%20at%20EthCC,%20use%20this%20frame&embeds[]=${process.env.NEXT_PUBLIC_HOST}/api/v2/frames/ethcc" />      
 
         </head>
         <body></body>

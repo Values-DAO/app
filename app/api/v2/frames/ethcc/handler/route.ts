@@ -70,7 +70,6 @@ export async function POST(req: any) {
             },
           }
         );
-        console.log("MintProfileResponse", MintProfileResponse.data);
         if (MintProfileResponse.data.status !== 200) {
           console.error(
             "Error minting profile for user",
@@ -85,17 +84,16 @@ export async function POST(req: any) {
 
         await sendDirectCast({
           recipientFid: Number(fid),
-          message: `gm\nWe analysed your warpcast and minted your values. Here are your values:\n${data?.user?.aiGeneratedValues?.warpcast
+          message: `gm\n\nValuesDAO is on a mission to create a more aligned world.\n\nCurrently, there is no way to know your Values.\n\nWe have an experimental AI model that takes your content and finds Values.\n\nWhile it will take months or even years to be completely accurate, it works very well in practice.\n\nHere are your Values:\n${data?.user?.aiGeneratedValues?.warpcast
             ?.map((value: string) => `* ${value}`)
             .join(
               "\n"
-            )}\nWe will direct cast you with top 3 aligned folks for you whom you should meet at ETHCC week.
-               \n\nClick to cast: https://warpcast.com/~/compose?text=I%20just%20minted%20my%20values%20at%20ValuesDAO,%20if%20you%20are%20coming%20to%20ETHCC,%20mint%20your%20values%20and%20find%20your%20aligned%20folks%20&embeds[]=${
-                 process.env.NEXT_PUBLIC_HOST
-               }/api/v2/frames/ethcc/success?fid=${fid}`,
+            )}\n\nBased on these Values, we will find the top 3 people you should meet at EthCC week in a few days.\n\nWe are a bootstrapped team of 2 building this project. Please help us reach everyone at EthCC.\n\nClick to cast: https://warpcast.com/~/compose?text=I%20just%20minted%20my%20Values%0A%0ATo%20find%20value-aligned%20folks%20at%20EthCC,%20use%20this%20frame&embeds[]=${
+            process.env.NEXT_PUBLIC_HOST
+          }/api/v2/frames/ethcc/success?fid=${fid}`,
         });
       }
-      console.log("Minted profile for user", fid);
+
       await connectToDatabase();
       await ETHCCAttendee.create({
         fid: fid,
@@ -117,3 +115,5 @@ export async function POST(req: any) {
     });
   }
 }
+
+export const GET = POST;
