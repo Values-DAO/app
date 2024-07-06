@@ -47,6 +47,17 @@ export async function GET(req: NextRequest) {
 
     let generatedValues: string[] | undefined = undefined;
     if (twitter && twitter_userId) {
+      if (
+        user.aiGeneratedValues.twitter &&
+        user.aiGeneratedValues.twitter.length > 2
+      ) {
+        return NextResponse.json({
+          status: 200,
+          user,
+          message: "User already has generated values",
+        });
+      }
+
       const tweets = await fetchUserTweets(twitter_userId);
       if (tweets.length < 100) {
         return NextResponse.json({
@@ -59,6 +70,16 @@ export async function GET(req: NextRequest) {
         user.aiGeneratedValues.twitter = Array.from(generatedValues);
       }
     } else if (fid) {
+      if (
+        user.aiGeneratedValues.warpcast &&
+        user.aiGeneratedValues.warpcast.length > 2
+      ) {
+        return NextResponse.json({
+          status: 200,
+          user,
+          message: "User already has generated values",
+        });
+      }
       const casts = await fetchCastsForUser(fid, 200);
       if (casts.length < 100) {
         return NextResponse.json({
