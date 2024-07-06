@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
           <meta name="fc:frame:post_url" content="${postUrl}" />
           <meta name="fc:frame:button:1" content="Analyse my values" />,
                 
-        <meta name="fc:frame:button:2" content="How does this work?" />
+        <meta name="fc:frame:button:2" content="How it works?" />
           <meta name="fc:frame:button:2:action" content="link" />
           <meta name="fc:frame:button:2:target" content="https://valuesdao.io/ethcc" />
         </head>
