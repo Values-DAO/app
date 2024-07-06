@@ -90,7 +90,7 @@ export async function POST(req: any) {
               "\n"
             )}\n\nBased on these Values, we will find the top 3 people you should meet at EthCC week in a few days.\n\nWe are a bootstrapped team of 2 building this project. Please help us reach everyone at EthCC.\n\nClick to cast: https://warpcast.com/~/compose?text=I%20just%20minted%20my%20Values%0A%0ATo%20find%20value-aligned%20folks%20at%20EthCC,%20use%20this%20frame&embeds[]=${
             process.env.NEXT_PUBLIC_HOST
-          }/api/v2/frames/ethcc/success?fid=${fid}`,
+          }/api/v2/ethcc/success?fid=${fid}`,
         });
       }
 

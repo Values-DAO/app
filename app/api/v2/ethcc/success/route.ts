@@ -5,7 +5,6 @@ import {NextRequest, NextResponse} from "next/server";
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   const fid = searchParams.get("fid");
-  console.log("fid", fid);
 
   await connectToDatabase();
   const userInfo = await User.findOne({farcaster: fid});
@@ -19,10 +18,10 @@ export async function GET(req: NextRequest) {
 
   const imageUrl = `${
     process.env.NEXT_PUBLIC_HOST
-  }/api/v2/frames/ethcc/image?section=3&values=${userInfo.aiGeneratedValues.warpcast.join(
+  }/api/v2/ethcc/image?section=3&values=${userInfo.aiGeneratedValues.warpcast.join(
     ","
   )}`;
-  const postUrl = `${process.env.NEXT_PUBLIC_HOST}/api/v2/frames/ethcc/`;
+  const postUrl = `${process.env.NEXT_PUBLIC_HOST}/api/v2/ethcc/`;
   return new NextResponse(
     `<!DOCTYPE html>
       <html>
@@ -34,9 +33,9 @@ export async function GET(req: NextRequest) {
           <meta name="fc:frame:post_url" content="${postUrl}" />
           <meta name="fc:frame:button:1" content="Analyse my values" />,
                 
-          <meta name="fc:frame:button:2" content="More about ValuesDAO" />
+        <meta name="fc:frame:button:2" content="How does this work?" />
           <meta name="fc:frame:button:2:action" content="link" />
-          <meta name="fc:frame:button:2:target" content="https://docs.google.com/document/d/1rNvqD6PxvFHRavaP-I-7_Oq6xqFPSVf_CqqXLWe3ze0/edit" />
+          <meta name="fc:frame:button:2:target" content="https://app.valuesdao.io/ethcc" />
         </head>
         </head>
         <body></body>
