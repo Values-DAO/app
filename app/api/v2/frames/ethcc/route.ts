@@ -1,3 +1,4 @@
+import {getFarcasterUserFollowers} from "@/lib/get-farcaster-user-followers";
 import axios from "axios";
 import {NextRequest, NextResponse} from "next/server";
 
@@ -14,6 +15,10 @@ export async function GET(req: NextRequest) {
           <meta name="fc:frame:image" content="${imageUrl}" />
           <meta name="fc:frame:post_url" content="${postUrl}" />
           <meta name="fc:frame:button:1" content="Analyse my values" />,
+                
+          <meta name="fc:frame:button:2" content="More about ValuesDAO" />
+          <meta name="fc:frame:button:2:action" content="link" />
+          <meta name="fc:frame:button:2:target" content="https://docs.google.com/document/d/1rNvqD6PxvFHRavaP-I-7_Oq6xqFPSVf_CqqXLWe3ze0/edit" />
         </head>
         <body></body>
       </html>`,
@@ -30,7 +35,39 @@ export async function POST(req: NextRequest) {
   const {
     untrustedData: {fid},
   } = await req.json();
+  const postUrl = `${process.env.NEXT_PUBLIC_HOST}/api/v2/frames/ethcc/`;
+
   try {
+    const followers = await getFarcasterUserFollowers("valuesdao");
+
+    if (!followers.includes(Number(fid))) {
+      return new NextResponse(
+        `<!DOCTYPE html>
+      <html>
+        <head>
+          <meta property="og:title" content="ValuesDAO" />
+          <meta property="og:image" content="${process.env.NEXT_PUBLIC_HOST}/api/v2/frames/ethcc/image?section=1&error=%22Please%20Follow%20@ValuesDAO%20to%20continue.%22" />
+          <meta name="fc:frame" content="vNext" />
+          <meta name="fc:frame:image" content="${process.env.NEXT_PUBLIC_HOST}/api/v2/frames/ethcc/image?section=1&error=%22Please%20Follow%20@ValuesDAO%20to%20continue.%22" />
+          <meta name="fc:frame:post_url" content="${postUrl}" />
+        <meta name="fc:frame:image" content="${imageUrl}" />
+          <meta name="fc:frame:post_url" content="${postUrl}" />
+          <meta name="fc:frame:button:1" content="Analyse my values" />,
+                
+          <meta name="fc:frame:button:2" content="More about ValuesDAO" />
+          <meta name="fc:frame:button:2:action" content="link" />
+          <meta name="fc:frame:button:2:target" content="https://docs.google.com/document/d/1rNvqD6PxvFHRavaP-I-7_Oq6xqFPSVf_CqqXLWe3ze0/edit" />
+        </head>
+        <body></body>
+      </html>`,
+        {
+          status: 200,
+          headers: {
+            "Content-Type": "text/html",
+          },
+        }
+      );
+    }
     axios.post(`${process.env.NEXT_PUBLIC_HOST}/api/v2/frames/ethcc/handler`, {
       fid,
     });

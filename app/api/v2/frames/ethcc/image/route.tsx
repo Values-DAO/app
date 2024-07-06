@@ -1,11 +1,17 @@
 import {NextRequest} from "next/server";
 import {ImageResponse} from "next/og";
+import {
+  TbCircleNumber1Filled,
+  TbCircleNumber2Filled,
+  TbCircleNumber3Filled,
+  TbCircleNumber4Filled,
+} from "react-icons/tb";
 
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   const section = searchParams.get("section");
+  const error = searchParams.get("error");
   let values: any | string[] = searchParams.get("values")?.split(",") ?? [];
-  console.log(`${process.env.NEXT_PUBLIC_HOST}/logo.png`);
   return new ImageResponse(
     (
       <div
@@ -25,7 +31,7 @@ export async function GET(req: NextRequest) {
         <img
           src={`${process.env.NEXT_PUBLIC_HOST}/logo.png`}
           style={{
-            height: "120px",
+            height: "60px",
             marginTop: 20,
           }}
         />
@@ -41,28 +47,278 @@ export async function GET(req: NextRequest) {
               whiteSpace: "pre-wrap",
               display: "flex",
               flexDirection: "column",
-              justifyContent: "center",
+
               alignItems: "center", // Center the content horizontally
             }}
           >
-            <h3> Are you going to EthCC?</h3>
-            <p
+            <h3
               style={{
-                fontSize: 50,
-                width: "95%",
-                fontWeight: "bold",
-                marginTop: 10,
+                fontSize: 90,
+                marginTop: 20,
                 textAlign: "center",
                 whiteSpace: "pre-wrap",
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "center",
+                alignItems: "center", // Center the content horizontally
+                backgroundColor: "yellow",
+                padding: "0 16px",
+                borderRadius: 10,
+                fontWeight: "bold",
+                marginBottom: "0px",
+              }}
+            >
+              {" "}
+              Are you going to ETHCC?
+            </h3>
+            <p
+              style={{
+                fontSize: 40,
+                width: "95%",
+                fontWeight: "medium",
+                margin: "0",
+                textAlign: "center",
+                whiteSpace: "pre-wrap",
+                display: "flex",
+                flexDirection: "column",
+                marginTop: "5px",
                 alignItems: "center", // Center the content horizontally
               }}
             >
-              Find your values and let us show you top 3 aligned folks that you
-              should meet.
+              and want to find your top 3 folks who match your vibes?
             </p>
+            {error && (
+              <p
+                style={{
+                  fontSize: 70,
+                  width: "95%",
+                  fontWeight: "medium",
+                  margin: "0",
+                  textAlign: "center",
+                  whiteSpace: "pre-wrap",
+                  display: "flex",
+                  flexDirection: "column",
+                  marginTop: 80,
+                  alignItems: "center", // Center the content horizontally
+                  backgroundColor: "orange",
+                  padding: "0 16px",
+                  color: "white",
+                }}
+              >
+                {error.slice(1, -1)}
+              </p>
+            )}
+
+            {!error && (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+
+                  width: "93%",
+                  margin: "auto",
+                  marginTop: 80,
+                  gap: 20,
+                  justifyContent: "space-between",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    height: "180px",
+                    border: "2px dashed yellow",
+                    boxShadow: "0 0 10px 0 rgba(0, 0, 0, 0.1)",
+                    width: "48%", // Ensure equal width for children
+                    padding: "20px",
+                  }}
+                >
+                  <span
+                    style={{
+                      color: "black",
+                      fontSize: 25,
+                      background: "yellow",
+                      padding: "2px 16px",
+                      fontWeight: "bold",
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    Step <TbCircleNumber1Filled />: Analyse your values
+                  </span>
+                  <p
+                    style={{
+                      color: "black",
+                      fontSize: 20,
+                      fontStyle: "lite",
+                      fontWeight: "bold",
+                      padding: "0 20px",
+                      textAlign: "center",
+                      marginTop: "20px",
+                      marginBottom: "0px",
+                    }}
+                  >
+                    We fetch casts and analyse it using our AI model to generate
+                    your first principle values.
+                  </p>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    height: "180px",
+                    border: "2px dashed yellow",
+                    boxShadow: "0 0 10px 0 rgba(0, 0, 0, 0.1)",
+                    width: "48%", // Ensure equal width for children
+                    padding: "20px",
+                  }}
+                >
+                  <span
+                    style={{
+                      color: "black",
+                      fontSize: 25,
+                      background: "yellow",
+                      padding: "2px 16px",
+                      fontWeight: "bold",
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    Step <TbCircleNumber2Filled />: Follow @ValuesDAO
+                  </span>
+                  <p
+                    style={{
+                      color: "black",
+                      fontSize: 20,
+                      fontStyle: "lite",
+                      fontWeight: "bold",
+                      padding: "0 20px",
+                      textAlign: "center",
+                      marginTop: "20px",
+                      marginBottom: "0px",
+                    }}
+                  >
+                    Follow @ValuesDAO to get your generated values in your
+                    direct cast in few minutes.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {!error && (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+
+                  width: "93%",
+                  margin: "auto",
+                  marginTop: 20,
+                  gap: 20,
+                  justifyContent: "space-between",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    height: "180px",
+                    border: "2px dashed yellow",
+                    boxShadow: "0 0 10px 0 rgba(0, 0, 0, 0.1)",
+                    width: "48%", // Ensure equal width for children
+                    padding: "20px",
+                  }}
+                >
+                  <span
+                    style={{
+                      color: "black",
+                      fontSize: 25,
+                      background: "yellow",
+                      padding: "2px 16px",
+                      fontWeight: "bold",
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    Step <TbCircleNumber3Filled />: Cast this frame
+                  </span>
+                  <p
+                    style={{
+                      color: "black",
+                      fontSize: 20,
+                      fontStyle: "lite",
+                      fontWeight: "bold",
+                      padding: "0 20px",
+                      textAlign: "center",
+                      marginTop: "20px",
+                      marginBottom: "0px",
+                    }}
+                  >
+                    Share this frame so we can find you more aligned folks that
+                    are gonna be attending ETHCC week.
+                  </p>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    height: "180px",
+                    border: "2px dashed yellow",
+                    boxShadow: "0 0 10px 0 rgba(0, 0, 0, 0.1)",
+                    width: "48%", // Ensure equal width for children
+                    padding: "20px",
+                  }}
+                >
+                  <span
+                    style={{
+                      color: "black",
+                      fontSize: 25,
+                      background: "yellow",
+                      padding: "2px 16px",
+                      fontWeight: "bold",
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    Step <TbCircleNumber4Filled />: Get top 3 aligned folks in
+                    your direct cast
+                  </span>
+                  <p
+                    style={{
+                      color: "black",
+                      fontSize: 20,
+                      fontStyle: "lite",
+                      fontWeight: "bold",
+                      padding: "0 20px",
+                      textAlign: "center",
+                      marginTop: "20px",
+                      marginBottom: "0px",
+                    }}
+                  >
+                    On 10th July, we will direct cast you with top 3 aligned
+                    folks that are gonna be attending ETHCC week whom you
+                    definitely meet!
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -97,9 +353,8 @@ export async function GET(req: NextRequest) {
                   margin: "40px auto",
                 }}
               >
-                We are analysing your values, sit back and we will direct cast
-                you your values in few mins. Follow @ValuesDAO to get your DC or
-                check requests folder for our DC.
+                We are analysing your casts, sit back and we will direct cast
+                you your values in few mins.
               </p>
               <p
                 style={{
@@ -110,8 +365,8 @@ export async function GET(req: NextRequest) {
                   margin: "40px auto",
                 }}
               >
-                Share this Frame on your feed, so we can find you more aligned
-                folks.
+                Share this frame on your feed. The more people cast this frame,
+                the more aligned folks we can find for you.
               </p>
             </div>
           </div>
@@ -123,23 +378,25 @@ export async function GET(req: NextRequest) {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-
+              width: "90%",
+              margin: "auto",
               flexWrap: "wrap",
             }}
           >
             <div
               style={{
                 color: "#000",
-                fontSize: 70,
+                fontSize: 50,
                 fontWeight: "bold",
-
+                fontFamily: "sans-serif",
                 whiteSpace: "pre-wrap",
                 display: "flex",
                 flexDirection: "column",
+                marginTop: 40,
               }}
             >
               I just minted my values at ValuesDAO, Mint your values and find
-              your top 3 aligned folks at EthCC.
+              your top 3 aligned folks whom you should meet during ethcc week.
             </div>
             <div
               style={{
@@ -147,7 +404,7 @@ export async function GET(req: NextRequest) {
                 flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "center",
-                marginTop: 30,
+                marginTop: 40,
                 flexWrap: "wrap",
                 gap: 10,
               }}
@@ -159,12 +416,14 @@ export async function GET(req: NextRequest) {
                       key={value}
                       style={{
                         color: "black",
-                        fontSize: 50,
+                        fontSize: 60,
                         fontStyle: "normal",
                         borderRadius: 10,
-                        backgroundColor: "yellow",
+                        border: "4px dashed yellow",
+                        boxShadow: "0 0 10px 0 rgba(0, 0, 0, 0.1)",
                         padding: "0 16px",
                         fontWeight: "bold",
+                        backgroundColor: "yellow",
                       }}
                     >
                       {value}
@@ -226,5 +485,3 @@ export async function GET(req: NextRequest) {
     }
   );
 }
-
-export const dynamic = "force-dynamic";
