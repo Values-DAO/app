@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
           <meta name="fc:frame" content="vNext" />
           <meta name="fc:frame:image" content="${imageUrl}" />
           <meta name="fc:frame:post_url" content="${postUrl}" />
-          <meta name="fc:frame:button:1" content="Analyse my values" />,
+          <meta name="fc:frame:button:1" content="Find my values" />,
                 
         <meta name="fc:frame:button:2" content="How it works?" />
           <meta name="fc:frame:button:2:action" content="link" />
