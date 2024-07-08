@@ -13,7 +13,7 @@ export async function POST(req: any) {
 
   try {
     const {data} = await axios.get(
-      `${process.env.NEXT_PUBLIC_HOST}/api/v2/generate-user-value?fid=${fid}`,
+      `${process.env.NEXT_PUBLIC_HOST}/api/v2/generate-user-value?fid=${fid}&includeweights=true`,
       {
         headers: {
           "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY,

@@ -332,12 +332,15 @@ const useValuesHook = () => {
         ? `fid=${fid}`
         : `twitter=${twitter}&twitter_userId=${user?.twitter?.subject}`;
     try {
-      const response = await axios.get(`/api/v2/generate-user-value?${query}`, {
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
-        },
-      });
+      const response = await axios.get(
+        `/api/v2/generate-user-value?${query}&includeweights=true`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+          },
+        }
+      );
       if (response.data.user && response.data.user.aiGeneratedValues)
         emailAnalytics({
           subject: "New user generated their values using ai",

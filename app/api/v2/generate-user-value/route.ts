@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
     const twitter = searchParams.get("twitter");
     const fid = searchParams.get("fid");
     const twitter_userId = searchParams.get("twitter_userId");
-
+    const includeWeights = searchParams.get("includeweights");
     if (!fid && !twitter) {
       return NextResponse.json({
         status: 400,
@@ -65,9 +65,15 @@ export async function GET(req: NextRequest) {
           error: "User has less than 100 tweets",
         });
       }
-      generatedValues = await generateValuesForUser(tweets);
-      if (generatedValues && generatedValues.length > 2) {
-        user.aiGeneratedValues.twitter = Array.from(generatedValues);
+      generatedValues = await generateValuesForUser(
+        tweets,
+        includeWeights === "true"
+      );
+
+      if (generatedValues && Object.keys(generatedValues).length > 2) {
+        user.aiGeneratedValuesWithWeights.twitter = generatedValues;
+        const topValues = Object.keys(generatedValues).slice(0, 7);
+        user.aiGeneratedValues.twitter = Array.from(topValues);
       }
     } else if (fid) {
       if (
@@ -81,15 +87,20 @@ export async function GET(req: NextRequest) {
         });
       }
       const casts = await fetchCastsForUser(fid, 200);
-      if (casts.length < 100) {
+      if (casts.length < 10) {
         return NextResponse.json({
           status: 400,
           error: "User has less than 100 casts",
         });
       }
-      generatedValues = await generateValuesForUser(casts);
-      if (generatedValues && generatedValues.length > 2) {
-        user.aiGeneratedValues.warpcast = Array.from(generatedValues);
+      generatedValues = await generateValuesForUser(
+        casts,
+        includeWeights === "true"
+      );
+      if (generatedValues && Object.keys(generatedValues).length > 2) {
+        user.aiGeneratedValuesWithWeights.warpcast = generatedValues;
+        const topValues = Object.keys(generatedValues).slice(0, 7);
+        user.aiGeneratedValues.warpcast = Array.from(topValues);
       }
     }
 
