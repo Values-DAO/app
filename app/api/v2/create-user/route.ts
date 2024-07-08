@@ -40,13 +40,14 @@ export async function GET(req: NextRequest) {
       fid: fid,
       values: user.aiGeneratedValues.warpcast,
       weightedValues: user.aiGeneratedValuesWithWeights.warpcast,
+      profileNft: `https://opensea.io/assets/base/0x55ea555d659cdef815a97e0a1fc026bffa71d094/${user.profileNft}`,
     });
   } catch (error) {
     console.error(error);
-    return {
+    return NextResponse.json({
       status: 500,
-      body: {error: error},
-    };
+      error,
+    });
   }
 }
 
@@ -79,6 +80,7 @@ export async function POST(req: NextRequest) {
         fid: fid,
         values: user.aiGeneratedValues.warpcast,
         weightedValues: user.aiGeneratedValuesWithWeights.warpcast,
+        profileNft: `https://opensea.io/assets/base/0x55ea555d659cdef815a97e0a1fc026bffa71d094/${user.profileNft}`,
       });
     }
 
@@ -90,9 +92,20 @@ export async function POST(req: NextRequest) {
         },
       }
     );
-
+    if (data.status !== 200) {
+      return NextResponse.json({
+        status: 400,
+        error: data.error,
+      });
+    }
     const wallets = await fetchFarcasterUserWallets(fid);
-    const MintProfileResponse = await axios.post(
+    if (wallets.length === 0) {
+      return NextResponse.json({
+        status: 400,
+        error: "User has no wallets",
+      });
+    }
+    await axios.post(
       `${process.env.NEXT_PUBLIC_HOST}/api/v2/user`,
       {
         farcaster: fid,
@@ -113,16 +126,18 @@ export async function POST(req: NextRequest) {
     );
     return NextResponse.json({
       status: 201,
+      message: "User created successfully",
       fid: fid,
       values: data.user.aiGeneratedValues.warpcast,
       weightedValues: data.user.aiGeneratedValuesWithWeights.warpcast,
-      message: "User created successfully",
+
+      profileNft: `https://opensea.io/assets/base/0x55ea555d659cdef815a97e0a1fc026bffa71d094/${data.user.profileNft}`,
     });
   } catch (error) {
     console.error(error);
-    return {
+    return NextResponse.json({
       status: 500,
-      body: {error: error},
-    };
+      error,
+    });
   }
 }

@@ -13,7 +13,10 @@ export type IUser = {
     twitter: string[];
     warpcast: string[];
   };
-
+  aiGeneratedValuesWithWeights?: {
+    twitter: Object;
+    warpcast: Object;
+  };
   profileNftHash?: string;
   profileNftIpfs?: string;
   communitiesMinted?: string[];
@@ -61,6 +64,10 @@ const userSchema = new Schema(
         type: [String],
         default: [],
       },
+    },
+    aiGeneratedValuesWithWeights: {
+      twitter: {type: Object, default: {}},
+      warpcast: {type: Object, default: {}},
     },
     balance: {
       type: Number,
