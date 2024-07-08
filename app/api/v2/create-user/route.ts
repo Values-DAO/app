@@ -105,7 +105,7 @@ export async function POST(req: NextRequest) {
         error: "User has no wallets",
       });
     }
-    await axios.post(
+    const mintResponse = await axios.post(
       `${process.env.NEXT_PUBLIC_HOST}/api/v2/user`,
       {
         farcaster: fid,
@@ -124,14 +124,16 @@ export async function POST(req: NextRequest) {
         },
       }
     );
+
     return NextResponse.json({
       status: 201,
       message: "User created successfully",
       fid: fid,
-      values: data.user.aiGeneratedValues.warpcast,
-      weightedValues: data.user.aiGeneratedValuesWithWeights.warpcast,
+      values: mintResponse.data.user.aiGeneratedValues.warpcast,
+      weightedValues:
+        mintResponse.data.user.aiGeneratedValuesWithWeights.warpcast,
 
-      profileNft: `https://opensea.io/assets/base/0x55ea555d659cdef815a97e0a1fc026bffa71d094/${data.user.profileNft}`,
+      profileNft: `https://opensea.io/assets/base/0x55ea555d659cdef815a97e0a1fc026bffa71d094/${mintResponse.data.user.profileNft}`,
     });
   } catch (error) {
     console.error(error);
