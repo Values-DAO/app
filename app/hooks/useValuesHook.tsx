@@ -263,9 +263,11 @@ const useValuesHook = () => {
   const isAHolderOfToken = async ({
     tokenAddress,
     chain,
+    type,
   }: {
-    tokenAddress: string;
+    tokenAddress: string | string[];
     chain: number;
+    type: "ERC721" | "ERC20";
   }) => {
     const userInfo = await fetchUser();
 
@@ -278,39 +280,53 @@ const useValuesHook = () => {
     ];
     if (!wallets || !tokenAddress || !chain) return;
 
-    let balance = 0;
-    try {
-      const balancePromises = wallets.map(async (wallet) => {
-        if (!wallet) return 0;
+    if (type === "ERC721") {
+      for (const token of tokenAddress) {
+        const balancePromises = wallets.map(async (wallet) => {
+          const {data} = await axios.get(
+            `https://base-mainnet.g.alchemy.com/nft/v3/${process.env.ALCHEMY_BASE_KEY}/isHolderOfContract?wallet=${wallet}}&contractAddress=${token}`
+          );
 
-        const response = await axios.get(
-          `https://deep-index.moralis.io/api/v2.2/${wallet}/erc20?chain=${
-            supportedChainsMoralis[chain] ?? "eth"
-          }&token_addresses%5B0%5D=${tokenAddress}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              "X-API-Key": process.env.NEXT_PUBLIC_MORALIS_API_KEY as string,
-            },
-          }
+          if (data?.isHolder) return 1;
+        });
+      }
+      return 0;
+    } else {
+      let balance = 0;
+      try {
+        const balancePromises = wallets.map(async (wallet) => {
+          if (!wallet) return 0;
+
+          const response = await axios.get(
+            `https://deep-index.moralis.io/api/v2.2/${wallet}/erc20?chain=${
+              supportedChainsMoralis[chain] ?? "eth"
+            }&token_addresses%5B0%5D=${tokenAddress}`,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                "X-API-Key": process.env.NEXT_PUBLIC_MORALIS_API_KEY as string,
+              },
+            }
+          );
+          return response?.data[0]?.balance;
+        });
+
+        const balances = await Promise.all(balancePromises);
+        const filteredBalances = balances.filter(
+          (balance) =>
+            balance !== null && balance !== 0 && balance !== undefined
         );
-        return response?.data[0]?.balance;
-      });
+        if (filteredBalances.length === 0) return 0;
+        balance = filteredBalances.reduce(
+          (acc, curr) => Number(acc) + Number(curr),
+          0
+        );
 
-      const balances = await Promise.all(balancePromises);
-      const filteredBalances = balances.filter(
-        (balance) => balance !== null && balance !== 0 && balance !== undefined
-      );
-      if (filteredBalances.length === 0) return 0;
-      balance = filteredBalances.reduce(
-        (acc, curr) => Number(acc) + Number(curr),
-        0
-      );
-
-      return balance / 10 ** 18;
-    } catch (e) {
-      console.error(e);
-      return null;
+        return balance / 10 ** 18;
+      } catch (e) {
+        console.error(e);
+        return null;
+      }
     }
   };
 

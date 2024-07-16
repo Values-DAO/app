@@ -66,8 +66,13 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
     const fetchUserTokenBalance = async () => {
       setBalanceLoader(true);
       const tokenbalance = await isAHolderOfToken({
-        tokenAddress: project?.contractAddress as `0x${string}`,
+        tokenAddress: [
+          project?.contractAddress as string,
+          ...project?.additionalNFTAddresses!,
+          ...project?.additionalERC20Addresses!,
+        ],
         chain: Number(project?.chainId!),
+        type: project?.category as unknown as "ERC721" | "ERC20",
       });
 
       if (tokenbalance != null) setTokenBalance(tokenbalance);
