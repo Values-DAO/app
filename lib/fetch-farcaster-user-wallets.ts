@@ -1,4 +1,5 @@
 import {gql, GraphQLClient} from "graphql-request";
+import {isAddress} from "viem";
 type FarcasterSocialData = {
   Socials: {
     Social: {
@@ -20,6 +21,7 @@ export const fetchFarcasterUserWallets = async (fid: string) => {
           Social {
             connectedAddresses {
               address
+              blockchain
             }
           }
         }
@@ -35,9 +37,9 @@ export const fetchFarcasterUserWallets = async (fid: string) => {
   try {
     const data: FarcasterSocialData = await graphQLClient.request(query);
 
-    return data.Socials.Social[0].connectedAddresses.map(
-      (address) => address.address
-    );
+    return data.Socials.Social[0].connectedAddresses
+      .filter(({address}) => isAddress(address))
+      .map(({address}) => address);
   } catch (error) {
     return [];
   }
