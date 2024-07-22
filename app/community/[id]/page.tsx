@@ -141,14 +141,11 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
                   tokenBalance <= 0 && (
                     <Alert className="my-8">
                       <WandSparklesIcon className="h-4 w-4" />
-                   <AlertTitle>
-                        You hold{" "}
-                        {project.category === "ERC20" &&
-                          tokenBalance.toFixed(2)}{" "}
-                        {project.category === ("ERC721" as any)
-                          ? "NFT"
-                          : "tokens"}{" "}
-                        from this project.
+                  <AlertTitle className="leading-2">
+                        You don&apos;t hold any{" "}
+                        {project.category === "NFT" || "ERC721" as any ? "NFT" : "tokens"} from
+                        this project. You can connect a different wallet if you
+                        have it there.
                       </AlertTitle>
                       <AlertDescription>
                         {isConnected ? (
@@ -176,11 +173,16 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
                   !userInfo?.communitiesMinted?.includes(id!) && (
                     <Alert className="my-8">
                       <RocketIcon className="h-4 w-4" />
-                      <AlertTitle>
-                        You hold {tokenBalance.toFixed(2)}{" "}
-                        {project.category === "NFT" ? "NFT" : "tokens"} from
-                        this project.
+                                    <AlertTitle>
+                        You hold{" "}
+                        {project.category === "ERC20" &&
+                          tokenBalance.toFixed(2)}{" "}
+                        {project.category === ("ERC721" as any)
+                          ? "NFT"
+                          : "tokens"}{" "}
+                        from this project.
                       </AlertTitle>
+
                       <AlertDescription>
                         You can mint values for free.
                       </AlertDescription>
