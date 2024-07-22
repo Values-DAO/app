@@ -30,6 +30,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import LoggedOutView from "@/components/logged-out-view";
 interface pageProps {
   params: {id: string};
 }
@@ -141,11 +142,13 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
                   tokenBalance <= 0 && (
                     <Alert className="my-8">
                       <WandSparklesIcon className="h-4 w-4" />
-                  <AlertTitle className="leading-2">
+                      <AlertTitle className="leading-2">
                         You don&apos;t hold any{" "}
-                        {project.category === "NFT" || "ERC721" as any ? "NFT" : "tokens"} from
-                        this project. You can connect a different wallet if you
-                        have it there.
+                        {project.category === "NFT" || ("ERC721" as any)
+                          ? "NFT"
+                          : "tokens"}{" "}
+                        from this project. You can connect a different wallet if
+                        you have it there.
                       </AlertTitle>
                       <AlertDescription>
                         {isConnected ? (
@@ -173,7 +176,7 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
                   !userInfo?.communitiesMinted?.includes(id!) && (
                     <Alert className="my-8">
                       <RocketIcon className="h-4 w-4" />
-                                    <AlertTitle>
+                      <AlertTitle>
                         You hold{" "}
                         {project.category === "ERC20" &&
                           tokenBalance.toFixed(2)}{" "}
@@ -272,6 +275,7 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
               </div>
             </section>
           )}
+          <LoggedOutView />
 
           {onMintingSuccessful && (
             <AlertDialog open={onMintingSuccessful}>

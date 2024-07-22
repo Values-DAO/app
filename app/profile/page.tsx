@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/table";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 import {ExclamationTriangleIcon} from "@radix-ui/react-icons";
+import LoggedOutView from "@/components/logged-out-view";
 
 const ProfilePage = () => {
   const {authenticated, login, ready, user} = usePrivy();
@@ -104,21 +105,7 @@ const ProfilePage = () => {
           </div>
         </div>
       )}
-      {ready && !authenticated && (
-        <section className="w-full mt-24  flex flex-col items-center ">
-          <span className="scroll-m-20 text-lg font-semibold tracking-tight ">
-            Login to view your profile
-          </span>
-          <Button
-            variant="default"
-            onClick={login}
-            disabled={!ready || authenticated || isLoading}
-            className="my-4"
-          >
-            {isLoading ? "Loading.." : "Login"}
-          </Button>
-        </section>
-      )}
+      <LoggedOutView />
       {!ready ||
         (isLoading && (
           <section className="w-full mt-24  flex flex-col items-center ">
