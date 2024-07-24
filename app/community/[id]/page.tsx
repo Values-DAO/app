@@ -80,16 +80,14 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
   return (
     <>
       {" "}
-      {loader ||
-        !project ||
-        (!userInfo && (
-          <div className="w-[90vw] m-auto flex flex-col gap-4">
-            <Skeleton className="w-full h-[320px] rounded-md" />
-            <Skeleton className="w-full m-auto h-[30px] rounded-md" />
-            <Skeleton className="w-full m-auto h-[30px] rounded-md" />
-          </div>
-        ))}
-      {userInfo && (
+      {(loader || !project) && (
+        <div className="w-[90vw] m-auto flex flex-col gap-4">
+          <Skeleton className="w-full h-[320px] rounded-md" />
+          <Skeleton className="w-full m-auto h-[30px] rounded-md" />
+          <Skeleton className="w-full m-auto h-[30px] rounded-md" />
+        </div>
+      )}
+      {
         <main className="p-4 overflow-y-auto">
           {project && (
             <section className="flex flex-col items-center md:items-start md:flex-row gap-4">
@@ -114,7 +112,7 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
                   ))}
                 </div>
 
-                {!userInfo.wallets && !address && (
+                {userInfo && !userInfo.wallets && !address && (
                   <Button
                     variant="secondary"
                     onClick={linkWallet}
@@ -328,7 +326,7 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
             </AlertDialog>
           )}
         </main>
-      )}
+      }
     </>
   );
 };

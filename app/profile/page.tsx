@@ -39,7 +39,7 @@ const ProfilePage = () => {
 
   return (
     <div className="p-4">
-      {authenticated && userInfo && !isLoading && (
+      {!isLoading && (
         <div>
           <h2 className="scroll-m-20 text-center border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 text-muted-foreground mb-2">
             || profile
@@ -50,12 +50,14 @@ const ProfilePage = () => {
               <span className="font-semibold">
                 Hello {user?.farcaster?.displayName}
               </span>{" "}
-              <Link
-                href={`https://opensea.io/assets/base/${NFT_CONTRACT_ADDRESS}/${userInfo.profileNft}`}
-                target="_blank"
-              >
-                <LinkIcon className="m-0 p-0 text-primary" size={"18px"} />
-              </Link>
+              {userInfo && (
+                <Link
+                  href={`https://opensea.io/assets/base/${NFT_CONTRACT_ADDRESS}/${userInfo.profileNft}`}
+                  target="_blank"
+                >
+                  <LinkIcon className="m-0 p-0 text-primary" size={"18px"} />
+                </Link>
+              )}
             </h3>
 
             <p className="leading-9 [&:not(:first-child)]:mt-6">
@@ -66,7 +68,9 @@ const ProfilePage = () => {
               data to train our AI model and get closer to accuracy.<br></br> If
               you feel a Value is inaccurate, you can always burn it.
             </p>
-            {userInfo.mintedValues && userInfo.mintedValues.length > 0 ? (
+            {userInfo &&
+            userInfo.mintedValues &&
+            userInfo.mintedValues.length > 0 ? (
               <Table className="border-[1px] border-gray-400   m-auto mt-4">
                 <TableHeader>
                   <TableRow>
