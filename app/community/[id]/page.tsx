@@ -93,18 +93,18 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
             <section className="flex flex-col items-center md:items-start md:flex-row gap-4">
               <div className="w-[90vw] m-auto">
                 <span>#{project.id}</span>
-                <h2 className="scroll-m-20 pb-2 text-xl font-medium tracking-tight first:mt-0">
-                  {project?.name}
+                <h2 className="text-3xl font-semibold tracking-tight mt-8">
+                  {project?.name} - Community Mint
                 </h2>
                 <Separator />
 
-                <p className="text-3xl font-semibold tracking-tight mt-8">
+                <p className="text-xl font-medium tracking-tight mt-8">
                   Values{" "}
                 </p>
                 <p className="my-2 text-muted-foreground">
                   If you hold a token/ NFT from this project in{" "}
                   {getChainName(Number(project?.chainId))} chain, you can mint
-                  values for free.
+                  the values written below for free.
                 </p>
                 <div className="flex flex-wrap flex-row gap-2 my-4 font-medium">
                   {project?.values.map((value, index) => (
@@ -120,17 +120,6 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
                   >
                     Connect Wallet
                   </Button>
-                )}
-
-                {!authenticated && (
-                  <section className=" flex flex-col gap-2 rounded-sm mt-10 items-center bg-gray-300 p-4 border-[1px] border-black">
-                    <span className="font-semibold text-lg">
-                      Login to mint values
-                    </span>
-                    <Button variant="default" onClick={login} className="w-fit">
-                      Login
-                    </Button>
-                  </section>
                 )}
 
                 {authenticated &&

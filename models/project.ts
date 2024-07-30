@@ -13,6 +13,7 @@ export interface IProject {
   values: string[];
   totalsMinters: number;
   category: "NFT" | "ERC20";
+  valuesSource?: string;
 }
 
 const projectSchema = new Schema({
@@ -61,6 +62,9 @@ const projectSchema = new Schema({
   category: {
     type: String,
     required: true,
+  },
+  valuesSource: {
+    type: String,
   },
 });
 
