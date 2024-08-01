@@ -67,6 +67,7 @@ export async function POST(req: NextRequest) {
         try {
           let hash: string | undefined = undefined;
           let IPFS_CID: string | undefined = undefined;
+          const nftId = await fetchAllNFTsValuesDAO();
           if (wallets.length > 0) {
             const {
               data: {cid},
@@ -74,7 +75,7 @@ export async function POST(req: NextRequest) {
               `${process.env.NEXT_PUBLIC_HOST}/api/v2/ipfs`,
               {
                 values: [],
-                tokenId: await fetchAllNFTsValuesDAO(),
+                tokenId: nftId,
               },
               {
                 headers: {
@@ -98,7 +99,7 @@ export async function POST(req: NextRequest) {
             ...(email && {email}),
             mintedValues: [],
             ...(wallets.length > 0 && {
-              profileNft: await fetchAllNFTsValuesDAO(),
+              profileNft: nftId,
               profileNftHash: hash,
               profileNftIpfs: IPFS_CID,
             }),
@@ -132,6 +133,7 @@ export async function POST(req: NextRequest) {
         let hash = "";
         let IPFS_CID = "";
         try {
+          const nftId = await fetchAllNFTsValuesDAO();
           if (wallets.length > 0) {
             const {
               data: {cid},
@@ -139,7 +141,7 @@ export async function POST(req: NextRequest) {
               `${process.env.NEXT_PUBLIC_HOST}/api/v2/ipfs`,
               {
                 values: values.length > 0 ? values : [],
-                tokenId: await fetchAllNFTsValuesDAO(),
+                tokenId: nftId,
               },
               {
                 headers: {
@@ -156,12 +158,10 @@ export async function POST(req: NextRequest) {
               args: [wallets[0], cid],
             });
 
-            console.log("hash", hash);
-
             user.profileNftHash = hash;
             user.profileNftIpfs = IPFS_CID;
-            user.profileNft = await fetchAllNFTsValuesDAO();
-            user.wallet = Array.from(new Set([...user.wallets, ...wallets]));
+            user.profileNft = nftId;
+            user.wallets = Array.from(new Set([...user.wallets, ...wallets]));
 
             await user.save();
             return NextResponse.json({
