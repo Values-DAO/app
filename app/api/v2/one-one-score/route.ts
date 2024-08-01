@@ -1,6 +1,7 @@
 import calculateAlignmentScore from "@/lib/calculate-alingment-score";
 import connectToDatabase from "@/lib/connect-to-db";
 import User from "@/models/user";
+import axios from "axios";
 import {NextRequest, NextResponse} from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -20,21 +21,47 @@ export async function GET(req: NextRequest) {
     let targetUser = await User.findOne({farcaster: targetFID});
     let user = await User.findOne({farcaster: userFID});
 
-    if (!targetUser || !user) {
-      return NextResponse.json({
-        status: 404,
-        error: "User not found",
-      });
+    if (!targetUser) {
+      const {data} = await axios.get(
+        `${process.env.NEXT_PUBLIC_HOST}/api/v2/generate-user-value?fid=${targetFID}&includeweights=true`,
+        {
+          headers: {
+            "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY,
+          },
+        }
+      );
+      targetUser = data.user;
+    }
+    if (!user) {
+      const {data} = await axios.get(
+        `${process.env.NEXT_PUBLIC_HOST}/api/v2/generate-user-value?fid=${userFID}&includeweights=true`,
+        {
+          headers: {
+            "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY,
+          },
+        }
+      );
+      user = data.user;
     }
 
     user = {
       ...user,
-      generatedValues: user.aiGeneratedValuesWithWeights.warpcast,
+      generatedValues:
+        user?.aiGeneratedValuesWithWeights?.warpcast ??
+        user.aiGeneratedValues?.warpcast?.map((value: string) => {
+          return {[value]: 100};
+        }),
     };
+
     targetUser = {
       ...targetUser,
-      generatedValues: targetUser.aiGeneratedValuesWithWeights.warpcast,
+      generatedValues:
+        targetUser?.aiGeneratedValuesWithWeights?.warpcast ??
+        targetUser?.aiGeneratedValues?.warpcast?.map((value: string) => {
+          return {[value]: 100};
+        }),
     };
+
     const userRecommendation = calculateAlignmentScore(
       user,
       [targetUser],
@@ -44,8 +71,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       status: 200,
 
-      targetToUserAlignment: userRecommendation[0].targetToUserScore,
-      userToTargetAlignment: userRecommendation[0].userToTargetScore,
+      // targetToUserAlignment: userRecommendation[0].targetToUserScore,
+      alignmentPercent: userRecommendation[0].userToTargetScore,
     });
   } catch (error) {
     console.error("Error:", error);
