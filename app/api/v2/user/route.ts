@@ -162,7 +162,16 @@ export async function POST(req: NextRequest) {
             user.profileNftIpfs = IPFS_CID;
             user.profileNft = nftId;
             user.wallets = Array.from(new Set([...user.wallets, ...wallets]));
-
+            if (values.length > 0) {
+              user.mintedValues = values.map((value: any) => {
+                return {
+                  value: value.name,
+                  weightage: value.newWeightage,
+                };
+              });
+            }
+            user.balance = 5;
+            user.communitiesMinted = "warpcast";
             await user.save();
             return NextResponse.json({
               user,
