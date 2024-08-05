@@ -20,17 +20,14 @@ export async function GET(req: NextRequest) {
     await connectToDatabase();
     let targetUser = await User.findOne({farcaster: targetFID});
     let user = await User.findOne({farcaster: userFID});
-
+    console.log("targetUser", targetUser);
+    console.log("user", user);
     if (
-      !targetUser &&
-      targetUser.aiGeneratedValues.warpcast === undefined &&
-      targetUser.aiGeneratedValues.warpcast.length === 0 &&
-      targetUser.aiGeneratedValuesWithWeights &&
-      targetUser.aiGeneratedValuesWithWeights.warpcast &&
-      targetUser.aiGeneratedValues.twitter === undefined &&
-      targetUser.aiGeneratedValues.twitter.length === 0 &&
-      targetUser.aiGeneratedValuesWithWeights.twitter === undefined &&
-      targetUser.aiGeneratedValuesWithWeights.twitter.length === 0
+      !targetUser ||
+      ((targetUser.aiGeneratedValues.warpcast === undefined ||
+        targetUser.aiGeneratedValues.warpcast.length === 0) &&
+        (targetUser.aiGeneratedValues.twitter === undefined ||
+          targetUser.aiGeneratedValues.twitter.length === 0))
     ) {
       const {data} = await axios.get(
         `${process.env.NEXT_PUBLIC_HOST}/api/v2/generate-user-value?fid=${targetFID}&includeweights=true`,
@@ -40,18 +37,21 @@ export async function GET(req: NextRequest) {
           },
         }
       );
+      console.log("data", data);
+      if (data.status === 403) {
+        return NextResponse.json({
+          status: 403,
+          error: `User with FID ${targetFID} has less than 100 casts`,
+        });
+      }
       targetUser = data.user;
     }
     if (
-      !user &&
-      user.aiGeneratedValues.warpcast === undefined &&
-      user.aiGeneratedValues.warpcast.length === 0 &&
-      user.aiGeneratedValuesWithWeights.warpcast === undefined &&
-      user.aiGeneratedValuesWithWeights.warpcast.length === 0 &&
-      user.aiGeneratedValues.twitter === undefined &&
-      user.aiGeneratedValues.twitter.length === 0 &&
-      user.aiGeneratedValuesWithWeights.twitter === undefined &&
-      user.aiGeneratedValuesWithWeights.twitter.length === 0
+      !user ||
+      ((user.aiGeneratedValues.warpcast === undefined ||
+        user.aiGeneratedValues.warpcast.length === 0) &&
+        (user.aiGeneratedValues.twitter === undefined ||
+          user.aiGeneratedValues.twitter.length === 0))
     ) {
       const {data} = await axios.get(
         `${process.env.NEXT_PUBLIC_HOST}/api/v2/generate-user-value?fid=${userFID}&includeweights=true`,
@@ -61,6 +61,12 @@ export async function GET(req: NextRequest) {
           },
         }
       );
+      if (data.status === 403) {
+        return NextResponse.json({
+          status: 403,
+          error: `User with FID ${userFID} has less than 100 casts`,
+        });
+      }
       user = data.user;
     }
 
@@ -89,7 +95,7 @@ export async function GET(req: NextRequest) {
               ...user?.aiGeneratedValuesWithWeights?.twitter,
             },
     };
-
+    console.log(user);
     targetUser = {
       generatedValues:
         Object.keys(targetUser?.aiGeneratedValuesWithWeights?.warpcast)
@@ -116,7 +122,7 @@ export async function GET(req: NextRequest) {
               ...targetUser?.aiGeneratedValuesWithWeights?.twitter,
             },
     };
-
+    console.log(targetUser);
     const userRecommendation = calculateAlignmentScore(
       user,
       [targetUser],

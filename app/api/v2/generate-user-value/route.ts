@@ -61,7 +61,7 @@ export async function GET(req: NextRequest) {
       const tweets = await fetchUserTweets(twitter_userId);
       if (tweets.length < 100) {
         return NextResponse.json({
-          status: 400,
+          status: 403,
           error: "User has less than 100 tweets",
         });
       }
@@ -89,7 +89,7 @@ export async function GET(req: NextRequest) {
       const casts = await fetchCastsForUser(fid, 200);
       if (casts.length < 10) {
         return NextResponse.json({
-          status: 400,
+          status: 403,
           error: "User has less than 100 casts",
         });
       }
