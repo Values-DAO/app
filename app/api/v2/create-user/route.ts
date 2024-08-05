@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const {fid} = await req.json();
+  const {fid, appName} = await req.json();
   try {
     await connectToDatabase();
     const apiKey = headers().get("x-api-key");
@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
     }
 
     const {data} = await axios.get(
-      `${process.env.NEXT_PUBLIC_HOST}/api/v2/generate-user-value?fid=${fid}&includeweights=true`,
+      `${process.env.NEXT_PUBLIC_HOST}/api/v2/generate-user-value?fid=${fid}&includeweights=true&referrer=${appName}`,
       {
         headers: {
           "x-api-key": apiKey,

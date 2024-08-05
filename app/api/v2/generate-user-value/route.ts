@@ -24,6 +24,7 @@ export async function GET(req: NextRequest) {
     const fid = searchParams.get("fid");
     const twitter_userId = searchParams.get("twitter_userId");
     const includeWeights = searchParams.get("includeweights");
+    const referrer = searchParams.get("referrer");
     if (!fid && !twitter) {
       return NextResponse.json({
         status: 400,
@@ -42,6 +43,7 @@ export async function GET(req: NextRequest) {
         ...(email ? {email} : {}),
         ...(twitter ? {twitter} : {}),
         ...(fid ? {farcaster: fid} : {}),
+        referrer,
       });
     }
 
