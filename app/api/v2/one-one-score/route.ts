@@ -45,23 +45,33 @@ export async function GET(req: NextRequest) {
     }
 
     user = {
-      ...user,
       generatedValues:
-        user?.aiGeneratedValuesWithWeights?.warpcast ??
-        user.aiGeneratedValues?.warpcast?.map((value: string) => {
-          return {[value]: 100};
-        }),
+        Object.keys(user?.aiGeneratedValuesWithWeights?.warpcast).length ===
+          0 || user?.aiGeneratedValuesWithWeights?.warpcast === undefined
+          ? user?.aiGeneratedValues?.warpcast?.reduce(
+              (acc: Record<string, number>, value: string) => {
+                acc[value] = 100;
+                return acc;
+              },
+              {}
+            )
+          : user?.aiGeneratedValuesWithWeights?.warpcast,
     };
 
     targetUser = {
-      ...targetUser,
       generatedValues:
-        targetUser?.aiGeneratedValuesWithWeights?.warpcast ??
-        targetUser?.aiGeneratedValues?.warpcast?.map((value: string) => {
-          return {[value]: 100};
-        }),
+        Object.keys(targetUser?.aiGeneratedValuesWithWeights?.warpcast)
+          .length === 0 ||
+        targetUser?.aiGeneratedValuesWithWeights?.warpcast === undefined
+          ? targetUser?.aiGeneratedValues?.warpcast?.reduce(
+              (acc: Record<string, number>, value: string) => {
+                acc[value] = 100;
+                return acc;
+              },
+              {}
+            )
+          : targetUser?.aiGeneratedValuesWithWeights?.warpcast,
     };
-
     const userRecommendation = calculateAlignmentScore(
       user,
       [targetUser],
