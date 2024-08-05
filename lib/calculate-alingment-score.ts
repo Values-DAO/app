@@ -9,8 +9,8 @@ interface IUser {
 }
 
 export default function calculateAlignmentScore(
-  targetUser: IUser,
-  allUsers: IUser[],
+  targetUser: IUser | any,
+  allUsers: IUser[] | any[],
   oneOnOne?: boolean
 ) {
   let alignmentScores = [];
@@ -61,7 +61,7 @@ export default function calculateAlignmentScore(
       let commonKeys = Object.keys(targetUserValues).filter(
         (key) => userValues && key in userValues
       );
-      console.log("commonKeys", commonKeys);
+
       if (commonKeys.length === 0) {
         console.log("No common keys between target and user", user);
         continue;
@@ -117,7 +117,7 @@ export default function calculateAlignmentScore(
     }
 
     return {
-      alignmentScores: alignmentScores.slice(0, 3),
+      alignmentScores: alignmentScores.slice(0, 10),
     };
   } catch (error) {
     console.error("Error:", error);

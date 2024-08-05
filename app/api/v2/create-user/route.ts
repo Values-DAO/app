@@ -78,8 +78,14 @@ export async function POST(req: NextRequest) {
         status: 409,
         error: "User already exists",
         fid: fid,
-        values: user.aiGeneratedValues.warpcast,
-        weightedValues: user.aiGeneratedValuesWithWeights.warpcast,
+        values: [
+          ...user.aiGeneratedValues.warpcast,
+          ...user.aiGeneratedValues.twitter,
+        ],
+        weightedValues: {
+          ...user.aiGeneratedValuesWithWeights.warpcast,
+          ...user.aiGeneratedValuesWithWeights.twitter,
+        },
         profileNft: `https://opensea.io/assets/base/0x55ea555d659cdef815a97e0a1fc026bffa71d094/${user.profileNft}`,
       });
     }

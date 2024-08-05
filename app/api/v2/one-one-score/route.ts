@@ -141,7 +141,7 @@ export async function GET(req: NextRequest) {
 
       // targetToUserAlignment: userRecommendation[0].targetToUserScore,
       alignmentPercent:
-        userRecommendation?.alignmentScores[0].userToTargetScore,
+        userRecommendation?.alignmentScores[0].targetToUserScore,
     });
   } catch (error) {
     console.error("Error:", error);

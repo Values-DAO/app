@@ -38,7 +38,9 @@ export async function POST(req: NextRequest) {
   const postUrl = `${process.env.NEXT_PUBLIC_HOST}/api/v2/ethcc/`;
 
   try {
-    const followers = await getFarcasterUserFollowers("valuesdao");
+    const followers = await getFarcasterUserFollowers({
+      username: "valuesdao",
+    });
 
     if (!followers.includes(Number(fid))) {
       return new NextResponse(
