@@ -34,5 +34,6 @@ export const GetFIDForUsername = async (username: string) => {
     return null;
   } catch (error) {
     console.error("Error:", error);
+    return null;
   }
 };

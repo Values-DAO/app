@@ -27,6 +27,10 @@ const PublicProfile = ({params: {id}}: {params: {id: string}}) => {
     setLoading(true);
     const fid = await GetFIDForUsername(id);
 
+    if (fid === null) {
+      setError("User not found");
+      setLoading(false);
+    }
     if (fid !== null || fid !== undefined) {
       const {data} = await axios.get(`/api/v2/user/?fid=${fid}`, {
         headers: {
@@ -36,8 +40,6 @@ const PublicProfile = ({params: {id}}: {params: {id: string}}) => {
       });
 
       setUser(data.user);
-    } else {
-      setError("User not found");
     }
     setLoading(false);
   };
@@ -103,8 +105,8 @@ const PublicProfile = ({params: {id}}: {params: {id: string}}) => {
           <div className="animate-spin rounded-full h-14 w-14 border-t-2 border-b-2 border-primary"></div>
         </div>
       )}
-      {error && (
-        <Alert variant="destructive" className="mt-4">
+      {error && !user && (
+        <Alert variant="destructive" className="mt-4 flex items-center">
           <ExclamationTriangleIcon className="h-4 w-4" />
 
           <AlertDescription>{error}</AlertDescription>
