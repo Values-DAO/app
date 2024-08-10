@@ -188,6 +188,8 @@ const ValuePage = () => {
                           )!,
                           type: "community",
                           communityId: "twitter",
+                          description: "Minted Values from Twitter",
+                          wallets: userInfo?.wallets,
                         });
                         setLoader(false);
 
@@ -322,6 +324,8 @@ const ValuePage = () => {
                           )!,
                           type: "community",
                           communityId: "warpcast",
+                          description: "Minted Values from Warpcast",
+                          wallets: userInfo?.wallets,
                         });
                         setLoader(false);
                         if (response) {
