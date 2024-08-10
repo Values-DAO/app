@@ -215,6 +215,8 @@ const HomeComponent = () => {
                                     const response = await mintHandler({
                                       values: [{name: value, weightage: "1"}],
                                       type: "manual",
+                                      description: "Minted value manually",
+                                      wallets: userInfo?.wallets,
                                     });
                                     if (response) {
                                       setUserInfo(response.user);
@@ -301,6 +303,9 @@ const HomeComponent = () => {
                                     values: [
                                       {name: searchValue, weightage: "1"},
                                     ],
+                                    type: "manual",
+                                    description: "Minted value manually",
+                                    wallets: userInfo?.wallets,
                                   });
                                   if (response) {
                                     setOnMintingSuccessful(true);
