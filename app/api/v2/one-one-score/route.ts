@@ -59,8 +59,10 @@ export async function GET(req: NextRequest) {
     console.log(targetUser);
     user = {
       generatedValues:
+        user?.aiGeneratedValuesWithWeights === undefined ||
         Object.keys(user?.aiGeneratedValuesWithWeights?.warpcast).length ===
-          0 || user?.aiGeneratedValuesWithWeights?.warpcast === undefined
+          0 ||
+        user?.aiGeneratedValuesWithWeights?.warpcast === undefined
           ? {
               ...user?.aiGeneratedValues?.warpcast?.reduce(
                 (acc: Record<string, number>, value: string) => {
@@ -85,6 +87,7 @@ export async function GET(req: NextRequest) {
 
     targetUser = {
       generatedValues:
+        targetUser?.aiGeneratedValuesWithWeights === undefined ||
         Object.keys(targetUser?.aiGeneratedValuesWithWeights?.warpcast)
           .length === 0 ||
         targetUser?.aiGeneratedValuesWithWeights?.warpcast === undefined
