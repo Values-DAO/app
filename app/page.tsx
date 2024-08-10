@@ -4,11 +4,19 @@ import {Button} from "@/components/ui/button";
 import {usePrivy} from "@privy-io/react-auth";
 import {useUserContext} from "@/providers/user-context-provider";
 import HomeComponent from "@/components/home-component";
+import LoggedOutView from "@/components/logged-out-view";
+import {useEffect, useState} from "react";
+import {useSession} from "next-auth/react";
 
 export default function Home() {
   const {authenticated, login, ready, user} = usePrivy();
+  const {data: nextauth} = useSession();
   const {userInfo, isLoading} = useUserContext();
+  const [showSignup, setShowSignup] = useState(false);
 
+  useEffect(() => {
+    console.log(userInfo);
+  }, [userInfo]);
   return (
     <>
       {isLoading && (
@@ -18,7 +26,7 @@ export default function Home() {
         </div>
       )}
 
-      {authenticated ? (
+      {authenticated || nextauth?.user ? (
         <>
           {isLoading && (
             <div className="flex items-center justify-center h-[60vh]">
@@ -39,12 +47,22 @@ export default function Home() {
               </p>
               <Button
                 variant="default"
-                onClick={login}
+                onClick={() => {
+                  setShowSignup(true);
+                }}
                 disabled={!ready || authenticated}
                 className="my-4"
               >
                 Get Started
               </Button>
+              {showSignup && (
+                <LoggedOutView
+                  modalCloseHandler={() => {
+                    setShowSignup(false);
+                  }}
+                  closeModalButton={true}
+                />
+              )}
             </div>
           ) : (
             <div className="flex items-center justify-center h-[60vh]">

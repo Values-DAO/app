@@ -12,10 +12,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {EllipsisVertical} from "lucide-react";
 import {usePrivy} from "@privy-io/react-auth";
+import {signOut, useSession} from "next-auth/react";
 
 const Navbar = () => {
   const {ready, authenticated, user, logout, login} = usePrivy();
-
+  const {data: nextauth} = useSession();
   return (
     <div className="flex flex-row justify-between items-center  p-4 md:p-6 relative">
       <Link href="/">
@@ -45,14 +46,27 @@ const Navbar = () => {
         {/* <Button variant={"link"} className="text-md" asChild>
           <Link href={"/mint"}>Mint a Value</Link>
         </Button> */}
-        {ready && authenticated ? (
-          <Button variant={"default"} onClick={logout}>
+        {(ready && authenticated) || nextauth?.user ? (
+          <Button
+            variant={"default"}
+            onClick={() => {
+              if (nextauth?.user) {
+                signOut();
+                logout();
+              } else {
+                logout();
+              }
+            }}
+          >
             Logout
           </Button>
         ) : (
-          <Button onClick={login} disabled={!ready}>
-            Login
-          </Button>
+          typeof window !== "undefined" &&
+          window.location.pathname !== "/" && (
+            <Button onClick={login} disabled={!ready}>
+              Login
+            </Button>
+          )
         )}
       </div>
       <div className=" flex flex-row gap-2  md:hidden mt-[-12px]">
@@ -81,10 +95,17 @@ const Navbar = () => {
             {/* <DropdownMenuItem asChild className="cursor-pointer">
               <Link href={"/mint"}>Mint a Value</Link>
             </DropdownMenuItem> */}
-            {authenticated ? (
+            {authenticated && nextauth?.user ? (
               <DropdownMenuItem
                 className="cursor-pointer"
-                onClick={() => logout()}
+                onClick={() => {
+                  if (nextauth?.user) {
+                    signOut();
+                    logout();
+                  } else {
+                    logout();
+                  }
+                }}
               >
                 Logout
               </DropdownMenuItem>

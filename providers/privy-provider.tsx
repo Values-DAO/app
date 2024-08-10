@@ -7,7 +7,7 @@ import {mainnet, base, baseSepolia, polygon, optimism} from "viem/chains";
 import {http} from "wagmi";
 
 import {createPublicClient, createWalletClient} from "viem";
-import {privateKeyToAccount} from "viem/accounts";
+import {injected, metaMask, safe, walletConnect} from "wagmi/connectors";
 
 export const viemPublicClient = createPublicClient({
   chain: baseSepolia,
@@ -16,6 +16,7 @@ export const viemPublicClient = createPublicClient({
 
 export const config = createConfig({
   chains: [mainnet, base, baseSepolia, polygon, optimism],
+
   transports: {
     [mainnet.id]: http(),
     [base.id]: http(),
@@ -36,7 +37,7 @@ export default function Providers({children}: {children: React.ReactNode}) {
           theme: "light",
           accentColor: "#f5d442",
         },
-        loginMethods: ["farcaster", "email"],
+        loginMethods: ["farcaster", "email", "wallet"],
       }}
     >
       <QueryClientProvider client={queryClient}>

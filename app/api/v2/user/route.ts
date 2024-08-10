@@ -11,7 +11,7 @@ import {privateKeyToAccount} from "viem/accounts";
 import Value from "@/models/value";
 import {fetchAllNFTsValuesDAO} from "@/lib/fetch-all-nfts-valuesdao";
 const viemWalletClient = createWalletClient({
-  chain: base,
+  chain: baseSepolia,
   transport: http(),
   account: privateKeyToAccount(
     process.env.ADMIN_WALLET_PRIVATE_KEY as `0x${string}`
@@ -39,19 +39,22 @@ export async function POST(req: NextRequest) {
       communityId,
       twitter,
       side,
+      worldid,
     } = await req.json();
     if (!method) {
       return NextResponse.json({error: "Method is required", status: 400});
     }
-    if (!email && !farcaster) {
+    if (!email && !farcaster && !worldid) {
       return NextResponse.json({
-        error: "Email or farcaster is required",
+        error: "Email or farcaster or worldid is required",
         status: 400,
       });
     }
     let user;
     if (email) {
       user = await User.findOne({email});
+    } else if (worldid) {
+      user = await User.findOne({worldid});
     } else {
       user = await User.findOne({farcaster});
     }
@@ -92,11 +95,12 @@ export async function POST(req: NextRequest) {
               args: [wallets[0], cid],
             });
           }
-
+          console.log("creating user", worldid);
           const createdUser = await User.create({
             wallets: wallets || [],
             balance: 5,
             ...(email && {email}),
+            ...(worldid && {worldid}),
             mintedValues: [],
             ...(wallets.length > 0 && {
               profileNft: nftId,
@@ -171,7 +175,9 @@ export async function POST(req: NextRequest) {
               });
             }
             user.balance = 5;
-            user.communitiesMinted = "warpcast";
+            if (values.length > 0) {
+              user.communitiesMinted = "warpcast";
+            }
             await user.save();
             return NextResponse.json({
               user,
@@ -418,12 +424,12 @@ export async function GET(req: NextRequest) {
     const searchParams = req.nextUrl.searchParams;
     const email = searchParams.get("email");
     const fid = searchParams.get("fid");
-
-    if (!email && !fid) {
+    const worldid = searchParams.get("worldid");
+    if (!email && !fid && !worldid) {
       return NextResponse.json({
         user: null,
         status: 404,
-        message: "Provide atleast either of one: Email or FID",
+        message: "Provide atleast either of one: Email or FID or World ID",
       });
     }
 
@@ -440,6 +446,17 @@ export async function GET(req: NextRequest) {
     }
     if (fid) {
       const user = await User.findOne({farcaster: fid});
+      if (!user) {
+        return NextResponse.json({
+          message: "User not found",
+          status: 404,
+          user: null,
+        });
+      }
+      return NextResponse.json({user, status: 200, message: "Success"});
+    }
+    if (worldid) {
+      const user = await User.findOne({worldid: worldid});
       if (!user) {
         return NextResponse.json({
           message: "User not found",

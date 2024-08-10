@@ -4,7 +4,10 @@ import useValuesHook from "@/app/hooks/useValuesHook";
 import {IUser} from "@/models/user";
 import {usePrivy} from "@privy-io/react-auth";
 import axios from "axios";
+
+import {useSession} from "next-auth/react";
 import {createContext, useContext, useEffect, useState} from "react";
+import {useAccount} from "wagmi";
 
 interface UserContextType {
   userInfo: IUser | null;
@@ -24,25 +27,28 @@ export const UserContextProvider = ({
   const [userInfo, setUserInfo] = useState<IUser | null>(null);
   const [isLoading, setLoading] = useState(false);
   const {authenticated, user} = usePrivy();
+  const {data: nextauth} = useSession();
   const [values, setValues] = useState([]);
   const {fetchUser, createUser, fetchFarcasterUserWallets} = useValuesHook();
+  const {address} = useAccount();
   useEffect(() => {
-    if (!authenticated) return;
+    if (!authenticated && !nextauth) return;
     setLoading(true);
 
     const isUserExist = async () => {
       let userInfo: IUser | null | undefined = null;
       let wallets;
       setLoading(true);
-      if (!user?.email?.address && !user?.farcaster?.fid) {
+      if (!user?.email?.address && !user?.farcaster?.fid && !nextauth?.user) {
         setLoading(false);
         return;
       }
       userInfo = (await fetchUser())?.user;
-
+      console.log("userInfo", userInfo);
       if (userInfo) {
         setUserInfo(userInfo);
       } else {
+        console.log("creating user", user);
         const wallets = await fetchFarcasterUserWallets();
 
         const userCreated = await createUser({
@@ -67,45 +73,26 @@ export const UserContextProvider = ({
     };
 
     isUserExist();
-  }, [user]);
+  }, [user, nextauth]);
 
   useEffect(() => {
     const addWalletsIfPresent = async () => {
-      if (!user?.wallet?.address && user?.farcaster?.fid) return;
+      if (!user?.wallet?.address && !nextauth) return;
       try {
-        const wallets = await fetchFarcasterUserWallets();
-
+        let wallets: string[] = [];
+        if (user?.farcaster?.fid) wallets = await fetchFarcasterUserWallets();
         await axios.post(
-          `/api/v2/user`,
-          {
-            method: "mint_profile",
-            wallets: [
-              ...(user?.wallet?.address ? [user.wallet.address] : []),
-              ,
-              ...wallets,
-            ],
-            ...(user?.farcaster?.fid ? {farcaster: user?.farcaster?.fid} : {}),
-            ...(user?.email?.address ? {email: user?.email?.address} : {}),
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
-            },
-          }
-        );
-
-        const {data} = await axios.post(
           "/api/v2/user",
           {
             method: "add_wallet",
             wallets: [
               ...(user?.wallet?.address ? [user.wallet.address] : []),
-              ,
-              ...wallets,
+
+              ...(wallets || []),
             ],
             ...(user?.farcaster?.fid ? {farcaster: user?.farcaster?.fid} : {}),
             ...(user?.email?.address ? {email: user?.email?.address} : {}),
+            ...(nextauth?.user?.name ? {worldid: nextauth?.user?.name} : {}),
           },
           {
             headers: {
@@ -114,6 +101,27 @@ export const UserContextProvider = ({
             },
           }
         );
+        const {data} = await axios.post(
+          `/api/v2/user`,
+          {
+            method: "mint_profile",
+            wallets: [
+              ...(user?.wallet?.address ? [user.wallet.address] : []),
+
+              ...wallets,
+            ],
+            ...(user?.farcaster?.fid ? {farcaster: user?.farcaster?.fid} : {}),
+            ...(user?.email?.address ? {email: user?.email?.address} : {}),
+            ...(nextauth?.user?.name ? {worldid: nextauth?.user?.name} : {}),
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+            },
+          }
+        );
+
         if (data.status === 200) setUserInfo(data.user);
       } catch (error) {
         console.log("error", error);
@@ -131,6 +139,7 @@ export const UserContextProvider = ({
             twitter: user?.twitter?.username,
             ...(user?.farcaster?.fid ? {farcaster: user?.farcaster?.fid} : {}),
             ...(user?.email?.address ? {email: user?.email?.address} : {}),
+            ...(nextauth?.user?.name ? {worldid: nextauth?.user?.name} : {}),
           },
           {
             headers: {
@@ -156,6 +165,7 @@ export const UserContextProvider = ({
 
             ...(user?.farcaster?.fid ? {farcaster: user?.farcaster?.fid} : {}),
             ...(user?.email?.address ? {email: user?.email?.address} : {}),
+            ...(nextauth?.user?.name ? {worldid: nextauth?.user?.name} : {}),
           },
           {
             headers: {
@@ -172,7 +182,7 @@ export const UserContextProvider = ({
     updatetwitterHandle();
     updateWarpcastHandle();
     addWalletsIfPresent();
-  }, [user]);
+  }, [user, nextauth]);
 
   useEffect(() => {
     const getAllValues = async () => {

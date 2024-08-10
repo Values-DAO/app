@@ -34,23 +34,23 @@ import {useUserContext} from "@/providers/user-context-provider";
 import {SearchIcon, Twitter} from "lucide-react";
 import {usePrivy} from "@privy-io/react-auth";
 import {useAccount} from "wagmi";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import useValuesHook from "@/app/hooks/useValuesHook";
 import {NFT_CONTRACT_ADDRESS} from "@/constants";
 import Projects from "./projects";
 import ValuePage from "@/app/value/page";
 import {Badge} from "./ui/badge";
+import {useSession} from "next-auth/react";
 
 const HomeComponent = () => {
   const {userInfo, setUserInfo, valuesRecommendation} = useUserContext();
   const {mintHandler} = useValuesHook();
   const {user, linkWallet, login, ready, authenticated, linkEmail} = usePrivy();
+  const {data: nextauth} = useSession();
   const {address} = useAccount();
   const [filteredData, setFilteredData] = useState<string[]>([]);
   const [searchValue, setSearchValue] = useState("");
   const [onMintingSuccessful, setOnMintingSuccessful] = useState(false);
   const [loading, setLoading] = useState<{[key: string]: boolean}>({});
-
   function searchInValues(input: string): string[] {
     return valuesRecommendation.filter((item) =>
       item.toLowerCase().includes(input.toLowerCase())
@@ -72,14 +72,30 @@ const HomeComponent = () => {
   return (
     <div className="flex justify-center mb-12">
       {!user?.farcaster?.fid &&
-        (!user?.wallet?.address || userInfo?.wallets?.length === 0) && (
+        !user?.wallet?.address &&
+        userInfo?.wallets?.length === 0 && (
           <div className="fixed inset-0 h-screen w-screen bg-white gap-4 bg-opacity-90 backdrop-filter backdrop-blur-md flex flex-col items-center justify-center overflow-hidden">
             <p className="leading-7 [&:not(:first-child)]:mt-6 font-semibold">
-              Connect your wallet to mint your values.
+              Connect your wallet to mint your values. Once you connect your
+              wallet, you will be minted an ValuesDAO Profile NFT.
             </p>
-            <Button onClick={linkWallet}>Link Wallet</Button>
+
+            <Button
+              onClick={() => {
+                if (nextauth?.user) {
+                  login();
+                  setUserInfo({
+                    ...userInfo,
+                    wallets: [user?.wallet?.address! ?? address],
+                  });
+                } else linkWallet();
+              }}
+            >
+              Link Wallet
+            </Button>
           </div>
         )}
+
       <div className="flex flex-col md:w-[900px] w-[98vw] max-w-[98%] m-auto">
         <ValuesWordCloud refresh={valuesRecommendation} />
         <div className="w-[95%] m-auto mb-4">
@@ -185,19 +201,106 @@ const HomeComponent = () => {
                   <SearchIcon className="h-5 w-5 text-gray-400" />
                 </div>
               </div>
-              {authenticated ? (
-                <>
-                  {(user?.email?.address || user?.farcaster?.fid) && (
-                    <section>
-                      {searchValue.length > 0 &&
-                        filteredData &&
-                        filteredData.map((value, index) => {
-                          return (
-                            <div
-                              key={index}
-                              className="w-full h-14 px-3 flex items-center hover:bg-gray-300/20 hover:cursor-pointer rounded-sm"
-                            >
-                              <span> {value}</span>
+              {authenticated ||
+                (nextauth && (
+                  <>
+                    {(user?.email?.address || user?.farcaster?.fid) && (
+                      <section>
+                        {searchValue.length > 0 &&
+                          filteredData &&
+                          filteredData.map((value, index) => {
+                            return (
+                              <div
+                                key={index}
+                                className="w-full h-14 px-3 flex items-center hover:bg-gray-300/20 hover:cursor-pointer rounded-sm"
+                              >
+                                <span> {value}</span>
+
+                                {address ||
+                                (userInfo &&
+                                  userInfo.wallets &&
+                                  userInfo.wallets?.length > 0) ? (
+                                  <Button
+                                    variant="default"
+                                    className="ml-auto h-8 w-32"
+                                    disabled={loading[value]}
+                                    onClick={async () => {
+                                      setLoading({
+                                        ...loading,
+                                        [value]: true,
+                                      });
+                                      const response = await mintHandler({
+                                        values: [{name: value, weightage: "1"}],
+                                        type: "manual",
+                                      });
+                                      if (response) {
+                                        setUserInfo(response.user);
+                                        toast({
+                                          title: "Minted Successfully.",
+
+                                          action: (
+                                            <ToastAction
+                                              onClick={() => {
+                                                window.open(
+                                                  `https://opensea.io/assets/base/${NFT_CONTRACT_ADDRESS}/${Number(
+                                                    userInfo?.profileNft
+                                                  )}`,
+                                                  "_blank"
+                                                );
+                                              }}
+                                              altText="View in Opensea"
+                                            >
+                                              View on Opensea
+                                            </ToastAction>
+                                          ),
+                                        });
+                                        setOnMintingSuccessful(true);
+                                        setUserInfo({
+                                          ...userInfo,
+                                          balance:
+                                            Number(userInfo?.balance) - 1,
+                                        });
+                                      } else if (!response) {
+                                        toast({
+                                          title: "Minting Failed.",
+                                          description: "Please try again later",
+                                          variant: "destructive",
+                                        });
+                                      }
+                                      setLoading({
+                                        ...loading,
+                                        [value]: false,
+                                      });
+                                    }}
+                                  >
+                                    {loading[value] ? (
+                                      <div className="flex flex-row gap-2">
+                                        Minting{" "}
+                                        <div className="animate-spin rounded-full h-6 w-6 border-4 border-dashed border-white"></div>
+                                      </div>
+                                    ) : (
+                                      "Mint"
+                                    )}
+                                  </Button>
+                                ) : (
+                                  <div className="ml-auto">
+                                    <Button
+                                      variant="default"
+                                      onClick={linkWallet}
+                                    >
+                                      Connect Wallet
+                                    </Button>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+
+                        {filteredData &&
+                          searchValue.length > 0 &&
+                          filteredData.length === 0 && (
+                            <div className="w-full h-14 px-3 flex items-center hover:bg-gray-300/20 hover:cursor-pointer rounded-sm">
+                              <span> {searchValue}</span>
 
                               {address ||
                               (userInfo &&
@@ -206,18 +309,21 @@ const HomeComponent = () => {
                                 <Button
                                   variant="default"
                                   className="ml-auto h-8 w-32"
-                                  disabled={loading[value]}
+                                  disabled={loading[searchValue]}
                                   onClick={async () => {
                                     setLoading({
                                       ...loading,
-                                      [value]: true,
+                                      [searchValue]: true,
                                     });
                                     const response = await mintHandler({
-                                      values: [{name: value, weightage: "1"}],
-                                      type: "manual",
+                                      values: [
+                                        {name: searchValue, weightage: "1"},
+                                      ],
                                     });
                                     if (response) {
+                                      setOnMintingSuccessful(true);
                                       setUserInfo(response.user);
+
                                       toast({
                                         title: "Minted Successfully.",
 
@@ -237,7 +343,7 @@ const HomeComponent = () => {
                                           </ToastAction>
                                         ),
                                       });
-                                      setOnMintingSuccessful(true);
+
                                       setUserInfo({
                                         ...userInfo,
                                         balance: Number(userInfo?.balance) - 1,
@@ -251,11 +357,11 @@ const HomeComponent = () => {
                                     }
                                     setLoading({
                                       ...loading,
-                                      [value]: false,
+                                      [searchValue]: false,
                                     });
                                   }}
                                 >
-                                  {loading[value] ? (
+                                  {loading[searchValue] ? (
                                     <div className="flex flex-row gap-2">
                                       Minting{" "}
                                       <div className="animate-spin rounded-full h-6 w-6 border-4 border-dashed border-white"></div>
@@ -275,113 +381,19 @@ const HomeComponent = () => {
                                 </div>
                               )}
                             </div>
-                          );
-                        })}
+                          )}
 
-                      {filteredData &&
-                        searchValue.length > 0 &&
-                        filteredData.length === 0 && (
-                          <div className="w-full h-14 px-3 flex items-center hover:bg-gray-300/20 hover:cursor-pointer rounded-sm">
-                            <span> {searchValue}</span>
-
-                            {address ||
-                            (userInfo &&
-                              userInfo.wallets &&
-                              userInfo.wallets?.length > 0) ? (
-                              <Button
-                                variant="default"
-                                className="ml-auto h-8 w-32"
-                                disabled={loading[searchValue]}
-                                onClick={async () => {
-                                  setLoading({
-                                    ...loading,
-                                    [searchValue]: true,
-                                  });
-                                  const response = await mintHandler({
-                                    values: [
-                                      {name: searchValue, weightage: "1"},
-                                    ],
-                                  });
-                                  if (response) {
-                                    setOnMintingSuccessful(true);
-                                    setUserInfo(response.user);
-
-                                    toast({
-                                      title: "Minted Successfully.",
-
-                                      action: (
-                                        <ToastAction
-                                          onClick={() => {
-                                            window.open(
-                                              `https://opensea.io/assets/base/${NFT_CONTRACT_ADDRESS}/${Number(
-                                                userInfo?.profileNft
-                                              )}`,
-                                              "_blank"
-                                            );
-                                          }}
-                                          altText="View in Opensea"
-                                        >
-                                          View on Opensea
-                                        </ToastAction>
-                                      ),
-                                    });
-
-                                    setUserInfo({
-                                      ...userInfo,
-                                      balance: Number(userInfo?.balance) - 1,
-                                    });
-                                  } else if (!response) {
-                                    toast({
-                                      title: "Minting Failed.",
-                                      description: "Please try again later",
-                                      variant: "destructive",
-                                    });
-                                  }
-                                  setLoading({
-                                    ...loading,
-                                    [searchValue]: false,
-                                  });
-                                }}
-                              >
-                                {loading[searchValue] ? (
-                                  <div className="flex flex-row gap-2">
-                                    Minting{" "}
-                                    <div className="animate-spin rounded-full h-6 w-6 border-4 border-dashed border-white"></div>
-                                  </div>
-                                ) : (
-                                  "Mint"
-                                )}
-                              </Button>
-                            ) : (
-                              <div className="ml-auto">
-                                <Button variant="default" onClick={linkWallet}>
-                                  Connect Wallet
-                                </Button>
-                              </div>
-                            )}
+                        {searchValue.length === 0 && (
+                          <div className="flex justify-center items-center p-4">
+                            <span className="font-semibold  text-gray-700 text-lg">
+                              Type out your values and mint them
+                            </span>{" "}
                           </div>
                         )}
-
-                      {searchValue.length === 0 && (
-                        <div className="flex justify-center items-center p-4">
-                          <span className="font-semibold  text-gray-700 text-lg">
-                            Type out your values and mint them
-                          </span>{" "}
-                        </div>
-                      )}
-                    </section>
-                  )}
-                </>
-              ) : (
-                <section className="md:w-[900px] pl-4 h-14  flex flex-row justify-between items-center hover:bg-gray-300/20 hover:cursor-pointer rounded-sm mt-4">
-                  <span className="font-semibold  text-gray-300 text-lg">
-                    Login to proceed
-                  </span>
-                  <Button variant="default" onClick={login}>
-                    Login
-                  </Button>
-                </section>
-              )}
+                      </section>
+                    )}
+                  </>
+                ))}
             </AccordionContent>
           </AccordionItem>
         </Accordion>

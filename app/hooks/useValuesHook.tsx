@@ -3,6 +3,7 @@ import {IUser} from "@/models/user";
 import {usePrivy} from "@privy-io/react-auth";
 import axios from "axios";
 import {gql, GraphQLClient} from "graphql-request";
+import {useSession} from "next-auth/react";
 import {useState} from "react";
 import {useAccount} from "wagmi";
 
@@ -28,20 +29,25 @@ const useValuesHook = () => {
     error: null,
   });
   const {user} = usePrivy();
+  const {data: nextauth} = useSession();
   const {address} = useAccount();
 
   const fetchUser = async (): Promise<{
     user: IUser | null;
     message: string;
   }> => {
-    if (!user?.email?.address && !user?.farcaster?.fid) {
+    if (!user?.email?.address && !user?.farcaster?.fid && !nextauth?.user) {
       return {user: null, message: "No user data"};
     }
 
-    const endpoint = user?.email?.address
-      ? `/api/v2/user?email=${user?.email?.address}`
-      : `/api/v2/user?fid=${user?.farcaster?.fid}`;
-
+    let endpoint: string;
+    if (user?.email?.address) {
+      endpoint = `/api/v2/user?email=${user?.email?.address}`;
+    } else if (nextauth) {
+      endpoint = `/api/v2/user?worldid=${nextauth?.user?.name}`;
+    } else {
+      endpoint = `/api/v2/user?fid=${user?.farcaster?.fid}`;
+    }
     try {
       const {data} = await axios.get(endpoint, {
         headers: {
@@ -67,7 +73,7 @@ const useValuesHook = () => {
     wallets?: string[];
     twitter?: string;
   }): Promise<{user: IUser | null; message: string}> => {
-    if (!user?.email?.address && !user?.farcaster?.fid)
+    if (!user?.email?.address && !user?.farcaster?.fid && !nextauth?.user?.name)
       return {user: null, message: "No user data"};
 
     try {
@@ -80,6 +86,7 @@ const useValuesHook = () => {
             ? {farcaster: user?.farcaster?.fid}
             : {}),
 
+          ...(nextauth?.user ? {worldid: nextauth?.user?.name} : {}),
           wallets: wallets || [],
           method: "create_user",
           balance: 5,
@@ -97,16 +104,17 @@ const useValuesHook = () => {
         subject: "New User",
         body: [
           "A new user has been created with the following details:",
-          user.email?.address ? `Email: ${user?.email?.address}` : "",
-          user.farcaster?.displayName
+          user?.email?.address ? `Email: ${user?.email?.address}` : "",
+          user?.farcaster?.displayName
             ? `Farcaster Display Name: ${user?.farcaster?.displayName}`
             : "",
-          user.twitter?.username
+          user?.twitter?.username
             ? `Twitter Username: ${user?.twitter?.username}`
             : "",
           user?.farcaster?.username
             ? `Warpcast: https://warpcast.com/${user?.farcaster?.username}`
             : ``,
+          nextauth?.user?.name ? `World ID: ${nextauth?.user?.name}` : ``,
         ].join("\n"),
       });
       return {user: userCreated.data, message: "User created successfully"};
@@ -201,6 +209,7 @@ const useValuesHook = () => {
           : user?.farcaster?.fid
           ? {farcaster: user.farcaster.fid}
           : {}),
+        ...(nextauth?.user ? {worldid: nextauth.user.name} : {}),
         method: "update_profile",
         values,
         type,
@@ -359,6 +368,7 @@ const useValuesHook = () => {
             `Twitter values: ${JSON.stringify(
               response.data.user.aiGeneratedValues.twitter
             )}`,
+            nextauth?.user?.name ? `World ID: ${nextauth?.user?.name}` : ``,
           ].join("\n"),
         });
       return {
@@ -375,6 +385,30 @@ const useValuesHook = () => {
     }
   };
 
+  const addWallet = async (wallet: string) => {
+    try {
+      const {data} = await axios.post(
+        "/api/v2/user",
+        {
+          method: "add_wallet",
+          wallets: [wallet],
+          ...(user?.farcaster?.fid ? {farcaster: user?.farcaster?.fid} : {}),
+          ...(user?.email?.address ? {email: user?.email?.address} : {}),
+          ...(nextauth?.user ? {worldid: nextauth?.user?.name} : {}),
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
+          },
+        }
+      );
+      return data;
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+
   return {
     currentState,
     fetchUser,
@@ -384,6 +418,7 @@ const useValuesHook = () => {
     fetchCommunityProjects,
     isAHolderOfToken,
     analyseUserAndGenerateValues,
+    addWallet,
   };
 };
 

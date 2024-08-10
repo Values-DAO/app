@@ -3,6 +3,7 @@ import mongoose, {Schema, models} from "mongoose";
 export type IUser = {
   name?: string;
   profileNft?: Number;
+  worldid?: string;
   email?: string;
   farcaster?: number;
   twitter?: string;
@@ -31,7 +32,9 @@ const userSchema = new Schema(
     profileNft: {
       type: Number,
     },
-
+    worldid: {
+      type: String,
+    },
     email: {
       type: String,
     },
@@ -100,7 +103,10 @@ userSchema.pre("save", async function (next) {
     (value, index, self) => self.indexOf(value) === index
   );
   if (user.isNew) {
-    const existingUser = await User.findOne({email: user.email}).exec();
+    const existingUser = await User.findOne({
+      ...(user.email && {email: user.email}),
+      ...(user.worldid && {worldid: user.worldid}),
+    }).exec();
     if (existingUser) {
       return next();
     }
