@@ -6,7 +6,7 @@ import {
 import { ethers } from "ethers";
 
 const provider =
-  ethers.getDefaultProvider("base") ||
+  ethers.getDefaultProvider("base-sepolia") ||
   new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_RPC as string);
 const signer = new ethers.Wallet(
   process.env.NEXT_PUBLIC_PRIVATE_KEY as string,
@@ -31,7 +31,7 @@ const registerSchema = async () => {
   schemaRegistry.connect(signer as unknown as TransactionSigner);
 
   const schema = "string[] values, string description, uint256 timestamp";
-  const resolverAddress = "0xschema_resolver_address";
+  const resolverAddress = "0x8Ef8d1f37f3aB4FF7fA01BCf7518C874CE72edD8";
   const revocable = true;
 
   const tx = await schemaRegistry.register({
@@ -49,7 +49,7 @@ const getSchemaInfo = async () => {
   const schemaRegistry = new SchemaRegistry(schemaRegistryContractAddress);
 
   schemaRegistry.connect(provider as unknown as any); // EAS has a type checking issue, this follows: https://docs.attest.org/docs/developer-tools/eas-sdk#using-the-eas-sdk
-  const schemaUID = "0xschema_resolver_address"; // Gotten after schema registration
+  const schemaUID = "0x8Ef8d1f37f3aB4FF7fA01BCf7518C874CE72edD8"; // Gotten after schema registration
 
   const schemaRecord = await schemaRegistry.getSchema({ uid: schemaUID });
   console.log(schemaRecord)

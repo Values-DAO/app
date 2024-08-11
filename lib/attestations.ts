@@ -14,7 +14,7 @@ const chainId = {
 };
 
 const provider =
-  ethers.getDefaultProvider("base") ||
+  ethers.getDefaultProvider("base-sepolia") ||
   new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_RPC as string);
 const signer = new ethers.Wallet(
   process.env.NEXT_PUBLIC_PRIVATE_KEY as string,
@@ -53,7 +53,7 @@ export const createAttestation = async (
     },
   ]);
 
-  const schema = "0xschemaUID";
+  const schema = "0xffcc89cd66b714a36c328636735e3bda771adf5eba0e071f8b7f4be6098f7d50";
 
   const tx = await eas.attest({
     schema,
@@ -89,7 +89,7 @@ export const getAttestation = async (uid: string) => {
  */
 export const revokeAttestation = async (uid: string) => {
   eas.connect(signer as unknown as TransactionSigner);
-  const schema = "0xschemaUID";
+  const schema = "0xffcc89cd66b714a36c328636735e3bda771adf5eba0e071f8b7f4be6098f7d50";
 
   const tx = await eas.revoke({
     schema,
