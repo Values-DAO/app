@@ -22,8 +22,11 @@ export async function POST(
     `${process.env.NEXT_PUBLIC_HOST}/api/v2/one-one-score/?userFid=${fid}&targetFid=${params.fid}`
   );
 
-  const imageUrl = `${process.env.NEXT_PUBLIC_HOST}/api/v2/superhack/image?section=2&score=${data.alignmentPercent}&user=${fid}&target=${params.fid}`;
-  console.log(imageUrl);
+  let imageUrl;
+  if (data.error) {
+    imageUrl = `${process.env.NEXT_PUBLIC_HOST}/api/v2/superhack/image?section=2&error=true`;
+  } else
+    imageUrl = `${process.env.NEXT_PUBLIC_HOST}/api/v2/superhack/image?section=2&score=${data.alignmentPercent}&user=${fid}&target=${params.fid}`;
   return new NextResponse(
     `<!DOCTYPE html>
       <html>
@@ -32,12 +35,18 @@ export async function POST(
           <meta property="og:image" content="${imageUrl}" />
           <meta name="fc:frame" content="vNext" />
           <meta name="fc:frame:image" content="${imageUrl}" />
-          <meta name="fc:frame:button:1" content="cast, let meh frens check w me" />
+   ${
+     data.error
+       ? `  <meta name="fc:frame:button:1" content="Take me to ValuesDAO" />
+          <meta name="fc:frame:button:1:action" content="link" />
+          <meta name="fc:frame:button:1:target" content=${`https://app.valuesdao.io/`} />`
+       : `<meta name="fc:frame:button:1" content="cast it" />
           <meta name="fc:frame:button:1:action" content="link" />
           <meta name="fc:frame:button:1:target" content="${`https://warpcast.com/~/compose?text=&embeds[]=${process.env.NEXT_PUBLIC_HOST}/api/v2/superhack/${fid}`}" />
-          <meta name="fc:frame:button:2" content="wat d fk iz dis?" />
+          <meta name="fc:frame:button:2" content="My Values" />
           <meta name="fc:frame:button:2:action" content="link" />
-          <meta name="fc:frame:button:2:target" content="https://valuesdao.io/superhack" />
+          <meta name="fc:frame:button:2:target" content=${`https://app.valuesdao.io/u/${fid}`} />`
+   }
         </head>
         <body></body>
       </html>`,

@@ -27,7 +27,7 @@ export async function GET(
                 
           <meta name="fc:frame:button:2" content="wat d fk iz dis?" />
           <meta name="fc:frame:button:2:action" content="link" />
-          <meta name="fc:frame:button:2:target" content="https://valuesdao.io/superhack" />
+          <meta name="fc:frame:button:2:target" content="https://valuesdao.io/making-values-tangible/" />
         </head>
         <body></body>
       </html>`,

@@ -4,11 +4,12 @@ import {join} from "path";
 import * as fs from "fs";
 import Image from "next/image";
 import {getFarcasterUserImage} from "@/lib/get-farcaster-user-image";
+import {MoveDownLeft} from "lucide-react";
 
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   const section = searchParams.get("section");
-  const image = searchParams.get("image");
+  const error = searchParams.get("error");
   const fontPath = join(process.cwd(), "public/PixeloidSans-mLxMm.ttf");
   const user = searchParams.get("user");
   const target = searchParams.get("target");
@@ -39,24 +40,22 @@ export async function GET(req: NextRequest) {
           backgroundSize: "100% 100%", // Stretches the image to cover the whole area
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
         }}
       >
-        {section && section === "1" && (
+        {!error && section && section === "1" && (
           <div
             style={{
               display: "flex",
               flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
+              marginTop: 80,
             }}
           >
             <div
               style={{
                 color: "#000",
-                fontSize: 140,
+                fontSize: 164,
                 fontWeight: "bold",
-                marginTop: 2,
+                marginTop: 60,
                 textAlign: "center",
                 whiteSpace: "pre-wrap",
                 display: "flex",
@@ -67,7 +66,7 @@ export async function GET(req: NextRequest) {
                 alignItems: "center", // Center the content horizontally
               }}
             >
-              Are ye aligned with me, anon?
+              Are we aligned, anon?
             </div>
 
             {/* {image && (
@@ -85,7 +84,7 @@ export async function GET(req: NextRequest) {
           </div>
         )}
 
-        {section && section === "2" && (
+        {!error && section && section === "2" && (
           <div
             style={{
               display: "flex",
@@ -98,7 +97,11 @@ export async function GET(req: NextRequest) {
               width: "100%",
               height: "100%",
               backgroundImage: `linear-gradient(to top, ${
-                Number(searchParams.get("score")) < 20 ? "red" : "lightgreen"
+                Number(searchParams.get("score")) < 30
+                  ? "red"
+                  : Number(searchParams.get("score")) <= 70
+                  ? "yellow"
+                  : "lightgreen"
               }, transparent)`, // Linear gradient from bottom to transparent based on score
             }}
           >
@@ -129,7 +132,15 @@ export async function GET(req: NextRequest) {
                   borderRadius: "50%",
                 }}
               />
-              <p> {searchParams.get("score")}%</p>
+              <p
+                style={{
+                  fontSize: 120,
+                  color: "#000",
+                }}
+              >
+                {" "}
+                {searchParams.get("score")}% Aligned
+              </p>
               <img
                 src={targetImage}
                 alt=""
@@ -148,10 +159,155 @@ export async function GET(req: NextRequest) {
                 color: "#fff",
               }}
             >
-              {Number(searchParams.get("score")) < 20
+              {Number(searchParams.get("score")) < 30
                 ? "Huh, nah nah nah, we ain't aligned"
                 : "Aye, we be aligned"}
             </p>
+            <div
+              style={{
+                marginBottom: 60,
+                display: "flex",
+                flexDirection: "row",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  height: 100,
+                  position: "relative",
+                  width: 45,
+                }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  style={{
+                    width: 24,
+                    height: 24,
+                    transform: "rotate(-45deg)",
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                  }}
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 19l-7-7 7-7"
+                  />
+                </svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  style={{
+                    width: 24,
+                    height: 24,
+                    transform: "rotate(-45deg)",
+                    position: "absolute",
+                    bottom: 10,
+                    left: 10,
+                  }}
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 19l-7-7 7-7"
+                  />
+                </svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  style={{
+                    width: 24,
+                    height: 24,
+                    transform: "rotate(-45deg)",
+                    position: "absolute",
+                    bottom: 20,
+                    left: 20,
+                  }}
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 19l-7-7 7-7"
+                  />
+                </svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  style={{
+                    width: 24,
+                    height: 24,
+                    transform: "rotate(-45deg)",
+                    position: "absolute",
+                    bottom: -10,
+                    left: -10,
+                  }}
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 19l-7-7 7-7"
+                  />
+                </svg>
+              </div>
+              <p
+                style={{
+                  marginBottom: 60,
+                  fontSize: 40,
+                  color: "#fff",
+                }}
+              >
+                Let your followers check their value-alignment with you
+              </p>
+            </div>
+          </div>
+        )}
+
+        {error && (
+          <div
+            style={{
+              color: "#eef616",
+              marginBottom: 60,
+              fontSize: 80,
+              textAlign: "center",
+              whiteSpace: "pre-wrap",
+              display: "flex",
+              flexDirection: "column",
+              width: "100%",
+              height: "100%",
+              margin: "auto",
+              justifyContent: "center",
+              alignItems: "center", // Center the content horizontally
+              backgroundImage: `linear-gradient(to top, red, #ff000072)`, // Linear gradient from bottom to transparent based on score
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                height: "70%",
+              }}
+            >
+              <p>You don&apos;t have enough casts to find alignment score.</p>{" "}
+              <p>
+                {" "}
+                Visit ValuesDAO app and generate values using your twitter.
+              </p>
+            </div>
           </div>
         )}
       </div>

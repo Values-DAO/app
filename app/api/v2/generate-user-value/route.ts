@@ -89,7 +89,7 @@ export async function GET(req: NextRequest) {
         });
       }
       const casts = await fetchCastsForUser(fid, 200);
-      if (casts.length < 10) {
+      if (casts.length < 100) {
         return NextResponse.json({
           status: 403,
           error: "User has less than 100 casts",
