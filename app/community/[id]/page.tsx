@@ -193,6 +193,8 @@ const ProjectsPage: React.FC<pageProps> = ({params}) => {
                           }),
                           type: "community",
                           communityId: id,
+                          description: `Minted values for ${project?.name} community`,
+                          wallets: userInfo?.wallets,
                         });
                         setLoader(false);
                         if (response) {

@@ -24,8 +24,13 @@ const PublicProfile = ({params: {id}}: {params: {id: string}}) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const findUser = async (id: string) => {
+    let fid = null;
     setLoading(true);
-    const fid = await GetFIDForUsername(id);
+    if (isNaN(Number(id))) {
+      fid = await GetFIDForUsername(id);
+    } else {
+      fid = id;
+    }
 
     if (fid === null) {
       setError("User not found");

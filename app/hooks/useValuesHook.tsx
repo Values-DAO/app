@@ -194,6 +194,8 @@ const useValuesHook = () => {
     values,
     type,
     communityId,
+    wallets,
+    description,
   }: {
     values: {
       name: string;
@@ -201,7 +203,12 @@ const useValuesHook = () => {
     }[];
     type?: string;
     communityId?: string;
+    wallets?: string[];
+    description?: string;
   }) => {
+    // values array for attestions = values.map((value)=>value.name)
+    // wallet = wallets[0]
+    // description = description
     try {
       const payload = {
         ...(user?.email?.address
