@@ -5,9 +5,17 @@ import "@ethereum-attestation-service/eas-contracts/contracts/resolver/SchemaRes
 import { IEAS, Attestation } from "@ethereum-attestation-service/eas-contracts/contracts/IEAS.sol";
 
 contract Resolver is SchemaResolver {
-    address private immutable _targetAttester;
+    address private _targetAttester;
 
     constructor(IEAS eas, address targetAttester) SchemaResolver(eas) {
+        _targetAttester = targetAttester;
+    }
+
+    function changeAttester(address targetAttester) public {
+        require(
+            msg.sender == _targetAttester,
+            "Only the previous attester can change the new attester."
+        );
         _targetAttester = targetAttester;
     }
 
