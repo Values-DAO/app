@@ -54,15 +54,14 @@ export async function GET(req: NextRequest) {
     }
 
     let user = userData.data.user;
-    console.log(user);
+
     let targetUser = targetData.data.user;
-    console.log(targetUser);
+
     user = {
       generatedValues:
         user?.aiGeneratedValuesWithWeights === undefined ||
-        Object.keys(user?.aiGeneratedValuesWithWeights?.warpcast).length ===
-          0 ||
-        user?.aiGeneratedValuesWithWeights?.warpcast === undefined
+        user?.aiGeneratedValuesWithWeights?.warpcast === undefined ||
+        Object.keys(user?.aiGeneratedValuesWithWeights?.warpcast).length === 0
           ? {
               ...user?.aiGeneratedValues?.warpcast?.reduce(
                 (acc: Record<string, number>, value: string) => {
@@ -71,26 +70,26 @@ export async function GET(req: NextRequest) {
                 },
                 {}
               ),
-              ...user?.aiGeneratedValues?.twitter?.reduce(
-                (acc: Record<string, number>, value: string) => {
-                  acc[value] = 100;
-                  return acc;
-                },
-                {}
-              ),
+              // ,
+              // ...user?.aiGeneratedValues?.twitter?.reduce(
+              //   (acc: Record<string, number>, value: string) => {
+              //     acc[value] = 100;
+              //     return acc;
+              //   },
+              //   {}
+              // ),
             }
           : {
               ...user?.aiGeneratedValuesWithWeights?.warpcast,
-              ...user?.aiGeneratedValuesWithWeights?.twitter,
             },
     };
 
     targetUser = {
       generatedValues:
         targetUser?.aiGeneratedValuesWithWeights === undefined ||
+        targetUser?.aiGeneratedValuesWithWeights?.warpcast === undefined ||
         Object.keys(targetUser?.aiGeneratedValuesWithWeights?.warpcast)
-          .length === 0 ||
-        targetUser?.aiGeneratedValuesWithWeights?.warpcast === undefined
+          .length === 0
           ? {
               ...targetUser?.aiGeneratedValues?.warpcast?.reduce(
                 (acc: Record<string, number>, value: string) => {
@@ -99,17 +98,17 @@ export async function GET(req: NextRequest) {
                 },
                 {}
               ),
-              ...targetUser?.aiGeneratedValues?.twitter?.reduce(
-                (acc: Record<string, number>, value: string) => {
-                  acc[value] = 100;
-                  return acc;
-                },
-                {}
-              ),
+              // ),
+              // ...targetUser?.aiGeneratedValues?.twitter?.reduce(
+              //   (acc: Record<string, number>, value: string) => {
+              //     acc[value] = 100;
+              //     return acc;
+              //   },
+              //   {}
+              // ),
             }
           : {
               ...targetUser?.aiGeneratedValuesWithWeights?.warpcast,
-              ...targetUser?.aiGeneratedValuesWithWeights?.twitter,
             },
     };
 
