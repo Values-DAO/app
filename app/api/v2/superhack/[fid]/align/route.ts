@@ -19,7 +19,7 @@ export async function POST(
   }
 
   const {data} = await axios.get(
-    `${process.env.NEXT_PUBLIC_HOST}/api/v2/one-one-score/?userFid=${fid}&targetFid=${params.fid}`
+    `${process.env.NEXT_PUBLIC_HOST}/api/v2/one-one-score/?userFid=${params.fid}&targetFid=${fid}`
   );
 
   let imageUrl;
