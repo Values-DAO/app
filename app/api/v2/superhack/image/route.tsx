@@ -5,22 +5,33 @@ import * as fs from "fs";
 import Image from "next/image";
 import {getFarcasterUserImage} from "@/lib/get-farcaster-user-image";
 import {MoveDownLeft} from "lucide-react";
+import User from "@/models/user";
+import axios from "axios";
 
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   const section = searchParams.get("section");
-  const error = searchParams.get("error");
+  let error;
   const fontPath = join(process.cwd(), "public/PixeloidSans-mLxMm.ttf");
   const user = searchParams.get("user");
   const target = searchParams.get("target");
   let font = fs.readFileSync(fontPath);
   let userImage = "";
   let targetImage = "";
+  let alignmentScore: number | undefined = undefined;
   if (user && target) {
-    const [userData, targetData] = await Promise.all([
+    const [userData, targetData, alignmentScoreResponse] = await Promise.all([
       getFarcasterUserImage(user),
       getFarcasterUserImage(target),
+
+      axios.get(
+        `${process.env.NEXT_PUBLIC_HOST}/api/v2/superhack/score/?userFid=${user}&targetFid=${target}`
+      ),
     ]);
+    if (alignmentScoreResponse.data.error) {
+      error = true;
+    }
+    alignmentScore = alignmentScoreResponse.data.alignmentPercent;
 
     userImage = userData;
     targetImage = targetData;
@@ -97,9 +108,9 @@ export async function GET(req: NextRequest) {
               width: "100%",
               height: "100%",
               backgroundImage: `linear-gradient(to top, ${
-                Number(searchParams.get("score")) < 30
+                Number(alignmentScore) < 30
                   ? "red"
-                  : Number(searchParams.get("score")) <= 70
+                  : Number(alignmentScore) <= 70
                   ? "yellow"
                   : "lightgreen"
               }, transparent)`, // Linear gradient from bottom to transparent based on score
@@ -139,7 +150,7 @@ export async function GET(req: NextRequest) {
                 }}
               >
                 {" "}
-                {searchParams.get("score")}% Aligned
+                {alignmentScore}% Aligned
               </p>
               <img
                 src={targetImage}
@@ -159,7 +170,7 @@ export async function GET(req: NextRequest) {
                 color: "#fff",
               }}
             >
-              {Number(searchParams.get("score")) < 30
+              {Number(alignmentScore) < 30
                 ? "Huh, nah nah nah, we ain't aligned"
                 : "Aye, we be aligned"}
             </p>

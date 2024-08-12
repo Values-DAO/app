@@ -18,15 +18,13 @@ export async function POST(
     return NextResponse.json({status: 400, message: "Missing fid"});
   }
 
-  const {data} = await axios.get(
+  axios.get(
     `${process.env.NEXT_PUBLIC_HOST}/api/v2/superhack/score/?userFid=${params.fid}&targetFid=${fid}`
   );
 
   let imageUrl;
-  if (data.error) {
-    imageUrl = `${process.env.NEXT_PUBLIC_HOST}/api/v2/superhack/image?section=2&error=true`;
-  } else
-    imageUrl = `${process.env.NEXT_PUBLIC_HOST}/api/v2/superhack/image?section=2&score=${data.alignmentPercent}&user=${fid}&target=${params.fid}`;
+
+  imageUrl = `${process.env.NEXT_PUBLIC_HOST}/api/v2/superhack/image?section=2&user=${params.fid}&target=${fid}`;
   return new NextResponse(
     `<!DOCTYPE html>
       <html>
@@ -35,18 +33,12 @@ export async function POST(
           <meta property="og:image" content="${imageUrl}" />
           <meta name="fc:frame" content="vNext" />
           <meta name="fc:frame:image" content="${imageUrl}" />
-   ${
-     data.error
-       ? `  <meta name="fc:frame:button:1" content="Take me to ValuesDAO" />
-          <meta name="fc:frame:button:1:action" content="link" />
-          <meta name="fc:frame:button:1:target" content="${`https://app.valuesdao.io/`}" />`
-       : `<meta name="fc:frame:button:1" content="cast it" />
+<meta name="fc:frame:button:1" content="cast it" />
           <meta name="fc:frame:button:1:action" content="link" />
           <meta name="fc:frame:button:1:target" content="${`https://warpcast.com/~/compose?text=&embeds[]=${process.env.NEXT_PUBLIC_HOST}/api/v2/superhack/${fid}`}" />
           <meta name="fc:frame:button:2" content="My Values" />
           <meta name="fc:frame:button:2:action" content="link" />
-          <meta name="fc:frame:button:2:target" content="${`https://app.valuesdao.io/u/${fid}`}" />`
-   }
+          <meta name="fc:frame:button:2:target" content="${`https://app.valuesdao.io/u/${fid}`}" />
         </head>
         <body></body>
       </html>`,
@@ -58,3 +50,4 @@ export async function POST(
     }
   );
 }
+export const dynamic = "force-dynamic";
