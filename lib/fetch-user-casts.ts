@@ -29,11 +29,7 @@ export const fetchCastsForUser = async (
     }
   );
 
-  const casts = airstackResponse.data.data.FarcasterCasts.Cast.map(
-    (cast: any) => {
-      return cast.rawText;
-    }
-  );
-
-  return casts;
+  return airstackResponse.data.data.FarcasterCasts.Cast.map((cast: any) => {
+    return cast.rawText;
+  });
 };

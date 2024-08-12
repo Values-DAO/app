@@ -6,7 +6,7 @@ export const generateValuesForUser = async (
 ) => {
   const content = casts.join("\n").slice(0, 30000); // assuming ~35k equates to 8k tokens
   const completion = await openai.chat.completions.create({
-    model: "gpt-4o",
+    model: "gpt-4o-mini",
     messages: [
       {
         role: "system",
@@ -98,6 +98,7 @@ interface UserValues {
     ?.replace("```json", "")
     .replace("```", "");
   values = JSON.parse(values!);
+
   if (includeWeights) {
     return values;
   }
