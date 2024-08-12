@@ -45,7 +45,7 @@ export async function POST(
           <meta name="fc:frame:button:1:target" content="${`https://warpcast.com/~/compose?text=&embeds[]=${process.env.NEXT_PUBLIC_HOST}/api/v2/superhack/${fid}`}" />
           <meta name="fc:frame:button:2" content="My Values" />
           <meta name="fc:frame:button:2:action" content="link" />
-          <meta name="fc:frame:button:2:target" content=${`https://app.valuesdao.io/u/${fid}`} />`
+          <meta name="fc:frame:button:2:target" content="${`https://app.valuesdao.io/u/${fid}`}" />`
    }
         </head>
         <body></body>
