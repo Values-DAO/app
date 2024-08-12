@@ -64,6 +64,16 @@ export default function calculateAlignmentScore(
 
       if (commonKeys.length === 0) {
         console.log("No common keys between target and user", user);
+        if (oneOnOne) {
+          return {
+            error: "No common keys between target and user",
+            alignmentScores: [
+              {
+                targetToUserScore: 0,
+              },
+            ],
+          };
+        }
         continue;
       }
       let totalScore = 0;

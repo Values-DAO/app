@@ -19,7 +19,7 @@ export async function POST(
   }
 
   const {data} = await axios.get(
-    `${process.env.NEXT_PUBLIC_HOST}/api/v2/one-one-score/?userFid=${params.fid}&targetFid=${fid}`
+    `${process.env.NEXT_PUBLIC_HOST}/api/v2/superhack/score/?userFid=${params.fid}&targetFid=${fid}`
   );
 
   let imageUrl;
@@ -39,7 +39,7 @@ export async function POST(
      data.error
        ? `  <meta name="fc:frame:button:1" content="Take me to ValuesDAO" />
           <meta name="fc:frame:button:1:action" content="link" />
-          <meta name="fc:frame:button:1:target" content=${`https://app.valuesdao.io/`} />`
+          <meta name="fc:frame:button:1:target" content="${`https://app.valuesdao.io/`}" />`
        : `<meta name="fc:frame:button:1" content="cast it" />
           <meta name="fc:frame:button:1:action" content="link" />
           <meta name="fc:frame:button:1:target" content="${`https://warpcast.com/~/compose?text=&embeds[]=${process.env.NEXT_PUBLIC_HOST}/api/v2/superhack/${fid}`}" />

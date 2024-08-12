@@ -1,16 +1,15 @@
-import User from "@/models/user";
 import {NextRequest, NextResponse} from "next/server";
-import {headers} from "next/headers";
-import validateApiKey from "@/lib/validate-key";
-import connectToDatabase from "@/lib/connect-to-db";
+
 import {fetchCastsForUser} from "@/lib/fetch-user-casts";
 import {generateValuesForUser} from "@/lib/generate-user-values-per-casts";
-import {fetchUserTweets} from "@/lib/fetch-user-tweets";
+import axios from "axios";
+import connectToDatabase from "@/lib/connect-to-db";
+import User from "@/models/user";
 
-export async function GET(req: NextRequest) {
+export async function GET(req: any) {
   try {
     await connectToDatabase();
-    const searchParams = req.nextUrl.searchParams;
+    const searchParams = new URL(req.nextUrl).searchParams;
 
     const fid = searchParams.get("fid");
     const includeWeights = searchParams.get("includeweights");
@@ -22,9 +21,46 @@ export async function GET(req: NextRequest) {
       });
     }
 
+    const user = await User.findOneAndUpdate(
+      {farcaster: fid},
+      {$setOnInsert: {farcaster: fid}},
+      {upsert: true, new: true}
+    );
+
+    if (
+      user &&
+      user.aiGeneratedValuesWithWeights &&
+      user.aiGeneratedValuesWithWeights.warpcast &&
+      Object.keys(user.aiGeneratedValuesWithWeights.warpcast).length > 0
+    ) {
+      return NextResponse.json({
+        status: 200,
+        generatedValues: user.aiGeneratedValuesWithWeights.warpcast,
+      });
+    } else if (
+      user &&
+      user.aiGeneratedValues &&
+      user.aiGeneratedValues.warpcast &&
+      user.aiGeneratedValues.warpcast.length > 0
+    ) {
+      return NextResponse.json({
+        status: 200,
+        generatedValues: {
+          ...user?.aiGeneratedValues?.warpcast?.reduce(
+            (acc: Record<string, number>, value: string) => {
+              acc[value] = 100;
+              return acc;
+            },
+            {}
+          ),
+        },
+      });
+    }
+
     let generatedValues: string[] | undefined = undefined;
+
     if (fid) {
-      const startTime = Date.now();
+      console.log("Generating values for user");
 
       const casts = await fetchCastsForUser(fid, 100);
 
@@ -34,14 +70,16 @@ export async function GET(req: NextRequest) {
           error: "User has less than 100 casts",
         });
       }
-      console.log(`Time taken before ai: ${Date.now() - startTime}ms`);
       generatedValues = await generateValuesForUser(
         casts,
         includeWeights === "true"
       );
-      const endTime = Date.now();
-      const elapsedTime = endTime - startTime;
-      console.log(`Time taken by fetchCastsForUser: ${elapsedTime}ms`);
+      if (generatedValues && Object.keys(generatedValues).length > 2) {
+        user.aiGeneratedValuesWithWeights.warpcast = generatedValues;
+        const topValues = Object.keys(generatedValues).slice(0, 7);
+        user.aiGeneratedValues.warpcast = Array.from(topValues);
+        await user.save();
+      }
     }
 
     return NextResponse.json({
@@ -55,3 +93,6 @@ export async function GET(req: NextRequest) {
     });
   }
 }
+// ... existing code ...
+
+export const dynamic = "force-dynamic";
