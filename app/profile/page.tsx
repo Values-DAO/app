@@ -32,7 +32,6 @@ const ProfilePage = () => {
     const fetchUserData = async () => {
       const user = (await fetchUser()).user;
 
-      console.log(user);
       if (user) setUserInfo(user);
     };
 

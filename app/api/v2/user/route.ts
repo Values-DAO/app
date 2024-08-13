@@ -11,7 +11,7 @@ import {privateKeyToAccount} from "viem/accounts";
 import Value from "@/models/value";
 import {fetchAllNFTsValuesDAO} from "@/lib/fetch-all-nfts-valuesdao";
 const viemWalletClient = createWalletClient({
-  chain: baseSepolia,
+  chain: base,
   transport: http(),
   account: privateKeyToAccount(
     process.env.ADMIN_WALLET_PRIVATE_KEY as `0x${string}`
