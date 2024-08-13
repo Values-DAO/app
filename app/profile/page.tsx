@@ -123,7 +123,7 @@ const ProfilePage = () => {
                     {userInfo.attestations &&
                       userInfo.attestations.map((value: string) => (
                         <TableRow key={value}>
-                          <TableCell className="font-medium" asChild>
+                          <TableCell className="font-medium">
                             <Button variant={"link"} asChild>
                               <Link
                                 href={`https://base-sepolia.easscan.org/attestation/view/${value}`}
