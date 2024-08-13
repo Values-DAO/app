@@ -31,6 +31,8 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       const user = (await fetchUser()).user;
+
+      console.log(user);
       if (user) setUserInfo(user);
     };
 
@@ -106,6 +108,37 @@ const ProfilePage = () => {
                 </AlertDescription>
               </Alert>
             )}
+
+            {userInfo &&
+              userInfo?.attestations &&
+              userInfo.attestations.length > 0 && (
+                <Table className="border-[1px] border-gray-400   m-auto mt-4">
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[100px] md:w-[200px] max-w-[400px]">
+                        Attestations UID
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {userInfo.attestations &&
+                      userInfo.attestations.map((value: string) => (
+                        <TableRow key={value}>
+                          <TableCell className="font-medium" asChild>
+                            <Button variant={"link"} asChild>
+                              <Link
+                                href={`https://base-sepolia.easscan.org/attestation/view/${value}`}
+                                target="_blank"
+                              >
+                                {value}
+                              </Link>
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              )}
           </div>
         </div>
       )}

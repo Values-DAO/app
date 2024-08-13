@@ -21,6 +21,7 @@ export type IUser = {
   profileNftIpfs?: string;
   communitiesMinted?: string[];
   referrer?: string;
+  attestations?: string[];
 };
 
 const userSchema = new Schema(
@@ -86,6 +87,10 @@ const userSchema = new Schema(
     },
     referrer: {
       type: String,
+    },
+    attestations: {
+      type: [String],
+      default: [],
     },
   },
 

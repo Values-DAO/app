@@ -1,4 +1,4 @@
-import { createAttestation } from "@/lib/attestations";
+import {createAttestation} from "@/lib/attestations";
 import {supportedChainsMoralis} from "@/lib/constants";
 import {IUser} from "@/models/user";
 import {usePrivy} from "@privy-io/react-auth";
@@ -199,10 +199,13 @@ const useValuesHook = () => {
     wallets?: string[];
     description?: string;
   }) => {
-    // values array for attestions = values.map((value)=>value.name)
-    // wallet = wallets[0]
-    // description = description
     try {
+      const wallet = wallets as string[];
+      const uid = await createAttestation(
+        wallet[0] as string,
+        values.map((value) => value.name),
+        description as string
+      );
       const payload = {
         ...(user?.email?.address
           ? {email: user.email.address}
@@ -213,9 +216,8 @@ const useValuesHook = () => {
         values,
         type,
         communityId,
+        attestationUid: uid,
       };
-      const wallet = wallets as string[];
-      const uid = await createAttestation(wallet[0] as string, values.map((value)=>value.name), description as string); // handle uid by storing on/off-chain alongside user wallets
 
       try {
         const {data} = await axios.post(`/api/v2/user`, payload, {

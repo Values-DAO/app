@@ -11,7 +11,7 @@ import {privateKeyToAccount} from "viem/accounts";
 import Value from "@/models/value";
 import {fetchAllNFTsValuesDAO} from "@/lib/fetch-all-nfts-valuesdao";
 const viemWalletClient = createWalletClient({
-  chain: base,
+  chain: baseSepolia,
   transport: http(),
   account: privateKeyToAccount(
     process.env.ADMIN_WALLET_PRIVATE_KEY as `0x${string}`
@@ -39,6 +39,7 @@ export async function POST(req: NextRequest) {
       communityId,
       twitter,
       side,
+      attestationUid,
     } = await req.json();
     if (!method) {
       return NextResponse.json({error: "Method is required", status: 400});
@@ -277,6 +278,7 @@ export async function POST(req: NextRequest) {
 
           user.profileNftHash = hash;
           user.profileNftIpfs = cid;
+          user.attestations.push(attestationUid);
           await user.save();
 
           return NextResponse.json({
