@@ -104,7 +104,9 @@ Please follow these steps:
 
 7. Give me a list of their values in descending order of weightage
 
-8. Now Imagine a spectrum of 1 to 100 stands for most individualistic thinking and hundred for most collectivist thinking where would you rate the person based on their casts given above, rate them. Here Individualist vs Collective is the spectrum, now also do all the spectrum listed in  this list [capitalism vs communism , holistic vs reductive, Individualist vs collective]
+8. Consider a spectrum ranging from 1 to 100, where 1 represents highly individualistic thinking and 100 signifies strong collectivist tendencies. Analyzing the individual's tweets, provide ratings for the following spectrums: capitalism <-> communism, holistic <-> reductive, individualist <-> collective.
+For instance, when evaluating the individualist <-> collective spectrum, assign a score above 50 if the person leans towards collective thinking based on their tweets
+
 Your final output should be always an JSON and has to follow the format below: 
 interface UserValues {
     [key: string]: number;
@@ -120,7 +122,7 @@ interface finalResponse{
         },
       ],
     });
-
+    console.log(completion.choices[0].message.content);
     let values: any = completion.choices[0].message.content
       ?.replace("```json", "")
       .replace("```", "");
