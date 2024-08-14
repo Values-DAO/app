@@ -104,15 +104,32 @@ Please follow these steps:
 
 7. Give me a list of their values in descending order of weightage
 
-8. Consider a spectrum ranging from 1 to 100, where 1 represents highly individualistic thinking and 100 signifies strong collectivist tendencies. Analyzing the individual's tweets, provide ratings for the following spectrums: capitalism <-> communism, holistic <-> reductive, individualist <-> collective.
-For instance, when evaluating the individualist <-> collective spectrum, assign a score above 50 if the person leans towards collective thinking based on their tweets
+8. Consider a spectrum ranging from 1 to 100, where 1 represents left end of the spectrum and 100 represents the right end of the spectrum
 
+Analyse this individual’s social media posts and rate them from 1 to 100 on the following spectrums:
+- Left: Individualism; Right: Collectivism
+- ⁠Left: Capitalism; Right: Communism
+- ⁠Left: Holistic; Right: Reductive
+- ⁠Left: Internal-focused; Right: External-focused
+- ⁠Left: More control; Right: Less control
+- ⁠Left: People; Right: Less control
+- ⁠Left: More control; Right: Systems
+- ⁠Left: Asceticism; Right: Hedonism
+- ⁠Left: Past-oriented; Right: Future-oriented
+- ⁠Left: Highly trusting; Right: highly cynical
+- ⁠Left: Process-oriented; Right: outcome-oriented
+- ⁠Left: High risk tolerance; Right: low risk tolerance
+- ⁠Left: Tribalism; Right: Universalism
+- ⁠Left: Idealism; Right: Utilitarianism
+- ⁠Left: Global; Right: local
+- ⁠Left: Specific; Right: Abstract
+
+Provide a one-line explanation of why each score was generated
 Your final output should be always an JSON and has to follow the format below: 
 interface UserValues {
     [key: string]: number;
 }
-interface UserSpectrum: {spectrum:string;score:Number; description:string}[]
-
+interface UserSpectrum: {spectrum:string; score:Number; description:string}[]; 
 interface finalResponse{
     UserValues:UserValues;
     UserSpectrum:UserSpectrum;
@@ -122,10 +139,11 @@ interface finalResponse{
         },
       ],
     });
-    console.log(completion.choices[0].message.content);
     let values: any = completion.choices[0].message.content
       ?.replace("```json", "")
       .replace("```", "");
+
+    console.log(values);
     values = JSON.parse(values!);
 
     if (includeWeights) {
