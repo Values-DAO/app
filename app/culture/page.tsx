@@ -12,6 +12,16 @@ const CulturePage = () => {
         alt="Steve Jobs GIF"
         className="w-[95%] md:w-[800px]"
       />
+      <iframe
+        width="760"
+        height="315"
+        className="w-[95%] md:w-[800px] h-[250px] md:h-[400px]"
+        src="https://www.youtube.com/embed/kGrVhM_Gi8k?si=JXazhz_LgmWJUGaS"
+        title="YouTube video player"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerpolicy="strict-origin-when-cross-origin"
+        allowfullscreen
+      ></iframe>
     </div>
   );
 };
