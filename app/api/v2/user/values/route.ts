@@ -68,7 +68,14 @@ export async function GET(req: NextRequest) {
         });
       }
 
-      const tweets = await fetchUserTweets(twitter_userId);
+      const tweets: any | undefined = await fetchUserTweets(twitter_userId);
+      if (tweets?.error) {
+        return NextResponse.json({
+          status: 500,
+          error: tweets.error || "Internal Server Error",
+          message: "Internal Server Error",
+        });
+      }
       if (tweets.length < 100) {
         return NextResponse.json({
           status: 403,
