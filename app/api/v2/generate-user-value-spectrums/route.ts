@@ -220,7 +220,7 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     return NextResponse.json({
-      error: error || "Internal Server Error",
+      error: "Internal Server Error. Please try again later.",
       status: 500,
     });
   }
