@@ -278,7 +278,7 @@ export async function POST(req: NextRequest) {
 
           user.profileNftHash = hash;
           user.profileNftIpfs = cid;
-          user.attestations.push(attestationUid);
+          if (attestationUid) user.attestations.push(attestationUid);
           await user.save();
 
           return NextResponse.json({

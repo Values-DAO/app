@@ -226,7 +226,7 @@ const useValuesHook = () => {
             "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
           },
         });
-        console.log("mintHandler Response", data);
+
         if (data.status === 200) {
           emailAnalytics({
             subject: "User minted Value(s)",
@@ -329,13 +329,16 @@ const useValuesHook = () => {
   const analyseUserAndGenerateValues = async ({
     fid,
     twitter,
+    method,
   }: {
     fid?: number;
     twitter?: string;
+    method?: "refresh_values" | "generate_spectrum";
   }): Promise<{
     user: IUser | null;
-    values: any | null;
+
     message: string;
+    error?: string;
   }> => {
     const query =
       fid && twitter
@@ -345,7 +348,9 @@ const useValuesHook = () => {
         : `twitter=${twitter}&twitter_userId=${user?.twitter?.subject}`;
     try {
       const response = await axios.get(
-        `/api/v2/generate-user-value?${query}&includeweights=true`,
+        `/api/v2/generate-user-value-spectrums?${query}&${
+          method ? `method=${method}` : ""
+        }`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -353,36 +358,58 @@ const useValuesHook = () => {
           },
         }
       );
-      if (response.data.user && response.data.user.aiGeneratedValues)
-        emailAnalytics({
-          subject: "New user generated their values using ai",
-          body: [
-            "user has generated their values using ai",
-            user?.email?.address ? `Email: ${user?.email?.address}` : "",
-            user?.farcaster?.displayName
-              ? `Farcaster Display Name: ${user?.farcaster?.displayName}`
-              : "",
-            user?.farcaster?.username
-              ? `Warpcast: https://warpcast.com/${user?.farcaster?.username}`
-              : ``,
-            `Warpcast values: ${JSON.stringify(
-              response.data.user.aiGeneratedValues.warpcast
-            )}`,
-            `Twitter values: ${JSON.stringify(
-              response.data.user.aiGeneratedValues.twitter
-            )}`,
-          ].join("\n"),
-        });
+
+      if (response.data.error) {
+        return {
+          user: null,
+
+          message: response.data.error,
+          error: response.data.error,
+        };
+      }
+
+      emailAnalytics({
+        subject: "New user generated their values using ai",
+        body: [
+          "user has generated their values using ai",
+          user?.email?.address ? `Email: ${user?.email?.address}` : "",
+          user?.farcaster?.displayName
+            ? `Farcaster Display Name: ${user?.farcaster?.displayName}`
+            : "",
+          user?.farcaster?.username
+            ? `Warpcast: https://warpcast.com/${user?.farcaster?.username}`
+            : ``,
+          `\nWarpcast values: ${JSON.stringify(
+            response.data.user.aiGeneratedValuesWithWeights.warpcast
+          )}\n`,
+          `Twitter values: ${JSON.stringify(
+            response.data.user.aiGeneratedValuesWithWeights.twitter
+          )}\n`,
+
+          `Warpcast Spectrum: ${response.data.user.spectrums.warpcast
+            .map(
+              (value: any) =>
+                `${value.name}: ${value.description} (Score: ${value.score})\n`
+            )
+            .join("\n")}`,
+          `Twitter Spectrum:${response.data.user.spectrums.twitter
+            .map(
+              (value: any) =>
+                `${value.name}: ${value.description} (Score: ${value.score})\n`
+            )
+            .join("\n")}`,
+        ].join("\n"),
+      });
       return {
-        user: response.data.user ?? null,
-        values: response.data.user.aiGeneratedValues ?? null,
+        user: response.data.user,
         message: response.data.error ?? "Values generated successfully",
       };
     } catch (error) {
+      console.error(error);
       return {
         user: null,
-        values: null,
         message: error as string,
+        error: error as string,
       };
     }
   };

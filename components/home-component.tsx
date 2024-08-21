@@ -197,7 +197,9 @@ const HomeComponent = () => {
                               key={index}
                               className="w-full h-14 px-3 flex items-center hover:bg-gray-300/20 hover:cursor-pointer rounded-sm"
                             >
-                              <span> {value}</span>
+                              <span>
+                                {value.charAt(0).toUpperCase() + value.slice(1)}
+                              </span>
 
                               {address ||
                               (userInfo &&
@@ -213,7 +215,14 @@ const HomeComponent = () => {
                                       [value]: true,
                                     });
                                     const response = await mintHandler({
-                                      values: [{name: value, weightage: "1"}],
+                                      values: [
+                                        {
+                                          name:
+                                            value.charAt(0).toUpperCase() +
+                                            value.slice(1),
+                                          weightage: "1",
+                                        },
+                                      ],
                                       type: "manual",
                                       description: "Minted value manually",
                                       wallets: userInfo?.wallets,

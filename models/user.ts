@@ -22,6 +22,10 @@ export type IUser = {
   communitiesMinted?: string[];
   referrer?: string;
   attestations?: string[];
+  spectrums?: {
+    warpcast: {name: string; description: string; score: number}[];
+    twitter: {name: string; description: string; score: number}[];
+  };
 };
 
 const userSchema = new Schema(
@@ -91,6 +95,46 @@ const userSchema = new Schema(
     attestations: {
       type: [String],
       default: [],
+    },
+    spectrums: {
+      warpcast: {
+        type: [
+          {
+            name: {
+              type: String,
+              required: true,
+            },
+            description: {
+              type: String,
+              required: false,
+            },
+            score: {
+              type: Number,
+              required: true,
+            },
+          },
+        ],
+        default: [],
+      },
+      twitter: {
+        type: [
+          {
+            name: {
+              type: String,
+              required: true,
+            },
+            description: {
+              type: String,
+              required: false,
+            },
+            score: {
+              type: Number,
+              required: true,
+            },
+          },
+        ],
+        default: [],
+      },
     },
   },
 

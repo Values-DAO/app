@@ -13,7 +13,7 @@ import {Alert, AlertDescription} from "@/components/ui/alert";
 import useValuesHook from "../hooks/useValuesHook";
 import axios from "axios";
 import ValueBadge from "@/components/ui/value-badge";
-import {Twitter} from "lucide-react";
+import {Twitter, X} from "lucide-react";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -26,6 +26,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import {toast} from "@/components/ui/use-toast";
+import {Badge} from "@/components/ui/badge";
 
 const ValuePage = () => {
   const {
@@ -49,6 +50,7 @@ const ValuePage = () => {
   const {address} = useAccount();
   const [onMintingSuccessful, setOnMintingSuccessful] = useState(false);
   const [loader, setLoader] = useState(false);
+  const [showNewFeatureModal, setShowNewFeatureModal] = useState(true);
   const loaderTexts: string[] = [
     "Analyzing your social content...",
     "Extracting values from your interactions...",
@@ -56,19 +58,6 @@ const ValuePage = () => {
     "Mapping your social values...",
     "Interpreting the essence of your online presence...",
   ];
-  // useEffect(() => {
-  //   const fetchValueRecs = async () => {
-  //     const response = await axios.get("/api/v2/value/", {
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
-  //       },
-  //     });
-  //     setValueRecommendation(response.data.values);
-  //   };
-
-  //   fetchValueRecs();
-  // }, []);
 
   useEffect(() => {
     if (loading) {
@@ -84,44 +73,42 @@ const ValuePage = () => {
     }
   }, [loading]);
 
-  const analyse = async (socialMedia: string) => {
-    setLoading(true);
-    let result = null; // Use a result object to hold the function's output
-
-    if (socialMedia === "twitter" && user?.twitter?.username) {
-      result = await analyseUserAndGenerateValues({
-        twitter: user.twitter.username,
-      });
-    } else if (socialMedia === "warpcast" && user?.farcaster?.fid) {
-      result = await analyseUserAndGenerateValues({
-        fid: user.farcaster.fid,
-      });
-    } else {
+  const analyse = async (
+    socialMedia: "twitter" | "warpcast",
+    method?: "refresh_values" | "generate_spectrum"
+  ) => {
+    if (!socialMedia) {
       setError({
         platform: socialMedia,
         message: "No account linked",
       });
-      setLoading(false);
       return;
     }
+    setLoading(true);
+    let result = null;
+    if (socialMedia === "twitter" && user?.twitter?.username) {
+      result = await analyseUserAndGenerateValues({
+        twitter: user.twitter.username,
+        ...(method ? {method} : {}),
+      });
+    } else if (socialMedia === "warpcast" && user?.farcaster?.fid) {
+      result = await analyseUserAndGenerateValues({
+        fid: user.farcaster.fid,
+        ...(method ? {method} : {}),
+      });
+    }
 
-    if (
-      result?.values &&
-      (result.values.twitter.length > 0 || result.values.warpcast.length > 0)
-    ) {
-      setUserInfo({...userInfo, aiGeneratedValues: result.values});
-    } else {
+    if (result?.error || !result?.user) {
       setError({
-        platform:
-          socialMedia === "twitter"
-            ? "INSUFFICIENT_TWEETS"
-            : "INSUFFICIENT_CASTS",
-        message:
-          "This account has less than 100 casts/tweets. We need more data to generate values.",
+        platform: socialMedia,
+        message: result?.error || "Error in generating values, try again later",
       });
       setLoading(false);
       return;
     }
+
+    setUserInfo(result.user);
+
     setLoading(false);
   };
 
@@ -130,6 +117,80 @@ const ValuePage = () => {
       {authenticated && (
         <div className="py-12 flex flex-col gap-4">
           <div className="flex flex-col gap-4">
+            {userInfo?.communitiesMinted?.includes("warpcast") &&
+              !userInfo?.aiGeneratedValuesWithWeights?.warpcast &&
+              userInfo?.communitiesMinted?.includes("twitter") &&
+              !userInfo?.aiGeneratedValuesWithWeights?.twitter &&
+              showNewFeatureModal && (
+                <section className="fixed top-0 left-0 inset-0 w-full h-full flex items-center justify-center bg-gray-500 bg-opacity-50 z-50">
+                  <div className="relative bg-white p-8 py-12 rounded-lg shadow-lg w-[350px] h-[350px] flex flex-col justify-center">
+                    <X
+                      className="absolute top-4 right-4 cursor-pointer"
+                      onClick={() => {
+                        setShowNewFeatureModal(false);
+                      }}
+                    />
+                    <div className="text-lg font-semibold">
+                      Value Spectrums and Weighted Values.
+                      <Badge className="ml-2 bg-green-300">New</Badge>
+                    </div>
+                    <div className="text-md font-light mt-2">
+                      We have added few new features that allows you to generate
+                      your Value Spectrums and Weighted Values. This will help
+                      you understand your values better and connect with
+                      communities that align with you.
+                    </div>
+
+                    <div className="text-md font-medium mt-4">
+                      <p>
+                        Go to AI Value Analysis to generate your Value Spectrum
+                        and Weights for each social media platform.
+                      </p>
+                    </div>
+                  </div>
+                </section>
+              )}
+
+            {((userInfo &&
+              userInfo.aiGeneratedValues?.warpcast &&
+              userInfo.aiGeneratedValues?.warpcast.length > 0) ||
+              (userInfo &&
+                userInfo.aiGeneratedValues?.twitter &&
+                userInfo.aiGeneratedValues?.twitter.length > 0)) &&
+              (!userInfo.spectrums ||
+                !userInfo.spectrums?.twitter ||
+                !userInfo.spectrums?.warpcast ||
+                userInfo.spectrums?.twitter.length === 0 ||
+                userInfo.spectrums?.warpcast.length === 0) &&
+              showNewFeatureModal && (
+                <section className="fixed top-0 left-0 inset-0 w-full h-full flex items-center justify-center bg-gray-500 bg-opacity-50 z-40">
+                  <div className="relative bg-white p-8 rounded-lg shadow-lg w-[350px] h-[350px] flex flex-col justify-center">
+                    <X
+                      className="absolute top-4 right-4 cursor-pointer"
+                      onClick={() => {
+                        setShowNewFeatureModal(false);
+                      }}
+                    />
+                    <div className="text-lg font-semibold">
+                      Value Spectrums
+                      <Badge className="ml-2 bg-green-300">New</Badge>
+                    </div>
+                    <div className="text-md font-light mt-2">
+                      We have added few new features that allow you to generate
+                      your Value Spectrums. This will help you understand your
+                      values better and connect with communities that align with
+                      you.
+                    </div>
+                    <div className="text-md font-medium mt-4">
+                      <p>
+                        Go to AI Value Analysis to generate your Value Spectrum
+                        for each social media platform.
+                      </p>
+                    </div>
+                  </div>
+                </section>
+              )}
+
             <Tabs defaultValue={"twitter"} className="w-full">
               <TabsList className="flex justify-center py-2 text-black">
                 <TabsTrigger
@@ -223,7 +284,74 @@ const ValuePage = () => {
                       Connect Wallet to mint
                     </Button>
                   )}
+                {userInfo?.spectrums &&
+                  userInfo?.spectrums?.twitter &&
+                  userInfo?.spectrums?.twitter.length > 0 && (
+                    <div className="flex flex-row gap-2 mt-6 items-center">
+                      <p className="text-lg font-medium">
+                        Your Value Spectrums are generated, check out in your
+                        profile {"=>"}
+                      </p>
+                      <Button asChild>
+                        <Link href={"/profile"}>Take me to Profile </Link>
+                      </Button>
+                    </div>
+                  )}
 
+                {userInfo?.communitiesMinted?.includes("twitter") &&
+                  userInfo.aiGeneratedValuesWithWeights?.twitter &&
+                  (!userInfo?.spectrums ||
+                    userInfo?.spectrums?.twitter === undefined ||
+                    (userInfo?.spectrums?.twitter?.length === 0 && (
+                      <div className="flex flex-col gap-2 mt-6">
+                        <div className="text-lg font-medium">
+                          Generate your value spectrums
+                          <Badge className="ml-2 bg-green-300">New</Badge>
+                        </div>
+                        {!loading && (
+                          <Button
+                            className="w-full cursor-pointer mt-4"
+                            disabled={loader}
+                            onClick={() => {
+                              analyse("twitter", "generate_spectrum");
+                            }}
+                          >
+                            Generate Value Spectrums
+                          </Button>
+                        )}
+                      </div>
+                    )))}
+
+                {userInfo?.communitiesMinted?.includes("twitter") &&
+                  !userInfo?.aiGeneratedValuesWithWeights?.twitter && (
+                    <div className="flex flex-col gap-2 mt-6">
+                      <div className="text-lg font-medium">
+                        Your Profile hasn&apos;t generated weighted values yet,
+                        proceed to generate them and also generate your Value
+                        Spectrums
+                        <Badge className="ml-2 bg-green-300">New</Badge>
+                      </div>
+                      {!loading && (
+                        <Button
+                          className="w-full cursor-pointer mt-4"
+                          disabled={loader}
+                          onClick={() => {
+                            analyse("twitter", "refresh_values");
+                          }}
+                        >
+                          Generate
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                {error && error.platform === "twitter" && (
+                  <Alert
+                    variant={"destructive"}
+                    className=" my-2 bg-[#ff4747] text-white"
+                  >
+                    <AlertDescription>{error.message}</AlertDescription>
+                  </Alert>
+                )}
                 {!loading &&
                   userInfo?.aiGeneratedValues &&
                   userInfo?.aiGeneratedValues?.twitter?.length === 0 && (
@@ -241,15 +369,6 @@ const ValuePage = () => {
                         <br></br> Once you are done, mint your Community Values
                         and try minting manually too.
                       </p>
-
-                      {error && error.platform === "INSUFFICIENT_TWEETS" && (
-                        <Alert
-                          variant={"destructive"}
-                          className=" my-2 bg-[#ff4747] text-white"
-                        >
-                          <AlertDescription>{error.message}</AlertDescription>
-                        </Alert>
-                      )}
 
                       {userInfo && userInfo?.twitter && !loading && (
                         <Button
@@ -345,6 +464,74 @@ const ValuePage = () => {
                     </Button>
                   )}
 
+                {userInfo?.spectrums &&
+                  userInfo?.spectrums?.warpcast &&
+                  userInfo?.spectrums?.warpcast.length > 0 && (
+                    <div className="flex flex-row gap-2 mt-6 items-center">
+                      <p className="text-lg font-medium">
+                        Your Value Spectrums are generated, check out in your
+                        profile {"=>"}
+                      </p>
+                      <Button asChild>
+                        <Link href={"/profile"}>Take me to Profile </Link>
+                      </Button>
+                    </div>
+                  )}
+
+                {userInfo?.communitiesMinted?.includes("warpcast") &&
+                  userInfo.aiGeneratedValuesWithWeights?.warpcast &&
+                  (!userInfo?.spectrums ||
+                    userInfo?.spectrums?.warpcast === undefined ||
+                    (userInfo?.spectrums?.warpcast?.length === 0 && (
+                      <div className="flex flex-col gap-2 mt-6">
+                        <div className="text-lg font-medium">
+                          Generate your value spectrums
+                          <Badge className="ml-2 bg-green-300">New</Badge>
+                        </div>
+                        {!loading && (
+                          <Button
+                            className="w-full cursor-pointer mt-4"
+                            disabled={loader}
+                            onClick={() => {
+                              analyse("warpcast", "generate_spectrum");
+                            }}
+                          >
+                            Generate Value Spectrums
+                          </Button>
+                        )}
+                      </div>
+                    )))}
+
+                {userInfo?.communitiesMinted?.includes("warpcast") &&
+                  !userInfo?.aiGeneratedValuesWithWeights?.warpcast && (
+                    <div className="flex flex-col gap-2 mt-6">
+                      <div className="text-lg font-medium">
+                        Your Profile hasn&apos;t generated weighted values yet,
+                        proceed to generate them and also generate your Value
+                        Spectrums
+                        <Badge className="ml-2 bg-green-300">New</Badge>
+                      </div>
+                      {!loading && (
+                        <Button
+                          className="w-full cursor-pointer mt-4"
+                          disabled={loader}
+                          onClick={() => {
+                            analyse("warpcast", "refresh_values");
+                          }}
+                        >
+                          Generate
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                {error && error.platform === "warpcast" && (
+                  <Alert
+                    variant={"destructive"}
+                    className=" my-2 bg-[#ff4747] text-white"
+                  >
+                    <AlertDescription>{error.message}</AlertDescription>
+                  </Alert>
+                )}
                 {userInfo?.aiGeneratedValues &&
                   userInfo?.aiGeneratedValues?.warpcast?.length === 0 && (
                     <div className="flex flex-col gap-4">
@@ -361,14 +548,6 @@ const ValuePage = () => {
                         <br></br> Once you are done, mint your Community Values
                         and try minting manually too.
                       </p>
-                      {error && error.platform === "INSUFFICIENT_CASTS" && (
-                        <Alert
-                          variant={"destructive"}
-                          className=" my-2 bg-[#ff4747] text-white"
-                        >
-                          <AlertDescription>{error.message}</AlertDescription>
-                        </Alert>
-                      )}
 
                       {userInfo && userInfo.farcaster && !loading && (
                         <Button
@@ -405,7 +584,7 @@ const ValuePage = () => {
 
           {loading && (
             <div className="flex flex-col gap-4 justify-center">
-              <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 max-w-5xl text-muted-foreground">
+              <h2 className="scroll-m-20 border-b pb-2 text-xl font-semibold tracking-tight first:mt-0 max-w-5xl text-muted-foreground text-center">
                 {loaderText}
               </h2>
             </div>
