@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
         referrer,
       });
     }
-    if (!method && user.createdAt > new Date("2024-08-21")) {
+    if (!method || user.createdAt > new Date("2024-08-21")) {
       method = "new_user";
     }
     let generatedValues: any | undefined = undefined;
