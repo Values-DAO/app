@@ -9,6 +9,7 @@ import useValuesHook from "../hooks/useValuesHook";
 import {NFT_CONTRACT_ADDRESS} from "@/constants";
 import {Link as LinkIcon} from "lucide-react";
 import Link from "next/link";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 
 import {
   Table,
@@ -22,6 +23,7 @@ import {
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 import {ExclamationTriangleIcon} from "@radix-ui/react-icons";
 import LoggedOutView from "@/components/logged-out-view";
+import MintedValuesBar from "@/components/ui/minted-values-bar";
 
 const ProfilePage = () => {
   const {authenticated, login, ready, user} = usePrivy();
@@ -61,52 +63,57 @@ const ProfilePage = () => {
               )}
             </h3>
 
-            <p className="leading-9 [&:not(:first-child)]:mt-6">
-              These are your weighted Values. While these aren’t completely
-              accurate, they are good enough to find aligned people and
-              communities.<br></br> To unlock that feature, we request you to
-              share on Twitter and Warpcast.<br></br> This helps us get more
-              data to train our AI model and get closer to accuracy.<br></br> If
-              you feel a Value is inaccurate, you can always burn it.
-            </p>
             {userInfo &&
-            userInfo.mintedValues &&
-            userInfo.mintedValues.length > 0 ? (
-              <Table className="border-[1px] border-gray-400   m-auto mt-4">
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[100px] md:w-[200px] max-w-[400px]">
-                      Value
-                    </TableHead>
+              userInfo.mintedValues &&
+              userInfo.mintedValues.length > 0 && (
+                <div>
+                  <h3 className="font-medium mt-8 mb-2 text-3xl">
+                    Minted Values
+                  </h3>
+                  <Table className="border-[1px] border-gray-400   m-auto mt-4">
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[100px] md:w-[200px] max-w-[400px]">
+                          Value
+                        </TableHead>
 
-                    <TableHead>Weight</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {userInfo.mintedValues &&
-                    userInfo.mintedValues
-                      .sort((a, b) => Number(b.weightage) - Number(a.weightage))
-                      .map((value) => (
-                        <TableRow key={value.value}>
-                          <TableCell className="font-medium">
-                            <ValueBadge value={value.value} />
-                          </TableCell>
+                        <TableHead>Weight</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {userInfo.mintedValues &&
+                        userInfo.mintedValues
+                          .sort(
+                            (a, b) => Number(b.weightage) - Number(a.weightage)
+                          )
+                          .map((value) => (
+                            <TableRow key={value.value}>
+                              <TableCell className="font-medium">
+                                <ValueBadge value={value.value} />
+                              </TableCell>
 
-                          <TableCell>{Number(value?.weightage) ?? 1}</TableCell>
-                        </TableRow>
-                      ))}
-                </TableBody>
-              </Table>
-            ) : (
-              <Alert variant="destructive" className="mt-4">
-                <ExclamationTriangleIcon className="h-4 w-4" />
+                              <MintedValuesBar
+                                weight={Number(value?.weightage) ?? 1}
+                              />
+                            </TableRow>
+                          ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
 
-                <AlertDescription>
-                  You haven&apos;t minted any values yet.{" "}
-                  <Link href="/">Click here to visit value mint page</Link>{" "}
-                </AlertDescription>
-              </Alert>
-            )}
+            {userInfo &&
+              userInfo.mintedValues &&
+              userInfo.mintedValues.length === 0 && (
+                <Alert variant="destructive" className="mt-4">
+                  <ExclamationTriangleIcon className="h-4 w-4" />
+
+                  <AlertDescription>
+                    You haven&apos;t minted any values yet.{" "}
+                    <Link href="/">Click here to visit value mint page</Link>{" "}
+                  </AlertDescription>
+                </Alert>
+              )}
 
             {userInfo &&
               userInfo?.attestations &&
