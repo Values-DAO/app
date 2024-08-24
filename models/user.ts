@@ -26,6 +26,7 @@ export type IUser = {
     warpcast: {name: string; description: string; score: number}[];
     twitter: {name: string; description: string; score: number}[];
   };
+  createdAt?: Date;
 };
 
 const userSchema = new Schema(

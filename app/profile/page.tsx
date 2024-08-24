@@ -64,14 +64,6 @@ const ProfilePage = () => {
               )}
             </h3>
 
-            <p className="leading-9 [&:not(:first-child)]:mt-6">
-              These are your weighted Values. While these aren&apos;t completely
-              accurate, they are good enough to find aligned people and
-              communities.<br></br> To unlock that feature, we request you to
-              share on Twitter and Warpcast.<br></br> This helps us get more
-              data to train our AI model and get closer to accuracy.<br></br> If
-              you feel a Value is inaccurate, you can always burn it.
-            </p>
             {userInfo &&
               userInfo.mintedValues &&
               userInfo.mintedValues.length > 0 && (

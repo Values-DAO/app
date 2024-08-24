@@ -117,13 +117,13 @@ const ValuePage = () => {
       {authenticated && (
         <div className="py-12 flex flex-col gap-4">
           <div className="flex flex-col gap-4">
-            {userInfo?.communitiesMinted?.includes("warpcast") &&
+            {/* {userInfo?.communitiesMinted?.includes("warpcast") &&
               !userInfo?.aiGeneratedValuesWithWeights?.warpcast &&
               userInfo?.communitiesMinted?.includes("twitter") &&
               !userInfo?.aiGeneratedValuesWithWeights?.twitter &&
               showNewFeatureModal && (
                 <section className="fixed top-0 left-0 inset-0 w-full h-full flex items-center justify-center bg-gray-500 bg-opacity-50 z-50">
-                  <div className="relative bg-white p-8 py-12 rounded-lg shadow-lg w-[350px] h-[350px] flex flex-col justify-center">
+                  <div className="relative bg-white p-8 py-12 rounded-lg shadow-lg w-[380px] h-[150px] flex flex-col justify-center">
                     <X
                       className="absolute top-4 right-4 cursor-pointer"
                       onClick={() => {
@@ -131,21 +131,8 @@ const ValuePage = () => {
                       }}
                     />
                     <div className="text-lg font-semibold">
-                      Value Spectrums and Weighted Values.
+                      Our v2 profile will blow your mind. I bet.
                       <Badge className="ml-2 bg-green-300">New</Badge>
-                    </div>
-                    <div className="text-md font-light mt-2">
-                      We have added few new features that allows you to generate
-                      your Value Spectrums and Weighted Values. This will help
-                      you understand your values better and connect with
-                      communities that align with you.
-                    </div>
-
-                    <div className="text-md font-medium mt-4">
-                      <p>
-                        Go to AI Value Analysis to generate your Value Spectrum
-                        and Weights for each social media platform.
-                      </p>
                     </div>
                   </div>
                 </section>
@@ -164,34 +151,23 @@ const ValuePage = () => {
                 userInfo.spectrums?.warpcast.length === 0) &&
               showNewFeatureModal && (
                 <section className="fixed top-0 left-0 inset-0 w-full h-full flex items-center justify-center bg-gray-500 bg-opacity-50 z-40">
-                  <div className="relative bg-white p-8 rounded-lg shadow-lg w-[350px] h-[350px] flex flex-col justify-center">
+                  <div className="relative bg-white p-8 rounded-lg shadow-lg w-[380px] h-[150px] flex flex-col justify-center">
                     <X
                       className="absolute top-4 right-4 cursor-pointer"
                       onClick={() => {
                         setShowNewFeatureModal(false);
                       }}
                     />
+
                     <div className="text-lg font-semibold">
-                      Value Spectrums
+                      Our v2 profile will blow your mind. I bet.
                       <Badge className="ml-2 bg-green-300">New</Badge>
-                    </div>
-                    <div className="text-md font-light mt-2">
-                      We have added few new features that allow you to generate
-                      your Value Spectrums. This will help you understand your
-                      values better and connect with communities that align with
-                      you.
-                    </div>
-                    <div className="text-md font-medium mt-4">
-                      <p>
-                        Go to AI Value Analysis to generate your Value Spectrum
-                        for each social media platform.
-                      </p>
                     </div>
                   </div>
                 </section>
-              )}
+              )} */}
 
-            <Tabs defaultValue={"twitter"} className="w-full">
+            <Tabs defaultValue={"twitter"} className="w-[94%] m-auto md:w-full">
               <TabsList className="flex justify-center py-2 text-black">
                 <TabsTrigger
                   value="twitter"
@@ -289,8 +265,8 @@ const ValuePage = () => {
                   userInfo?.spectrums?.twitter.length > 0 && (
                     <div className="flex flex-row gap-2 mt-6 items-center">
                       <p className="text-lg font-medium">
-                        Your Value Spectrums are generated, check out in your
-                        profile {"=>"}
+                        Check out your v2 Profile
+                        {" => "}
                       </p>
                       <Button asChild>
                         <Link href={"/profile"}>Take me to Profile </Link>
@@ -326,9 +302,8 @@ const ValuePage = () => {
                   !userInfo?.aiGeneratedValuesWithWeights?.twitter && (
                     <div className="flex flex-col gap-2 mt-6">
                       <div className="text-lg font-medium">
-                        Your Profile hasn&apos;t generated weighted values yet,
-                        proceed to generate them and also generate your Value
-                        Spectrums
+                        You&apos;re using our old v1 profile. Get your mind
+                        blown with our v2 profile
                         <Badge className="ml-2 bg-green-300">New</Badge>
                       </div>
                       {!loading && (
@@ -469,8 +444,7 @@ const ValuePage = () => {
                   userInfo?.spectrums?.warpcast.length > 0 && (
                     <div className="flex flex-row gap-2 mt-6 items-center">
                       <p className="text-lg font-medium">
-                        Your Value Spectrums are generated, check out in your
-                        profile {"=>"}
+                        Check out your v2 Profile {" => "}
                       </p>
                       <Button asChild>
                         <Link href={"/profile"}>Take me to Profile </Link>
@@ -506,9 +480,8 @@ const ValuePage = () => {
                   !userInfo?.aiGeneratedValuesWithWeights?.warpcast && (
                     <div className="flex flex-col gap-2 mt-6">
                       <div className="text-lg font-medium">
-                        Your Profile hasn&apos;t generated weighted values yet,
-                        proceed to generate them and also generate your Value
-                        Spectrums
+                        You&apos;re using our old v1 profile. Get your mind
+                        blown with our v2 profile
                         <Badge className="ml-2 bg-green-300">New</Badge>
                       </div>
                       {!loading && (
