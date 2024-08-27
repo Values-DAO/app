@@ -1,10 +1,13 @@
-export const fetchUserTweets = async (twitter_userId: string) => {
+export const fetchUserTweets = async (
+  twitter_userId: string,
+  pageLimit: number
+) => {
   const tweets = [];
   let pagination_token: string | null = null;
   let pageCount = 0; // Initialize a page counter
   try {
     do {
-      if (pageCount >= 3) break; // Stop if 10 pages have been fetched
+      if (pageCount >= pageLimit) break;
       const queryParam: string = pagination_token
         ? `pagination_token=${pagination_token}`
         : "";
@@ -17,7 +20,11 @@ export const fetchUserTweets = async (twitter_userId: string) => {
         }
       );
       if (!response.ok) {
-        throw new Error(`Failed to fetch tweets: ${response.statusText}`);
+        const data = await response.json();
+        console.error("Error fetching user tweets:", data);
+        return {
+          error: data || "Error fetching user tweets",
+        };
       }
       const {data, meta} = await response.json();
       if (data) {
@@ -26,10 +33,11 @@ export const fetchUserTweets = async (twitter_userId: string) => {
       pagination_token = meta.next_token ? meta.next_token : null;
       pageCount++; // Increment the page counter after each successful fetch
     } while (pagination_token);
+    return tweets;
   } catch (error) {
     console.error("Error fetching user tweets:", error);
-    return [];
+    return {
+      error: error || "Error fetching user tweets",
+    };
   }
-
-  return tweets;
 };

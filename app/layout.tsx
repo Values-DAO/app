@@ -1,13 +1,11 @@
 import type {Metadata} from "next";
 import {Inter} from "next/font/google";
 import "./globals.css";
-import Providers from "../providers/privy-provider";
 import {cn} from "@/lib/utils";
+import Providers from "@/providers/privy-provider";
 import Navbar from "@/components/ui/navbar";
 import Footer from "@/components/ui/footer";
-import {Toaster} from "@/components/ui/toaster";
 import {UserContextProvider} from "@/providers/user-context-provider";
-import GoogleAnalytics from "@/components/google-analytics";
 
 const inter = Inter({subsets: ["latin"], variable: "--font-sans"});
 
@@ -22,10 +20,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <link rel="icon" href="/favicon.png" sizes="any" />
-      </head>
-      <GoogleAnalytics />
       <body
         className={cn(
           "flex flex-col min-h-screen bg-background font-sans antialiased",
@@ -36,7 +30,6 @@ export default function RootLayout({
           <UserContextProvider>
             <Navbar />
             <section className="flex-grow"> {children}</section>
-            <Toaster />
           </UserContextProvider>
         </Providers>
         <Footer />

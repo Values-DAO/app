@@ -1,63 +1,36 @@
 import mongoose, {Schema, models} from "mongoose";
 
-export type IUser = {
-  name?: string;
-  profileNft?: Number;
-  email?: string;
-  farcaster?: number;
-  twitter?: string;
-  wallets?: string[];
-  mintedValues?: {value: string; weightage?: Number}[];
-  balance?: number;
-  aiGeneratedValues?: {
-    twitter: string[];
-    warpcast: string[];
-  };
-  aiGeneratedValuesWithWeights?: {
-    twitter: Object;
-    warpcast: Object;
-  };
-  profileNftHash?: string;
-  profileNftIpfs?: string;
-  communitiesMinted?: string[];
-  referrer?: string;
-  attestations?: string[];
-};
-
 const userSchema = new Schema(
   {
-    name: {
+    userId: {
       type: String,
+      required: true,
+      unique: true,
+    },
+    profileMinted: {
+      type: Boolean,
+      default: false,
     },
     profileNft: {
       type: Number,
     },
-
     email: {
       type: String,
     },
-    farcaster: {
+    fid: {
       type: Number,
     },
-    twitter: {
+    twitterUsername: {
       type: String,
     },
-
+    twitterId: {
+      type: String,
+    },
     wallets: {
       type: [String],
       default: [],
     },
-    mintedValues: {
-      type: [
-        {
-          value: String,
-          weightage: Number,
-        },
-      ],
-      default: [],
-    },
-
-    aiGeneratedValues: {
+    generatedValues: {
       twitter: {
         type: [String],
         default: [],
@@ -67,28 +40,91 @@ const userSchema = new Schema(
         default: [],
       },
     },
-    aiGeneratedValuesWithWeights: {
-      twitter: {type: Object, default: {}},
-      warpcast: {type: Object, default: {}},
+    generatedValuesWithWeights: {
+      twitter: {
+        type: Map,
+        of: Number,
+        default: new Map(),
+      },
+      warpcast: {
+        type: Map,
+        of: Number,
+        default: new Map(),
+      },
+    },
+    spectrum: {
+      warpcast: {
+        type: [
+          {
+            name: String,
+            description: String,
+            score: Number,
+          },
+        ],
+        default: [],
+      },
+      twitter: {
+        type: [
+          {
+            name: String,
+            description: String,
+            score: Number,
+          },
+        ],
+        default: [],
+      },
+    },
+
+    userContentRemarks: {
+      warpcast: {
+        type: String,
+      },
+      twitter: {
+        type: String,
+      },
+    },
+
+    mintedValues: {
+      type: [
+        {
+          value: {
+            type: Schema.Types.ObjectId,
+            ref: "Values",
+          },
+          weightage: Number,
+        },
+      ],
+      default: [],
     },
     balance: {
       type: Number,
-      default: 0,
+      default: 5,
     },
-    profileNftHash: {
-      type: String,
+    userTxHashes: {
+      type: [
+        {
+          txHash: String,
+          createdAt: Date,
+        },
+      ],
+      default: [],
     },
     profileNftIpfs: {
       type: String,
     },
     communitiesMinted: {
+      type: [{type: Schema.Types.ObjectId, ref: "Communities"}],
+      default: [],
+    },
+
+    attestations: {
       type: [String],
       default: [],
     },
     referrer: {
       type: String,
     },
-    attestations: {
+    socialValuesMinted: {
       type: [String],
       default: [],
     },
@@ -96,6 +132,7 @@ const userSchema = new Schema(
 
   {timestamps: true}
 );
+
 // Middleware to ensure uniqueness of wallets
 userSchema.pre("save", async function (next) {
   const user = this;
@@ -105,7 +142,7 @@ userSchema.pre("save", async function (next) {
     (value, index, self) => self.indexOf(value) === index
   );
   if (user.isNew) {
-    const existingUser = await User.findOne({email: user.email}).exec();
+    const existingUser = await Users.findOne({email: user.email}).exec();
     if (existingUser) {
       return next();
     }
@@ -113,5 +150,5 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-const User = models.User || mongoose.model("User", userSchema);
-export default User;
+const Users = models.Users || mongoose.model("Users", userSchema);
+export default Users;

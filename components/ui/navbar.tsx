@@ -14,7 +14,7 @@ import {EllipsisVertical} from "lucide-react";
 import {usePrivy} from "@privy-io/react-auth";
 
 const Navbar = () => {
-  const {ready, authenticated, user, logout, login} = usePrivy();
+  const {ready, authenticated, logout, login} = usePrivy();
 
   return (
     <div className="flex flex-row justify-between items-center  p-4 md:p-6 relative">
@@ -27,16 +27,16 @@ const Navbar = () => {
       </Link>
 
       <div className="hidden md:flex flex-row gap-4 mt-[-12px]">
-        <Button variant={"link"} className="text-md" asChild>
+        {/* <Button variant={"link"} className="text-md" asChild>
           <Link href={"/"}>Home</Link>
-        </Button>
+        </Button> */}
         {/* <Button variant={"link"} className="text-md" asChild>
           <Link href={"/farcaster-meetup"}>Farcaster Meetup SF</Link>
         </Button> */}
         {/* <Button variant={"link"} className="text-md" asChild>
           <Link href={"/farcon-aligned"}>Farcon</Link>
         </Button> */}{" "}
-        <Button variant={"link"} className="text-md" asChild>
+        {/* <Button variant={"link"} className="text-md" asChild>
           <Link href={"/community"}>Communities</Link>
         </Button>{" "}
         <Button variant={"link"} className="text-md" asChild>
@@ -44,7 +44,7 @@ const Navbar = () => {
         </Button>
         <Button variant={"link"} className="text-md" asChild>
           <Link href={"/profile"}>Profile</Link>
-        </Button>
+        </Button> */}
         {/* <Button variant={"link"} className="text-md" asChild>
           <Link href={"/mint"}>Mint a Value</Link>
         </Button> */}
@@ -66,16 +66,16 @@ const Navbar = () => {
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="mr-4">
-            <DropdownMenuItem asChild className="cursor-pointer">
+            {/* <DropdownMenuItem asChild className="cursor-pointer">
               <Link href={"/"}>Home</Link>
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
             {/* <DropdownMenuItem asChild className="cursor-pointer">
               <Link href={"/farcaster-meetup"}>Farcaster Meetup SF</Link>
             </DropdownMenuItem> */}
             {/* <DropdownMenuItem asChild className="cursor-pointer">
               <Link href={"/farcon-aligned"}>Farcon</Link>
             </DropdownMenuItem> */}
-            <DropdownMenuItem asChild className="cursor-pointer">
+            {/* <DropdownMenuItem asChild className="cursor-pointer">
               <Link href={"/community"}>Communities</Link>
             </DropdownMenuItem>{" "}
             <DropdownMenuItem asChild className="cursor-pointer">
@@ -83,7 +83,7 @@ const Navbar = () => {
             </DropdownMenuItem>{" "}
             <DropdownMenuItem asChild className="cursor-pointer">
               <Link href={"/profile"}>Profile</Link>
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
             {/* <DropdownMenuItem asChild className="cursor-pointer">
               <Link href={"/mint"}>Mint a Value</Link>
             </DropdownMenuItem> */}

@@ -1,5 +1,5 @@
+import {AIRSTACK_API_URL} from "@/constants";
 import axios from "axios";
-import {AIRSTACK_API_URL} from "./constants";
 
 export const fetchCastsForUser = async (
   fid: number | string,
@@ -16,20 +16,26 @@ export const fetchCastsForUser = async (
         }
     }`;
 
-  const airstackResponse = await axios.post(
-    AIRSTACK_API_URL,
-    {
-      query,
-    },
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: process.env.NEXT_PUBLIC_AIRSTACK_API_KEY || "",
+  try {
+    const airstackResponse = await axios.post(
+      AIRSTACK_API_URL,
+      {
+        query,
       },
-    }
-  );
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: process.env.NEXT_PUBLIC_AIRSTACK_API_KEY || "",
+        },
+      }
+    );
 
-  return airstackResponse.data.data.FarcasterCasts.Cast.map((cast: any) => {
-    return cast.rawText;
-  });
+    return airstackResponse.data.data.FarcasterCasts.Cast.map((cast: any) => {
+      return cast.rawText;
+    });
+  } catch (error) {
+    return {
+      error: error || "Error fetching user casts",
+    };
+  }
 };

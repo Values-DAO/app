@@ -1,16 +1,16 @@
 import React from "react";
 import {Badge} from "./badge";
 
-const ValueBadge = ({value, weight}: {value: string; weight?: string}) => {
+const ValueBadge = ({value, weight}: {value: string; weight?: number}) => {
   const capitalizedValue =
     value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
 
   return (
     <Badge
       variant="outline"
-      className="rounded-sm text-[18px] text-nowrap w-fit border-2 border-primary"
+      className="text-primary-foreground text-md border-primary border-2 rounded-md"
     >
-      {capitalizedValue} {weight && `(${weight})`}
+      {capitalizedValue}
     </Badge>
   );
 };
