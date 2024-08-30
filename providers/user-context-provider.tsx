@@ -7,7 +7,7 @@ import {createContext, useContext, useEffect, useState} from "react";
 
 interface IUserContext {
   userInfo: IUser | null;
-  setUserInfo: (userInfo: IUser) => void;
+  setUserInfo: (userInfo: IUser | null) => void;
   isLoading: boolean;
 }
 
@@ -30,7 +30,7 @@ export const UserContextProvider = ({
   useEffect(() => {
     const userExists = async () => {
       if (!authenticated) return;
-
+      if (userInfo?.userId) return;
       if (user?.farcaster?.fid || user?.email?.address) {
         setIsLoading(true);
         const userData = await getUserData({
@@ -41,7 +41,8 @@ export const UserContextProvider = ({
           if (userData.error === "User not found") {
             // user does not exist, create user
             const newUser = await createUser({
-              fid: user?.farcaster?.fid!,
+              ...(user?.farcaster?.fid && {fid: user?.farcaster?.fid}),
+              ...(user?.email?.address && {email: user?.email?.address}),
             });
 
             if ("error" in newUser) {

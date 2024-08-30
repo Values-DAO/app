@@ -42,6 +42,7 @@ const userSchema = new Schema(
     },
     generatedValuesWithWeights: {
       twitter: {
+        // {humility:50, empathy: 30}
         type: Map,
         of: Number,
         default: new Map(),
@@ -66,9 +67,9 @@ const userSchema = new Schema(
       twitter: {
         type: [
           {
-            name: String,
+            name: String, // individual vs collectivism
             description: String,
-            score: Number,
+            score: Number, // 70   (100-score) = 30
           },
         ],
         default: [],
@@ -91,7 +92,7 @@ const userSchema = new Schema(
             type: Schema.Types.ObjectId,
             ref: "Values",
           },
-          weightage: Number,
+          weightage: Number, //todo change 'weightage' to  'timesMinted'
         },
       ],
       default: [],
@@ -108,9 +109,6 @@ const userSchema = new Schema(
         },
       ],
       default: [],
-    },
-    profileNftIpfs: {
-      type: String,
     },
     communitiesMinted: {
       type: [{type: Schema.Types.ObjectId, ref: "Communities"}],

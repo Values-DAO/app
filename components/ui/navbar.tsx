@@ -11,11 +11,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {EllipsisVertical} from "lucide-react";
-import {usePrivy} from "@privy-io/react-auth";
+import {useLogout, usePrivy} from "@privy-io/react-auth";
+import {useUserContext} from "@/providers/user-context-provider";
 
 const Navbar = () => {
-  const {ready, authenticated, logout, login} = usePrivy();
-
+  const {ready, authenticated, login} = usePrivy();
+  const {setUserInfo} = useUserContext();
+  const {logout} = useLogout({
+    onSuccess: () => {
+      setUserInfo(null);
+    },
+  });
   return (
     <div className="flex flex-row justify-between items-center  p-4 md:p-6 relative">
       <Link href="/">

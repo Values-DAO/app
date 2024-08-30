@@ -185,6 +185,28 @@ const useValuesHook = () => {
     return data;
   };
 
+  const attachFarcaster = async ({
+    userId,
+    fid,
+  }: {
+    userId: string;
+    fid: number;
+  }): Promise<{error: string} | IUser> => {
+    if (!userId || !fid) {
+      return {error: "Please provide userId and fid"};
+    }
+    const {data} = await axios.post(`/api/users`, {
+      userId,
+      method: "link_farcaster",
+      userDataToUpdate: {
+        fid,
+      },
+    });
+    if (data.error) {
+      return {error: data.error};
+    }
+    return data;
+  };
   return {
     getAllValues,
     getUserData,
@@ -193,6 +215,7 @@ const useValuesHook = () => {
     generateValues,
     attachTwitter,
     mintValues,
+    attachFarcaster,
   };
 };
 

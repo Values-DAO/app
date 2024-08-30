@@ -9,9 +9,57 @@ import ValueGeneratingLoader from "./ui/value-generating-loader";
 import SpectrumCard from "./ui/spectrum-card";
 import {useLinkAccount, usePrivy} from "@privy-io/react-auth";
 import {NFT_CONTRACT_ADDRESS} from "@/constants";
+import LinkWalletComponent from "./ui/link-wallet-component";
 
 const AiValueComponent = () => {
   const {user} = usePrivy();
+  const [accountLinkError, setAccountLinkError] = useState<string | null>(null);
+  const {userInfo, setUserInfo} = useUserContext();
+  const {attachTwitter, attachFarcaster, addWallet} = useValuesHook();
+  const {linkTwitter, linkFarcaster, linkWallet} = useLinkAccount({
+    onSuccess: async (user, linkMethod, linkedAccount) => {
+      if (linkMethod === "twitter") {
+        const response = await attachTwitter({
+          userId: userInfo?.userId!,
+          username: user.twitter?.username!,
+          id: user.twitter?.subject!,
+        });
+
+        if ("error" in response) {
+          setAccountLinkError("Error linking Twitter account");
+        } else {
+          setUserInfo(response);
+        }
+      } else if (linkMethod === "farcaster") {
+        const response = await attachFarcaster({
+          userId: userInfo?.userId!,
+          fid: user?.farcaster?.fid!,
+        });
+
+        if ("error" in response) {
+          setAccountLinkError("Error linking Farcaster account");
+        } else {
+          setUserInfo(response);
+        }
+      } else if (linkMethod === "siwe") {
+        const response = await addWallet({
+          userId: userInfo?.userId!,
+          walletAddress: user?.wallet?.address!,
+        });
+
+        if ("error" in response) {
+          setAccountLinkError("Error linking wallet");
+        } else {
+          setUserInfo(response);
+        }
+      }
+    },
+
+    onError: (e) => {
+      if (e === "exited_link_flow") return;
+      else setAccountLinkError("Error linking account");
+    },
+  });
   return (
     <section className="w-[92%] md:w-[70%] m-auto mt-0 md:mt-12">
       <h2 className="scroll-m-20 border-b pb-2 text-2xl md:text-4xl font-medium tracking-tight text-center mb-2 md:mb-8">
@@ -36,25 +84,40 @@ const AiValueComponent = () => {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="warpcast">
-          <WarpcastTab />
+          <WarpcastTab
+            linkFarcaster={linkFarcaster}
+            accountLinkError={accountLinkError}
+            linkWallet={linkWallet}
+          />
         </TabsContent>
         <TabsContent value="twitter">
-          <TwitterTab />
+          <TwitterTab
+            linkTwitter={linkTwitter}
+            accountLinkError={accountLinkError}
+            linkWallet={linkWallet}
+          />
         </TabsContent>
       </Tabs>
     </section>
   );
 };
 
-const WarpcastTab = () => {
+const WarpcastTab = ({
+  linkFarcaster,
+  linkWallet,
+  accountLinkError,
+}: {
+  linkFarcaster: () => void;
+  linkWallet: () => void;
+  accountLinkError: string | null;
+}) => {
   const {userInfo, setUserInfo} = useUserContext();
-  const {generateValues, mintValues} = useValuesHook();
+  const {generateValues, mintValues, attachFarcaster} = useValuesHook();
   const [generatingValues, setGeneratingValues] = useState(false);
   const [mintingValues, setMintingValues] = useState(false);
-  const {linkFarcaster} = usePrivy();
   const [error, setError] = useState<string | null>(null);
   const handleGenerateValues = async () => {
-    if (!userInfo) {
+    if (!userInfo?.fid) {
       return;
     }
     setGeneratingValues(true);
@@ -65,7 +128,6 @@ const WarpcastTab = () => {
     });
 
     if ("error" in response) {
-      console.error(response.error);
       setError(response.error);
     } else {
       setUserInfo(response);
@@ -83,7 +145,6 @@ const WarpcastTab = () => {
       source: "warpcast",
     });
     if ("error" in response) {
-      console.error(response.error);
       setError(response.error);
     } else {
       setUserInfo(response);
@@ -92,10 +153,10 @@ const WarpcastTab = () => {
   };
   return (
     <div className="w-full flex flex-col py-2 mb-8">
-      {error && (
+      {(error || accountLinkError) && (
         <Alert className="border-red-600 text-red-600 my-4">
           <AlertDescription className="text-md font-light">
-            {error}
+            {error || accountLinkError}
           </AlertDescription>
         </Alert>
       )}
@@ -116,7 +177,7 @@ const WarpcastTab = () => {
               </Button>
             </div>
           )}
-          {!generatingValues && (
+          {!generatingValues && userInfo.fid && (
             <Button
               className="mt-4 w-full text-md "
               onClick={handleGenerateValues}
@@ -139,23 +200,7 @@ const WarpcastTab = () => {
               userInfo.socialValuesMinted.includes("warpcast") && (
                 <Alert className="bg-green-300 text-black">
                   <AlertDescription className="text-md font-light">
-                    You have minted these Values. Checkout your ValuesDAO
-                    Profile to see your Values {"=>"}{" "}
-                    <a
-                      href={`https://${
-                        process.env.NEXT_PUBLIC_APP_ENV !== "prod"
-                          ? ""
-                          : "testnets."
-                      }opensea.io/assets/${
-                        process.env.NEXT_PUBLIC_APP_ENV === "prod"
-                          ? "base"
-                          : "base-sepolia"
-                      }/${NFT_CONTRACT_ADDRESS}/${userInfo.profileNft}`}
-                      target="_blank"
-                      className="border-b border-black cursor-pointer"
-                    >
-                      Profile
-                    </a>
+                    You have minted these Values.
                   </AlertDescription>
                 </Alert>
               )}
@@ -174,6 +219,12 @@ const WarpcastTab = () => {
                 ))}
             </div>
           </div>
+        )}
+
+      {userInfo &&
+        userInfo.generatedValues.warpcast.length > 0 &&
+        userInfo.wallets.length === 0 && (
+          <LinkWalletComponent linkWallet={linkWallet} />
         )}
       {userInfo &&
         userInfo.generatedValues.warpcast.length > 0 &&
@@ -207,35 +258,24 @@ const WarpcastTab = () => {
     </div>
   );
 };
-const TwitterTab = () => {
+const TwitterTab = ({
+  linkTwitter,
+  linkWallet,
+  accountLinkError,
+}: {
+  linkTwitter: () => void;
+  linkWallet: () => void;
+  accountLinkError: string | null;
+}) => {
   const {userInfo, setUserInfo} = useUserContext();
+
   const {generateValues, attachTwitter, mintValues} = useValuesHook();
   const [generatingValues, setGeneratingValues] = useState(false);
-  const {user} = usePrivy();
-  const [mintingValues, setMintingValues] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const {linkTwitter} = useLinkAccount({
-    onSuccess: async (user, linkMethod, linkedAccount) => {
-      const response = await attachTwitter({
-        userId: userInfo?.userId!,
-        username: user.twitter?.username!,
-        id: user.twitter?.subject!,
-      });
+  const [mintingValues, setMintingValues] = useState(false);
 
-      if ("error" in response) {
-        console.error(response.error);
-        setError("Error linking Twitter account");
-      } else {
-        setUserInfo(response);
-      }
-    },
-
-    onError: (e) => {
-      setError("Error linking Twitter account");
-    },
-  });
   const handleGenerateValues = async () => {
-    if (!userInfo || !user?.twitter?.subject) {
+    if (!userInfo?.twitterId || !userInfo?.twitterUsername) {
       return;
     }
     setGeneratingValues(true);
@@ -249,7 +289,6 @@ const TwitterTab = () => {
     });
 
     if ("error" in response) {
-      console.error(response.error);
       setError(response.error);
     } else {
       setUserInfo(response);
@@ -267,7 +306,6 @@ const TwitterTab = () => {
       source: "twitter",
     });
     if ("error" in response) {
-      console.error(response.error);
       setError(response.error);
     } else {
       setUserInfo(response);
@@ -277,10 +315,10 @@ const TwitterTab = () => {
 
   return (
     <div className="w-full flex flex-col py-2 mb-8">
-      {error && (
+      {(error || accountLinkError) && (
         <Alert className="border-red-600 text-red-600">
           <AlertDescription className="text-md font-light">
-            {error}
+            {error || accountLinkError}
           </AlertDescription>
         </Alert>
       )}
@@ -305,7 +343,7 @@ const TwitterTab = () => {
             <Button
               className="mt-4 w-full text-md "
               onClick={handleGenerateValues}
-              disabled={!user?.twitter?.subject || !userInfo.twitterId}
+              disabled={!userInfo.twitterUsername || !userInfo.twitterId}
             >
               Analyse my Values
             </Button>
@@ -323,23 +361,7 @@ const TwitterTab = () => {
               userInfo.socialValuesMinted.includes("twitter") && (
                 <Alert className="bg-green-300 text-black">
                   <AlertDescription className="text-md font-light">
-                    You have minted these Values. Checkout your ValuesDAO
-                    Profile to see your Values {"=>"}{" "}
-                    <a
-                      href={`https://${
-                        process.env.NEXT_PUBLIC_APP_ENV === "prod"
-                          ? ""
-                          : "testnets."
-                      }opensea.io/assets/${
-                        process.env.NEXT_PUBLIC_APP_ENV === "prod"
-                          ? "base"
-                          : "base-sepolia"
-                      }/${NFT_CONTRACT_ADDRESS}/${userInfo.profileNft}`}
-                      target="_blank"
-                      className="border-b border-black cursor-pointer"
-                    >
-                      Profile
-                    </a>
+                    You have minted these Values.
                   </AlertDescription>
                 </Alert>
               )}
@@ -361,7 +383,13 @@ const TwitterTab = () => {
         )}
       {userInfo &&
         userInfo.generatedValues.twitter.length > 0 &&
-        !userInfo.socialValuesMinted.includes("twitter") && (
+        userInfo.wallets.length === 0 && (
+          <LinkWalletComponent linkWallet={linkWallet} />
+        )}
+      {userInfo &&
+        userInfo.generatedValues.twitter.length > 0 &&
+        !userInfo.socialValuesMinted.includes("twitter") &&
+        userInfo.wallets.length > 0 && (
           <Button
             className="mt-4 w-full text-md"
             onClick={handleMint}
