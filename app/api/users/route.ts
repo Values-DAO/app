@@ -463,6 +463,54 @@ export async function POST(req: NextRequest) {
           socialValuesMinted: user.socialValuesMinted,
           communitiesMinted: user.communitiesMinted,
         });
+
+      case "link_farcaster":
+        if (!user) {
+          return NextResponse.json({
+            error: "User not found",
+          });
+        }
+        if (user.fid) {
+          return NextResponse.json({
+            error: "User already has a farcaster account linked",
+          });
+        }
+
+        if (!userDataToUpdate || !userDataToUpdate.fid) {
+          return NextResponse.json({
+            error: "Please provide fid to link",
+          });
+        }
+        user.fid = userDataToUpdate.fid;
+        await user.save();
+        return NextResponse.json({
+          userId: user.userId,
+          ...(user.fid && {fid: user.fid}),
+          ...(user.twitterUsername && {
+            twitterUsername: user.twitterUsername,
+          }),
+          ...(user.twitterId && {twitterId: user.twitterId}),
+          ...(user.email && {email: user.email}),
+          ...(user.wallets && {wallets: user.wallets}),
+          wallets: user.wallets,
+          profileMinted: user.profileMinted,
+          profileNft: user.profileNft,
+          balance: user.balance,
+          mintedValues: (
+            await user.populate({
+              path: "mintedValues.value",
+              model: "Values",
+            })
+          ).mintedValues.map((v: any) => ({
+            name: v.value.name,
+            weightage: v.weightage,
+          })),
+          generatedValues: user.generatedValues,
+          generatedValuesWithWeights: user.generatedValuesWithWeights,
+          spectrum: user.spectrum,
+          socialValuesMinted: user.socialValuesMinted,
+          communitiesMinted: user.communitiesMinted,
+        });
     }
 
     return NextResponse.json({
