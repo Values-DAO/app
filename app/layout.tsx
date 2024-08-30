@@ -6,6 +6,7 @@ import Providers from "@/providers/privy-provider";
 import Navbar from "@/components/ui/navbar";
 import Footer from "@/components/ui/footer";
 import {UserContextProvider} from "@/providers/user-context-provider";
+import GoogleAnalytics from "@/components/google-analytics";
 
 const inter = Inter({subsets: ["latin"], variable: "--font-sans"});
 
@@ -20,6 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <GoogleAnalytics />
       <body
         className={cn(
           "flex flex-col min-h-screen bg-background font-sans antialiased",
