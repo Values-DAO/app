@@ -47,6 +47,9 @@ dependencies:
   next:
     specifier: 14.2.6
     version: 14.2.6(@babel/core@7.25.2)(react-dom@18.3.1)(react@18.3.1)
+  nodemailer:
+    specifier: ^6.9.14
+    version: 6.9.14
   openai:
     specifier: ^4.56.0
     version: 4.56.0
@@ -8929,6 +8932,11 @@ packages:
   /node-stream-zip@1.15.0:
     resolution: {integrity: sha512-LN4fydt9TqhZhThkZIVQnF9cwjU3qmUH9h78Mx/K7d3VvfRqqwthLwJEUOEL0QPZ0XQmNN7be5Ggit5+4dq3Bw==}
     engines: {node: '>=0.12.0'}
+    dev: false
+
+  /nodemailer@6.9.14:
+    resolution: {integrity: sha512-Dobp/ebDKBvz91sbtRKhcznLThrKxKt97GI2FAlAyy+fk19j73Uz3sBXolVtmcXjaorivqsbbbjDY+Jkt4/bQA==}
+    engines: {node: '>=6.0.0'}
     dev: false
 
   /normalize-path@3.0.0:
