@@ -20,9 +20,7 @@ export async function sendMail(subject: string, body: any) {
         ? "siddeshsankhya@gmail.com, pareenwriting@gmail.com"
         : "siddeshsankhya@gmail.com"
     }`,
-    subject: `${
-      process.env.NEXT_PUBLIC_APP_ENV === "prod" ? "[PROD]" : "[STAGING]"
-    } - ${subject}`,
+    subject: subject,
     html: body,
   };
   return new Promise((resolve, reject) => {
