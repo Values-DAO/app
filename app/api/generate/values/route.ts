@@ -4,6 +4,7 @@ import {fetchUserTweets} from "@/lib/fetch-user-tweets";
 import {generateUserValues} from "@/lib/generate-user-values";
 import Users from "@/models/user";
 import Values from "@/models/values";
+import {generateEmailHTML, sendMail} from "@/service/email";
 import {NextRequest, NextResponse} from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -138,6 +139,21 @@ export async function POST(req: NextRequest) {
     }
 
     await user.save();
+
+    await sendMail(
+      `Values generated via AI`,
+      generateEmailHTML({
+        action: "USER_VALUES_GENERATED",
+        fid: user?.fid,
+        email: user.email,
+        twitter: user.twitterUsername,
+        generatedValues:
+          user.generatedValues[source === "farcaster" ? "warpcast" : "twitter"],
+        source,
+        spectrum:
+          user.spectrum[source === "farcaster" ? "warpcast" : "twitter"],
+      })
+    );
     return NextResponse.json({
       status: 200,
       message: "success",

@@ -11,6 +11,7 @@ import {NFT_CONTRACT_ABI, NFT_CONTRACT_ADDRESS} from "@/constants";
 import {getTotalProfileNFTsMintedCount} from "@/lib/get-total-profile-minted-count";
 import {AnyError} from "mongodb";
 import Communities from "@/models/community";
+import {generateEmailHTML, sendMail} from "@/service/email";
 const viemWalletClient = createWalletClient({
   chain: process.env.NEXT_PUBLIC_APP_ENV === "prod" ? base : baseSepolia,
   transport: http(),
@@ -91,6 +92,14 @@ export async function POST(req: NextRequest) {
           referrer: referrer || "unknown",
         });
 
+        await sendMail(
+          `New User`,
+          generateEmailHTML({
+            action: "NEW_USER",
+            ...(fid && {fid}),
+            ...(email && {email}),
+          })
+        );
         return NextResponse.json({
           userId: createdUser.userId,
           ...(createdUser.fid && {fid: createdUser.fid}),
@@ -335,6 +344,15 @@ export async function POST(req: NextRequest) {
         }
 
         await user.save();
+        await sendMail(
+          `Values Minted`,
+          generateEmailHTML({
+            action: "USER_VALUES_MINTED",
+            ...(user.fid && {fid: user.fid}),
+            ...(user.email && {email: user.email}),
+            mintedValues: userDataToUpdate.values.map((v: any) => v),
+          })
+        );
         return NextResponse.json({
           userId: user.userId,
           ...(user.fid && {fid: user.fid}),
