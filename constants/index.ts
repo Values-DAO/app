@@ -1,10 +1,12 @@
-// export const NFT_CONTRACT_ADDRESS =
-//   process.env.NEXT_PUBLIC_APP_ENV === "staging"
-//     ? "0x6613c7e5a5FaaE496AaEeC9C85562D9128FeDF4a"
-//     : "0x68cf79739AFF49b7bc74e9F7f3571E867410B3Fc";
-
 export const NFT_CONTRACT_ADDRESS =
-  "0x55ea555d659cdeF815a97E0A1Fc026bfFA71D094";
+  process.env.NEXT_PUBLIC_APP_ENV === "prod"
+    ? "0x55ea555d659cdeF815a97E0A1Fc026bfFA71D094"
+    : process.env.NEXT_PUBLIC_APP_ENV === "staging"
+    ? "0x6613c7e5a5FaaE496AaEeC9C85562D9128FeDF4a"
+    : "0x68cf79739AFF49b7bc74e9F7f3571E867410B3Fc";
+
+export const AIRSTACK_API_URL = "https://api.airstack.xyz/graphql";
+
 export const NFT_CONTRACT_ABI = [
   {
     inputs: [

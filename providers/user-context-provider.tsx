@@ -1,20 +1,21 @@
 "use client";
-
-import useValuesHook from "@/app/hooks/useValuesHook";
-import {IUser} from "@/models/user";
+import useValuesHook from "@/hooks/useValuesHook";
+import {getUserFarcasterWallets} from "@/lib/get-user-farcaster-wallets";
+import {IUser} from "@/types";
 import {usePrivy} from "@privy-io/react-auth";
-import axios from "axios";
 import {createContext, useContext, useEffect, useState} from "react";
 
-interface UserContextType {
+interface IUserContext {
   userInfo: IUser | null;
-  setUserInfo: (userInfo: IUser) => void;
+  setUserInfo: (userInfo: IUser | null) => void;
   isLoading: boolean;
-  valuesRecommendation: string[];
 }
-export const UserContext = createContext<UserContextType | undefined>(
-  undefined
-);
+
+const UserContext = createContext<IUserContext>({
+  userInfo: null,
+  setUserInfo: () => {},
+  isLoading: false,
+});
 
 export const UserContextProvider = ({
   children,
@@ -22,180 +23,71 @@ export const UserContextProvider = ({
   children: React.ReactNode;
 }) => {
   const [userInfo, setUserInfo] = useState<IUser | null>(null);
-  const [isLoading, setLoading] = useState(false);
-  const {authenticated, user} = usePrivy();
-  const [values, setValues] = useState([]);
-  const {fetchUser, createUser, fetchFarcasterUserWallets} = useValuesHook();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const {authenticated, user, ready} = usePrivy();
+  const {getUserData, createUser, addWallet} = useValuesHook();
+
   useEffect(() => {
-    if (!authenticated) return;
-    setLoading(true);
+    const userExists = async () => {
+      if (!authenticated) return;
+      if (userInfo?.userId) return;
+      if (user?.farcaster?.fid || user?.email?.address) {
+        setIsLoading(true);
+        const userData = await getUserData({
+          ...(user?.farcaster?.fid && {fid: user?.farcaster?.fid}),
+          ...(user?.email?.address && {email: user?.email?.address}),
+        });
+        if ("error" in userData) {
+          if (userData.error === "User not found") {
+            // user does not exist, create user
+            const newUser = await createUser({
+              ...(user?.farcaster?.fid && {fid: user?.farcaster?.fid}),
+              ...(user?.email?.address && {email: user?.email?.address}),
+            });
 
-    const isUserExist = async () => {
-      let userInfo: IUser | null | undefined = null;
-      let wallets;
-      setLoading(true);
-      if (!user?.email?.address && !user?.farcaster?.fid) {
-        setLoading(false);
-        return;
+            if ("error" in newUser) {
+            } else {
+              setUserInfo(newUser);
+            }
+          }
+        } else {
+          setUserInfo(userData);
+        }
+        setIsLoading(false);
       }
-      userInfo = (await fetchUser())?.user;
+      return;
+    };
+    userExists();
+  }, [user]);
 
-      if (userInfo) {
-        setUserInfo(userInfo);
-      } else {
-        const wallets = await fetchFarcasterUserWallets();
+  useEffect(() => {
+    const updateUserWalletsIfNotExists = async () => {
+      if (!userInfo) return;
+      if (userInfo.wallets.length === 0) {
+        if (!user?.farcaster?.fid) return;
+        const userFarcasterWallets = await getUserFarcasterWallets(
+          user?.farcaster?.fid
+        );
 
-        const userCreated = await createUser({
-          wallets:
-            [
-              ...new Set(
-                wallets
-                  .filter((wallet) => wallet)
-                  .map((wallet) => wallet.toLowerCase())
-              ),
-              ...(user?.wallet?.address
-                ? [user.wallet.address.toLowerCase()]
-                : []),
-            ] || [],
-          twitter: user?.twitter?.username as string,
+        if (userFarcasterWallets.length === 0) return;
+
+        const updatedUser = await addWallet({
+          userId: userInfo.userId,
+          walletAddress: userFarcasterWallets[0],
         });
 
-        setUserInfo(userCreated.user);
-      }
-
-      setLoading(false);
-    };
-
-    isUserExist();
-  }, [user]);
-
-  useEffect(() => {
-    const addWalletsIfPresent = async () => {
-      if (!user?.wallet?.address && user?.farcaster?.fid) return;
-      try {
-        const wallets = await fetchFarcasterUserWallets();
-
-        await axios.post(
-          `/api/v2/user`,
-          {
-            method: "mint_profile",
-            wallets: [
-              ...(user?.wallet?.address ? [user.wallet.address] : []),
-              ,
-              ...wallets,
-            ],
-            ...(user?.farcaster?.fid ? {farcaster: user?.farcaster?.fid} : {}),
-            ...(user?.email?.address ? {email: user?.email?.address} : {}),
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
-            },
-          }
-        );
-
-        const {data} = await axios.post(
-          "/api/v2/user",
-          {
-            method: "add_wallet",
-            wallets: [
-              ...(user?.wallet?.address ? [user.wallet.address] : []),
-              ,
-              ...wallets,
-            ],
-            ...(user?.farcaster?.fid ? {farcaster: user?.farcaster?.fid} : {}),
-            ...(user?.email?.address ? {email: user?.email?.address} : {}),
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
-            },
-          }
-        );
-        if (data.status === 200) setUserInfo(data.user);
-      } catch (error) {
-        console.log("error", error);
+        if ("error" in updatedUser) {
+          console.error(updatedUser.error);
+        } else {
+          setUserInfo(updatedUser);
+        }
       }
     };
-
-    const updatetwitterHandle = async () => {
-      if (!user || !user?.twitter?.username) return;
-      try {
-        if (userInfo?.twitter) return;
-        const {data} = await axios.post(
-          "/api/v2/user",
-          {
-            method: "update_twitter",
-            twitter: user?.twitter?.username,
-            ...(user?.farcaster?.fid ? {farcaster: user?.farcaster?.fid} : {}),
-            ...(user?.email?.address ? {email: user?.email?.address} : {}),
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
-            },
-          }
-        );
-        if (data.status === 200) setUserInfo(data.user);
-      } catch (error) {
-        console.log("error", error);
-      }
-    };
-
-    const updateWarpcastHandle = async () => {
-      if (!user || !user?.farcaster?.fid) return;
-      try {
-        if (userInfo?.farcaster) return;
-        const {data} = await axios.post(
-          "/api/v2/user",
-          {
-            method: "update_farcaster",
-
-            ...(user?.farcaster?.fid ? {farcaster: user?.farcaster?.fid} : {}),
-            ...(user?.email?.address ? {email: user?.email?.address} : {}),
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              "x-api-key": process.env.NEXT_PUBLIC_NEXT_API_KEY as string,
-            },
-          }
-        );
-        if (data.status === 200) setUserInfo(data.user);
-      } catch (error) {
-        console.log("error", error);
-      }
-    };
-    updatetwitterHandle();
-    updateWarpcastHandle();
-    addWalletsIfPresent();
-  }, [user]);
-
-  useEffect(() => {
-    const getAllValues = async () => {
-      //basically value recommendations array
-      const {
-        data: {values},
-      } = await axios.get(`${process.env.NEXT_PUBLIC_HOST}/api/v2/value`);
-
-      setValues(values);
-    };
-
-    getAllValues();
-  }, []);
+    updateUserWalletsIfNotExists();
+  }, [user, userInfo]);
 
   return (
-    <UserContext.Provider
-      value={{
-        userInfo,
-        setUserInfo,
-        isLoading,
-        valuesRecommendation: values,
-      }}
-    >
+    <UserContext.Provider value={{userInfo, setUserInfo, isLoading}}>
       {children}
     </UserContext.Provider>
   );

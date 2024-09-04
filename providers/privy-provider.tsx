@@ -18,7 +18,7 @@ export const config = createConfig({
   chains: [mainnet, base, baseSepolia, polygon, optimism],
   transports: {
     [mainnet.id]: http(),
-    [base.id]: http(),
+    [base.id]: http(process.env.NEXT_PUBLIC_BASE_RPC || ""),
     [baseSepolia.id]: http(process.env.NEXT_PUBLIC_BASE_SEPOLIA_RPC || ""),
     [polygon.id]: http(),
     [optimism.id]: http(),
