@@ -25,7 +25,7 @@ const SpectrumCard = ({
         <CardTitle className="flex flex-row justify-between mb-4">
           <span className="text-xl">{name}</span>
         </CardTitle>
-        <CardDescription>{description}</CardDescription>
+        {/* <CardDescription>{description}</CardDescription> */}
       </CardHeader>
       <CardContent>
         <div className="flex flex-row justify-between my-1">
