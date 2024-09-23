@@ -113,15 +113,7 @@ export async function POST(req: NextRequest) {
           profileMinted: createdUser.profileMinted,
           profileNft: createdUser.profileNft,
           balance: createdUser.balance,
-          mintedValues: (
-            await createdUser.populate({
-              path: "mintedValues.value",
-              model: "Values",
-            })
-          ).mintedValues.map((v: any) => ({
-            name: v.value.name,
-            weightage: v.weightage,
-          })),
+          mintedValues: [],
           generatedValues: createdUser.generatedValues,
           generatedValuesWithWeights: createdUser.generatedValuesWithWeights,
           spectrum: createdUser.spectrum,

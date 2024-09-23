@@ -112,7 +112,7 @@ export const generateUserValues = async (
  Specific vs Abstract
  
  
- Provide a one-line explanation of why each score was generated
+ Provide a one-line explanation of why each score was generated and address user directly, e.g. "Your tweets often emphasize personal freedom and autonomy."
  Your final output should be always an JSON and has to follow the format below: 
  interface FinalResponse {
      UserValues: {
@@ -135,11 +135,7 @@ export const generateUserValues = async (
       .replace("```", "");
 
     values = JSON.parse(values!);
-
     let userValues = values.UserValues;
-    if (values.UserValues.Values) {
-      userValues = values.UserValues.Values;
-    }
 
     const response = {
       topValues: Object.keys(userValues).slice(0, 7),
