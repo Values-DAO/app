@@ -132,8 +132,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     logger.error("An error occurred", {
       requestId,
-      error: error.message,
-      stack: error.stack,
+      error: error,
     });
     return NextResponse.json({error: "An error occurred"}, {status: 500});
   }
