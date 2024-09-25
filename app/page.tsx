@@ -1,9 +1,12 @@
 "use client";
 import AiValueComponent from "@/components/ai-value-component";
 import {Button} from "@/components/ui/button";
+import SpectrumCard from "@/components/ui/spectrum-card";
 import ValuesWordCloud from "@/components/word-cloud";
+import {SPECTRUMS} from "@/constants";
 import {useUserContext} from "@/providers/user-context-provider";
 import {usePrivy} from "@privy-io/react-auth";
+import Image from "next/image";
 
 export default function Home() {
   const {userInfo, isLoading} = useUserContext();
@@ -12,10 +15,26 @@ export default function Home() {
     <main className="mt-8">
       {!isLoading && (
         <>
-          <ValuesWordCloud />
+          {authenticated && <ValuesWordCloud />}
           {authenticated && <AiValueComponent />}
           {ready && !authenticated && (
             <div className="flex flex-col items-center px-6 mt-12">
+              <div
+                className={`grid md:grid-cols-3 gap-2 my-4 mb-12 ${
+                  window.innerWidth > 768 ? "grid-cols-2" : "grid-cols-1"
+                }`}
+              >
+                {Array(window.innerWidth > 768 ? 3 : 1)
+                  .fill(1)
+                  .map((_, index) => (
+                    <SpectrumCard
+                      key={index}
+                      name={SPECTRUMS[index]}
+                      score={Math.random() * 100}
+                      description="Description"
+                    />
+                  ))}
+              </div>
               <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-6xl">
                 Collect your Values!
               </h1>

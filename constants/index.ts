@@ -608,3 +608,9 @@ export const NFT_CONTRACT_ABI = [
     type: "function",
   },
 ];
+
+export const SPECTRUMS = [
+  "Individualism vs Collectivism",
+  "Capitalism vs Communism",
+  "Holistic vs Reductive",
+];
