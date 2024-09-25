@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   const requestId = uuidv4();
 
   try {
-    const {fid} = await req.json();
+    const {fid, referrer} = await req.json();
     if (!fid) {
       logger.warn("Missing fid in request", {requestId});
       return NextResponse.json({error: "fid is required"}, {status: 400});
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
         body: JSON.stringify({
           fid,
           method: "create_user",
-          referrer: "pregeneration_sep_19",
+          referrer: referrer ?? "app.valuesdao.io",
         }),
       }
     );

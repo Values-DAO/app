@@ -1,5 +1,6 @@
 import connectToDatabase from "@/lib/connect-to-database";
 import Users from "@/models/user";
+import axios from "axios";
 import {NextRequest, NextResponse} from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -25,13 +26,22 @@ export async function GET(req: NextRequest) {
     if (!user) {
       return NextResponse.json({error: "User not found"}, {status: 404});
     }
+    const topValues = user?.generatedValues?.warpcast.slice(0, 3) ?? [];
+
+    if (topValues.length === 0) {
+      axios.post(`${process.env.NEXT_PUBLIC_HOST}/api/pregenerator`, {
+        fid,
+        referrer: "app.valuesdao.io",
+      });
+      return NextResponse.json(
+        {error: "User has no generated values"},
+        {status: 404}
+      );
+    }
 
     return NextResponse.json(
-      {
-        values: user.generatedValues,
-        spectrum: user.spectrum,
-        userContentRemarks: user.userContentRemarks,
-      },
+      topValues,
+
       {status: 200}
     );
   } catch (error) {
