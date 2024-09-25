@@ -1,3 +1,4 @@
+import {AIRSTACK_API_URL} from "@/constants";
 import {gql, GraphQLClient} from "graphql-request";
 import {isAddress} from "viem";
 type FarcasterSocialData = {
@@ -27,8 +28,8 @@ export const getUserFarcasterWallets = async (fid: number) => {
         }
       }
     `;
-  const url = "https://api.airstack.xyz/graphql";
-  const graphQLClient = new GraphQLClient(url, {
+
+  const graphQLClient = new GraphQLClient(AIRSTACK_API_URL, {
     headers: {
       Authorization: process.env.NEXT_PUBLIC_AIRSTACK_API_KEY || "",
     },
