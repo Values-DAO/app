@@ -1,10 +1,12 @@
 "use client";
 
+import {Badge} from "@/components/ui/badge";
 import SpectrumCard from "@/components/ui/spectrum-card";
 import ValueBadge from "@/components/ui/value-badge";
 import {getFarcasterUser} from "@/lib/get-farcaster-user";
 import {IUser} from "@/types";
-import {parse} from "path";
+import axios from "axios";
+import {useSearchParams} from "next/navigation";
 import React, {useEffect, useState} from "react";
 
 const UserPage = ({
@@ -16,6 +18,10 @@ const UserPage = ({
 }) => {
   const [user, setUser] = useState<IUser | null>(null);
   const [farcasterUser, setFarcasterUser] = useState<any | null>(null);
+  const [alignmentScore, setAlignmentScore] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const viewingUser = searchParams.get("viewing");
+
   const {id} = params;
 
   const getUser = async () => {
@@ -29,8 +35,19 @@ const UserPage = ({
     const info = await getFarcasterUser(parseInt(id));
     setFarcasterUser(info);
   };
+
+  const getAlignmentScore = async () => {
+    if (!isNaN(parseInt(viewingUser!))) {
+      const response = await axios.get(
+        `/api/users/alignment-score?fid=${parseInt(
+          viewingUser!
+        )}&targetFid=${parseInt(id)}`
+      );
+      setAlignmentScore(response.data.alignmentScore);
+    }
+  };
   useEffect(() => {
-    Promise.all([getUser(), getUserFarcasterName()]);
+    Promise.all([getUser(), getUserFarcasterName(), getAlignmentScore()]);
   }, [id]);
 
   if (Number.isNaN(parseInt(id))) {
@@ -50,15 +67,23 @@ const UserPage = ({
             Profile
           </h3>
           {farcasterUser && (
-            <div className="w-full flex flex-row gap-2 items-center flex-wrap">
-              <a
-                className="scroll-m-20 text-lg font-medium tracking-tight"
-                href={`https://app.wildcard.lol/profile/${farcasterUser?.profileHandle}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {farcasterUser?.profileHandle}
-              </a>
+            <div>
+              <div className="w-full flex flex-row gap-2 items-center flex-wrap">
+                <a
+                  className="scroll-m-20 text-lg font-medium tracking-tight"
+                  href={`https://app.wildcard.lol/profile/${farcasterUser?.profileHandle}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {farcasterUser?.profileName}
+                </a>{" "}
+                {alignmentScore && (
+                  <Badge>
+                    You are {alignmentScore}% aligned with{" "}
+                    {farcasterUser?.profileName}
+                  </Badge>
+                )}
+              </div>
             </div>
           )}
 
