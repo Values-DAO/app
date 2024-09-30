@@ -37,8 +37,10 @@ export async function GET(req: NextRequest) {
       );
     }
     if (
-      user?.spectrum?.warpcast?.length == 0 ||
-      targetUser?.spectrum?.warpcast?.length == 0
+      (user?.spectrum?.warpcast?.length == 0 &&
+        user?.spectrum?.twitter?.length == 0) ||
+      (targetUser?.spectrum?.warpcast?.length == 0 &&
+        targetUser?.spectrum?.twitter?.length == 0)
     ) {
       logger.warn("User or target user has no warpcast spectrum");
       return NextResponse.json(
