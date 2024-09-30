@@ -35,7 +35,7 @@ export default function Home() {
                     />
                   ))}
               </div>
-              <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-6xl">
+              <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-6xl text-center">
                 Collect your Values!
               </h1>
               <p className="leading-7 [&:not(:first-child)]:mt-6 text-center">
