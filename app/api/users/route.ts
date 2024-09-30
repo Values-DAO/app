@@ -605,6 +605,7 @@ export async function GET(req: NextRequest) {
       spectrum: user.spectrum,
       socialValuesMinted: user.socialValuesMinted,
       communitiesMinted: user.communitiesMinted,
+      userContentRemarks: user.userContentRemarks,
     });
   } catch (error) {
     return NextResponse.json(error);

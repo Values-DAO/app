@@ -47,6 +47,11 @@ const UserPage = ({params}: {params: {id: string}}) => {
       const data = await response.json();
       if (data.error) throw new Error(data.error);
 
+      if (data.userContentRemarks && data.userContentRemarks.warpcast) {
+        setError(
+          `${farcasterUser?.target?.profileName ?? id} has less than 100 casts`
+        );
+      }
       const values = Array.from(
         new Set([
           ...(data.generatedValues.warpcast || []),
@@ -157,9 +162,11 @@ const UserPage = ({params}: {params: {id: string}}) => {
       {error && (
         <Alert variant="destructive">
           <Terminal className="h-4 w-4" />
-          <AlertTitle>User not found</AlertTitle>
+          <AlertTitle>{error}</AlertTitle>
         </Alert>
       )}
+
+      {userValues && userValues.length === 0}
       {userValues && userValues.length > 0 && (
         <>
           <h4 className="scroll-m-20 border-b text-xl font-medium tracking-tight mb-2 mt-4">
