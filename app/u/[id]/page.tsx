@@ -141,18 +141,14 @@ const UserPage = ({params}: {params: {id: string}}) => {
   return (
     <section className="p-4">
       {alignmentScore && farcasterUser?.viewer && farcasterUser?.target && (
-        <div className="flex flex-row gap-2 items-center">
-          <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-            Alignment between{" "}
-            {capitalizeFirstLetter(farcasterUser.viewer.profileName)} and{" "}
-            {capitalizeFirstLetter(farcasterUser.target.profileName)} :
-          </h3>
+        <div className="flex items-center scroll-m-20 text-2xl font-semibold tracking-tight">
+          Alignment between{" "}
+          {capitalizeFirstLetter(farcasterUser.viewer.profileName)} and{" "}
+          {capitalizeFirstLetter(farcasterUser.target.profileName)} :
           <Badge
-            className={
-              Number(alignmentScore) > 50
-                ? "bg-green-500 text-white text-sm"
-                : "bg-red-500 text-white text-sm"
-            }
+            className={`text-white text-sm ml-2 w-[150px] md:w-fit text-center ${
+              Number(alignmentScore) > 50 ? "bg-green-500" : "bg-red-500"
+            }`}
           >
             || {alignmentScore}%
           </Badge>
