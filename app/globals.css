@@ -57,3 +57,12 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes moveLeftRight {
+  0% {
+    left: 0;
+  }
+  100% {
+    left: calc(100% - 20px);
+  }
+}

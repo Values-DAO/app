@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
         error: userContent.error,
       });
     }
-    if (userContent.length < 90) {
+    if (userContent.length < 9) {
       user.userContentRemarks[source === "farcaster" ? "warpcast" : "twitter"] =
         "You have less than 100 tweets/casts.";
       await user.save();
