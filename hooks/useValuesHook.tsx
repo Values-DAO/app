@@ -1,3 +1,4 @@
+import {getFarcasterUser} from "@/lib/get-farcaster-user";
 import {IUser} from "@/types";
 import axios from "axios";
 
@@ -207,6 +208,33 @@ const useValuesHook = () => {
     }
     return data;
   };
+
+  const getFarcaterUserName = async ({fid}: {fid: number}): Promise<Object> => {
+    if (!fid) {
+      return {error: "Please provide fid"};
+    }
+    const response = await getFarcasterUser(fid);
+
+    return response;
+  };
+
+  const getAlignmentScore = async ({
+    fid,
+    viewerFid,
+  }: {
+    fid: number;
+    viewerFid: number;
+  }): Promise<{error: string} | {alignmentScore: string}> => {
+    const {data} = await axios.get(
+      `/api/users/alignment-score?fid=${viewerFid}&targetFid=${fid}`
+    );
+
+    if ("error" in data) {
+      return {error: data.error};
+    }
+
+    return data;
+  };
   return {
     getAllValues,
     getUserData,
@@ -216,6 +244,8 @@ const useValuesHook = () => {
     attachTwitter,
     mintValues,
     attachFarcaster,
+    getFarcaterUserName,
+    getAlignmentScore,
   };
 };
 
