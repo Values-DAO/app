@@ -245,7 +245,7 @@ const useValuesHook = () => {
   }): Promise<{username: string; fid: string}[] | {error: any}> => {
     const query = `query SearchFarcasterUser {
         Socials(
-          input: {filter: {profileName: {_regex: "${username}"}}, blockchain: ethereum, limit: 10, order: {farRank: ASC}}
+          input: {filter: {profileName: {_regex: "${username.toLowerCase()}"}}, blockchain: ethereum, limit: 10, order: {farRank: ASC}}
         ) {
           Social {
             fid: userId
@@ -263,7 +263,7 @@ const useValuesHook = () => {
     try {
       const data: FarcasterSearchUserType = await graphQLClient.request(query);
 
-      return data.Socials.Social;
+      return data.Socials.Social || [];
     } catch (error) {
       return {error: error};
     }
