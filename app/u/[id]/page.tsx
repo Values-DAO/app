@@ -205,14 +205,14 @@ const Page = ({params}: {params: {id: string}}) => {
           {alignmentScore &&
             userFarcasterInfo?.profileName &&
             viewerFarcasterInfo?.profileName && (
-              <div className="flex items-center scroll-m-20 text-2xl font-semibold tracking-tight">
+              <div className="  scroll-m-20 text-2xl font-semibold tracking-tight">
                 Alignment between{" "}
                 {capitalizeFirstLetter(viewerFarcasterInfo?.profileName) ??
                   viewer}{" "}
                 and{" "}
-                {capitalizeFirstLetter(userFarcasterInfo?.profileName) ?? id} :
+                {capitalizeFirstLetter(userFarcasterInfo?.profileName) ?? id}
                 <Badge
-                  className={`text-white text-sm ml-2 w-[150px] md:w-fit text-center ${
+                  className={`text-white text-sm ml-2 w-fit text-center ${
                     Number(alignmentScore) > 50 ? "bg-green-500" : "bg-red-500"
                   }`}
                 >
@@ -220,35 +220,16 @@ const Page = ({params}: {params: {id: string}}) => {
                 </Badge>
               </div>
             )}
-          {userData && userData.values && userData.values.length > 0 && (
-            <>
-              <h4 className="scroll-m-20 border-b text-xl font-medium tracking-tight mb-2 mt-4">
-                {userFarcasterInfo?.profileName
-                  ? `${capitalizeFirstLetter(
-                      userFarcasterInfo?.profileName
-                    )}'s Values`
-                  : "Values"}
-              </h4>
-              <div className="w-full flex flex-row gap-2 items-center flex-wrap">
-                {userData.values.map((value, index) => (
-                  <ValueBadge key={index} value={value} />
-                ))}
-              </div>
-            </>
-          )}
 
           {userData && userData.spectrum && userData.spectrum.length > 0 && (
             <div className="w-full flex flex-col gap-4 mt-8">
-              <h4 className="scroll-m-20 border-b text-xl font-medium tracking-tight mb-2 mt-4">
-                Value Spectrum
-              </h4>
               {userData &&
                 userFarcasterInfo &&
                 viewerFarcasterInfo &&
                 viewerData &&
                 viewerData.spectrum &&
                 viewerData.spectrum.length > 0 && (
-                  <div className="flex flex-col-reverse gap-2">
+                  <div className="flex flex-col gap-2">
                     <AlignmentSearchSheet />
                     <div className="flex flex-col gap-2 border-[1px] border-gray-300 p-2 rounded-md">
                       <div className="flex flex-row gap-2 items-center">
@@ -277,6 +258,13 @@ const Page = ({params}: {params: {id: string}}) => {
                     </div>
                   </div>
                 )}
+
+              <h4 className="scroll-m-20 border-b text-xl font-medium tracking-tight mb-2 mt-4">
+                {viewer
+                  ? "Value Spectrum"
+                  : `${capitalizeFirstLetter(userFarcasterInfo?.profileName)}'s
+                  Value Spectrum`}
+              </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {userData.spectrum.map((value, index) => (
                   <SpectrumCard
