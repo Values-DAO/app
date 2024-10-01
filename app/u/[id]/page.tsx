@@ -239,11 +239,7 @@ const Page = ({params}: {params: {id: string}}) => {
           {userData && userData.spectrum && userData.spectrum.length > 0 && (
             <div className="w-full flex flex-col gap-4 mt-8">
               <h4 className="scroll-m-20 border-b text-xl font-medium tracking-tight mb-2 mt-4">
-                {userFarcasterInfo?.profileName
-                  ? `${capitalizeFirstLetter(
-                      userFarcasterInfo?.profileName
-                    )}'s Value Spectrum`
-                  : "Value Spectrum"}
+                Value Spectrum
               </h4>
               {userData &&
                 userFarcasterInfo &&
