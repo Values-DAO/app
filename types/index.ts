@@ -51,3 +51,12 @@ export interface IUser {
   referrer?: string;
   socialValuesMinted: string[];
 }
+
+export type FarcasterSearchUserType = {
+  Socials: {
+    Social: {
+      fid: string;
+      username: string;
+    }[];
+  };
+};

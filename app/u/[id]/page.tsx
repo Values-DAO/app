@@ -11,6 +11,7 @@ import React, {useEffect, useState} from "react";
 import {MessageCircleWarningIcon} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import Link from "next/link";
+import {AlignmentSearchSheet} from "@/components/alignment-search-sheet";
 
 interface UserData {
   spectrum: {name: string; score: number; description: string}[];
@@ -247,29 +248,32 @@ const Page = ({params}: {params: {id: string}}) => {
                 viewerData &&
                 viewerData.spectrum &&
                 viewerData.spectrum.length > 0 && (
-                  <div className="flex flex-col gap-2 border-[1px] border-gray-300 p-2 rounded-md">
-                    <div className="flex flex-row gap-2 items-center">
-                      <span className="w-4 h-4 rounded-full bg-primary"></span>
-                      <span className="text-sm">
-                        {`${capitalizeFirstLetter(
-                          userFarcasterInfo?.profileName
-                        )}'s
+                  <div className="flex flex-col-reverse gap-2">
+                    <AlignmentSearchSheet />
+                    <div className="flex flex-col gap-2 border-[1px] border-gray-300 p-2 rounded-md">
+                      <div className="flex flex-row gap-2 items-center">
+                        <span className="w-4 h-4 rounded-full bg-primary"></span>
+                        <span className="text-sm">
+                          {`${capitalizeFirstLetter(
+                            userFarcasterInfo?.profileName
+                          )}'s
                   Score`}
-                      </span>
-                    </div>
-                    <div className="flex flex-row gap-2 items-center">
-                      <span className="w-4 h-4 rounded-full bg-green-400"></span>
-                      <span className="text-sm">
-                        {" "}
-                        {`${capitalizeFirstLetter(
-                          viewerFarcasterInfo?.profileName
-                        )}'s
+                        </span>
+                      </div>
+                      <div className="flex flex-row gap-2 items-center">
+                        <span className="w-4 h-4 rounded-full bg-green-400"></span>
+                        <span className="text-sm">
+                          {" "}
+                          {`${capitalizeFirstLetter(
+                            viewerFarcasterInfo?.profileName
+                          )}'s
                   Score`}
-                      </span>
-                    </div>
-                    <div className="flex flex-row gap-2 items-center">
-                      <span className="w-4 h-4 rounded-full bg-blue-400"></span>
-                      <span className="text-sm">If both scores are same</span>
+                        </span>
+                      </div>
+                      <div className="flex flex-row gap-2 items-center">
+                        <span className="w-4 h-4 rounded-full bg-blue-400"></span>
+                        <span className="text-sm">If both scores are same</span>
+                      </div>
                     </div>
                   </div>
                 )}
