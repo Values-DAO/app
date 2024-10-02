@@ -5,45 +5,41 @@ import {NextRequest, NextResponse} from "next/server";
 
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
-  const userId = searchParams.get("userId");
-  const fid = searchParams.get("fid");
-  const email = searchParams.get("email");
 
-  if (!userId && !fid && !email) {
-    return NextResponse.json(
-      {error: "userId, fid or email is required"},
-      {status: 400}
-    );
+  const fid = searchParams.get("fid");
+
+  if (!fid) {
+    return NextResponse.json({error: "fid is required"});
   }
 
   try {
     await connectToDatabase();
     const user = await Users.findOne({
-      ...(userId && {userId}),
-      ...(fid && {fid}),
-      ...(email && {email}),
+      fid: fid,
     });
     if (!user) {
-      return NextResponse.json({error: "User not found"}, {status: 404});
-    }
-    const topValues = user?.generatedValues?.warpcast.slice(0, 3) ?? [];
-
-    if (topValues.length === 0) {
       axios.post(`${process.env.NEXT_PUBLIC_HOST}/api/pregenerator`, {
         fid,
         referrer: "app.valuesdao.io",
       });
-      return NextResponse.json(
-        {error: "User has no generated values"},
-        {status: 404}
-      );
+      return NextResponse.json({error: "User not found"});
+    }
+    const userValues = Array.from(
+      new Set([
+        ...(user.generatedValues.warpcast || []),
+        ...(user.generatedValues.twitter || []),
+      ])
+    );
+
+    if (userValues.length === 0) {
+      axios.post(`${process.env.NEXT_PUBLIC_HOST}/api/pregenerator`, {
+        fid,
+        referrer: "app.valuesdao.io",
+      });
+      return NextResponse.json({error: "User has no generated values"});
     }
 
-    return NextResponse.json(
-      topValues,
-
-      {status: 200}
-    );
+    return NextResponse.json({fid: fid, values: userValues.slice(0, 3)});
   } catch (error) {
     console.error(error);
     return NextResponse.json({error: "An error occurred"}, {status: 500});
