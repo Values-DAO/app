@@ -10,14 +10,9 @@ export async function GET(req: NextRequest) {
   const targetFid = searchParams.get("targetFid");
   if (!fid || !targetFid) {
     logger.warn("Invalid input");
-    return NextResponse.json(
-      {
-        error: "Invalid input: 'fid' and 'targetFid' must be provided.",
-      },
-      {
-        status: 400,
-      }
-    );
+    return NextResponse.json({
+      error: "Invalid input: 'fid' and 'targetFid' must be provided.",
+    });
   }
 
   try {
@@ -27,14 +22,9 @@ export async function GET(req: NextRequest) {
 
     if (!user || !targetUser) {
       logger.warn("User or target user not found");
-      return NextResponse.json(
-        {
-          error: "User or target user not found.",
-        },
-        {
-          status: 404,
-        }
-      );
+      return NextResponse.json({
+        error: "User or target user not found.",
+      });
     }
     if (
       (user?.spectrum?.warpcast?.length == 0 &&
@@ -43,14 +33,9 @@ export async function GET(req: NextRequest) {
         targetUser?.spectrum?.twitter?.length == 0)
     ) {
       logger.warn("User or target user has no warpcast spectrum");
-      return NextResponse.json(
-        {
-          error: "User or target user has no warpcast spectrum.",
-        },
-        {
-          status: 400,
-        }
-      );
+      return NextResponse.json({
+        error: "User or target user has no warpcast spectrum.",
+      });
     }
     const alignmentScore = calculateAlignmentScore(user, targetUser);
 
