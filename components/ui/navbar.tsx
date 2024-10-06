@@ -1,6 +1,5 @@
 "use client";
-import Image from "next/image";
-import React, {useState, useEffect} from "react";
+import React from "react";
 
 import {Button} from "../ui/button";
 import Link from "next/link";
@@ -13,10 +12,13 @@ import {
 import {EllipsisVertical} from "lucide-react";
 import {useLogout, usePrivy} from "@privy-io/react-auth";
 import {useUserContext} from "@/providers/user-context-provider";
+import {AlignmentSearchSheet} from "../alignment-search-sheet";
+import {usePathname} from "next/navigation";
 
 const Navbar = () => {
   const {ready, authenticated, login} = usePrivy();
   const {setUserInfo} = useUserContext();
+  const pathname = usePathname();
   const {logout} = useLogout({
     onSuccess: () => {
       setUserInfo(null);
@@ -33,29 +35,11 @@ const Navbar = () => {
       </Link>
 
       <div className="hidden md:flex flex-row gap-4 mt-[-12px]">
-        {/* <Button variant={"link"} className="text-md" asChild>
-          <Link href={"/"}>Home</Link>
-        </Button> */}
-        {/* <Button variant={"link"} className="text-md" asChild>
-          <Link href={"/farcaster-meetup"}>Farcaster Meetup SF</Link>
-        </Button> */}
-        {/* <Button variant={"link"} className="text-md" asChild>
-          <Link href={"/farcon-aligned"}>Farcon</Link>
-        </Button> */}{" "}
-        {/* <Button variant={"link"} className="text-md" asChild>
-          <Link href={"/community"}>Communities</Link>
-        </Button>{" "}
-        <Button variant={"link"} className="text-md" asChild>
-          <Link href={"/culture"}>Culture</Link>
-        </Button>
-        <Button variant={"link"} className="text-md" asChild>
-          <Link href={"/profile"}>Profile</Link>
-        </Button> */}
-        {/* <Button variant={"link"} className="text-md" asChild>
-          <Link href={"/mint"}>Mint a Value</Link>
-        </Button> */}
+        {pathname === "/" && (
+          <AlignmentSearchSheet buttonText="Check Alignment w/ Farcaster user" />
+        )}
         {ready && authenticated ? (
-          <Button variant={"default"} onClick={logout}>
+          <Button variant={"secondary"} onClick={logout}>
             Logout
           </Button>
         ) : (
@@ -72,27 +56,6 @@ const Navbar = () => {
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="mr-4">
-            {/* <DropdownMenuItem asChild className="cursor-pointer">
-              <Link href={"/"}>Home</Link>
-            </DropdownMenuItem> */}
-            {/* <DropdownMenuItem asChild className="cursor-pointer">
-              <Link href={"/farcaster-meetup"}>Farcaster Meetup SF</Link>
-            </DropdownMenuItem> */}
-            {/* <DropdownMenuItem asChild className="cursor-pointer">
-              <Link href={"/farcon-aligned"}>Farcon</Link>
-            </DropdownMenuItem> */}
-            {/* <DropdownMenuItem asChild className="cursor-pointer">
-              <Link href={"/community"}>Communities</Link>
-            </DropdownMenuItem>{" "}
-            <DropdownMenuItem asChild className="cursor-pointer">
-              <Link href={"/culture"}>Culture</Link>
-            </DropdownMenuItem>{" "}
-            <DropdownMenuItem asChild className="cursor-pointer">
-              <Link href={"/profile"}>Profile</Link>
-            </DropdownMenuItem> */}
-            {/* <DropdownMenuItem asChild className="cursor-pointer">
-              <Link href={"/mint"}>Mint a Value</Link>
-            </DropdownMenuItem> */}
             {authenticated ? (
               <DropdownMenuItem
                 className="cursor-pointer"

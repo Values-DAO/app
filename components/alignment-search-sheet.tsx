@@ -16,7 +16,13 @@ import {useState} from "react";
 import {Badge} from "./ui/badge";
 import useValuesHook from "@/hooks/useValuesHook";
 
-export function AlignmentSearchSheet() {
+export function AlignmentSearchSheet({
+  buttonVariant,
+  buttonText,
+}: {
+  buttonVariant?: "default" | "outline" | "secondary";
+  buttonText?: string;
+}) {
   const [usernameInput, setUsernameInput] = useState<string>("");
   const [targetUsernameInput, setTargetUsernameInput] = useState<string>("");
   const [user, setUser] = useState<{username: string; fid: string} | null>(
@@ -42,8 +48,8 @@ export function AlignmentSearchSheet() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="default" className="">
-          Check with a different user
+        <Button variant={buttonVariant || "default"} className="w-full">
+          {buttonText || "Check with a different user"}
         </Button>
       </SheetTrigger>
       <SheetContent>
@@ -144,7 +150,7 @@ function UserPicker({
         className="col-span-3"
         disabled={selected !== null}
       />
-      {(searchResults.length > 0 || loading) && (
+      {(searchResults.length > 0 || loading) && !selected && (
         <div className="border-[1px] rounded-md">
           {loading && (
             <div className="px-2 py-1 bg-white border-[0.5px] border-gray-200 text-green-300">

@@ -54,7 +54,7 @@ const Page = ({params}: {params: {id: string}}) => {
   const [viewerData, setViewerData] = useState<UserData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [alignmentScore, setAlignmentScore] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [userFarcasterInfo, setUserFarcasterInfo] = useState<any | null>(null);
   const [viewerFarcasterInfo, setViewerFarcasterInfo] = useState<any | null>(
     null

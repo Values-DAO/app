@@ -10,6 +10,7 @@ import SpectrumCard from "./ui/spectrum-card";
 import {useLinkAccount, usePrivy} from "@privy-io/react-auth";
 import {NFT_CONTRACT_ADDRESS} from "@/constants";
 import LinkWalletComponent from "./ui/link-wallet-component";
+import {AlignmentSearchSheet} from "./alignment-search-sheet";
 
 const AiValueComponent = () => {
   const {user} = usePrivy();
@@ -65,6 +66,9 @@ const AiValueComponent = () => {
       <h2 className="scroll-m-20 border-b pb-2 text-2xl md:text-4xl font-medium tracking-tight text-center mb-2 md:mb-8">
         AI Value analysis
       </h2>
+      <div className="w-full md:hidden my-2">
+        <AlignmentSearchSheet buttonText="Check Alignment w/ Farcaster user" />
+      </div>
       <Tabs
         defaultValue={user?.twitter?.subject ? "twitter" : "warpcast"}
         className="w-full"
