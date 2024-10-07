@@ -614,3 +614,9 @@ export const SPECTRUMS = [
   "Capitalism vs Communism",
   "Holistic vs Reductive",
 ];
+export const API_BASE_URL =
+  process.env.NEXT_PUBLIC_APP_ENV === "prod"
+    ? "https://api.valuesdao.io"
+    : process.env.NEXT_PUBLIC_APP_ENV === "staging"
+    ? "https://staging-api.valuesdao.io"
+    : "http://localhost:3000";

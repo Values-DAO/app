@@ -1,4 +1,4 @@
-import {AIRSTACK_API_URL} from "@/constants";
+import {AIRSTACK_API_URL, API_BASE_URL} from "@/constants";
 import {getFarcasterUser} from "@/lib/get-farcaster-user";
 import {FarcasterSearchUserType, IUser} from "@/types";
 import axios from "axios";
@@ -12,7 +12,7 @@ const useValuesHook = () => {
       mintersCount: number;
     }[]
   > => {
-    const {data} = await axios.get("/api/values");
+    const {data} = await axios.get(`${API_BASE_URL}/values`);
     return data;
   };
   const getUserData = async ({
@@ -25,14 +25,14 @@ const useValuesHook = () => {
     email?: string;
   }): Promise<{error: string} | IUser> => {
     if (userId) {
-      const {data} = await axios.get(`/api/users/${userId}`);
+      const {data} = await axios.get(`${API_BASE_URL}/users/${userId}`);
       return data;
     }
     if (fid) {
-      const {data} = await axios.get(`/api/users?fid=${fid}`);
+      const {data} = await axios.get(`${API_BASE_URL}/users?fid=${fid}`);
       return data;
     } else if (email) {
-      const {data} = await axios.get(`/api/users?email=${email}`);
+      const {data} = await axios.get(`${API_BASE_URL}/users?email=${email}`);
       return data;
     }
     return {error: "Please provide either userId, fid or email"};
@@ -46,7 +46,7 @@ const useValuesHook = () => {
     email?: string;
   }): Promise<{error: string} | IUser> => {
     if (fid) {
-      const {data} = await axios.post("/api/users", {
+      const {data} = await axios.post(`${API_BASE_URL}/users`, {
         fid,
         method: "create_user",
         referrer: "app.valuesdao.io",
@@ -54,7 +54,7 @@ const useValuesHook = () => {
       return data;
     }
     if (email) {
-      const {data} = await axios.post("/api/users", {
+      const {data} = await axios.post(`${API_BASE_URL}/users`, {
         email,
         method: "create_user",
         referrer: "app.valuesdao.io",
@@ -74,7 +74,7 @@ const useValuesHook = () => {
     if (!userId || !walletAddress) {
       return {error: "Please provide userId and walletAddress"};
     }
-    const {data} = await axios.post(`/api/users`, {
+    const {data} = await axios.post(`${API_BASE_URL}/users`, {
       userId,
       method: "add_wallet",
       userDataToUpdate: {
@@ -100,7 +100,7 @@ const useValuesHook = () => {
     }
 
     if (source === "farcaster" && farcaster && farcaster.fid) {
-      const {data} = await axios.post(`/api/generate/values`, {
+      const {data} = await axios.post(`${API_BASE_URL}/generate/values`, {
         userId,
         source,
         farcaster: {fid: farcaster.fid},
@@ -113,7 +113,7 @@ const useValuesHook = () => {
       twitter.username
     ) {
       try {
-        const {data} = await axios.post(`/api/generate/values`, {
+        const {data} = await axios.post(`${API_BASE_URL}/generate/values`, {
           userId,
           source,
           twitter: {id: twitter.id, username: twitter.username},
@@ -147,7 +147,7 @@ const useValuesHook = () => {
     if (!userId || !username || !id) {
       return {error: "Please provide userId, username and id"};
     }
-    const {data} = await axios.post(`/api/users`, {
+    const {data} = await axios.post(`${API_BASE_URL}/users`, {
       userId,
       method: "link_twitter",
       userDataToUpdate: {
@@ -174,7 +174,7 @@ const useValuesHook = () => {
     if (!userId || !values || values.length === 0) {
       return {error: "Please provide userId and values"};
     }
-    const {data} = await axios.post(`/api/users`, {
+    const {data} = await axios.post(`${API_BASE_URL}/users`, {
       userId,
       method: "mint_values",
       userDataToUpdate: {
@@ -198,7 +198,7 @@ const useValuesHook = () => {
     if (!userId || !fid) {
       return {error: "Please provide userId and fid"};
     }
-    const {data} = await axios.post(`/api/users`, {
+    const {data} = await axios.post(`${API_BASE_URL}/users`, {
       userId,
       method: "link_farcaster",
       userDataToUpdate: {
@@ -211,7 +211,11 @@ const useValuesHook = () => {
     return data;
   };
 
-  const getFarcaterUserName = async ({fid}: {fid: number}): Promise<Object> => {
+  const getFarcasterUserName = async ({
+    fid,
+  }: {
+    fid: number;
+  }): Promise<Object> => {
     if (!fid) {
       return {error: "Please provide fid"};
     }
@@ -228,7 +232,7 @@ const useValuesHook = () => {
     viewerFid: number;
   }): Promise<{error: string} | {alignmentScore: string}> => {
     const {data} = await axios.get(
-      `/api/users/alignment-score?fid=${viewerFid}&targetFid=${fid}`
+      `${API_BASE_URL}/users/alignment-score?fid=${viewerFid}&targetFid=${fid}`
     );
 
     if ("error" in data) {
@@ -277,7 +281,7 @@ const useValuesHook = () => {
     attachTwitter,
     mintValues,
     attachFarcaster,
-    getFarcaterUserName,
+    getFarcasterUserName,
     getAlignmentScore,
     searchFarcasterUser,
   };

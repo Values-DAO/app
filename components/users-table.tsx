@@ -24,6 +24,7 @@ import {
   ChevronsRightIcon,
 } from "lucide-react";
 import {usePrivy} from "@privy-io/react-auth";
+import {API_BASE_URL} from "@/constants";
 
 interface User {
   userId: string;
@@ -76,7 +77,7 @@ export default function UserDataTable() {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `/api/all-users?page=${currentPage}&limit=${itemsPerPage}&search=${searchTerm}&sortField=${sortField}&sortOrder=${sortOrder}&privyId=${
+        `${API_BASE_URL}/all-users?page=${currentPage}&limit=${itemsPerPage}&search=${searchTerm}&sortField=${sortField}&sortOrder=${sortOrder}&privyId=${
           user?.id.split(":")[2]
         }`
       );

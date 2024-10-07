@@ -60,7 +60,8 @@ const Page = ({params}: {params: {id: string}}) => {
     null
   );
 
-  const {getUserData, getFarcaterUserName, getAlignmentScore} = useValuesHook();
+  const {getUserData, getFarcasterUserName, getAlignmentScore} =
+    useValuesHook();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -133,7 +134,7 @@ const Page = ({params}: {params: {id: string}}) => {
     if (!viewer) return;
 
     const fetchViewerInfo = async () => {
-      const viewerInfo = await getFarcaterUserName({fid: Number(viewer)});
+      const viewerInfo = await getFarcasterUserName({fid: Number(viewer)});
       setViewerFarcasterInfo(viewerInfo);
     };
     fetchViewerInfo();
@@ -142,7 +143,9 @@ const Page = ({params}: {params: {id: string}}) => {
   useEffect(() => {
     if (!id) return;
     const fetchUserInfo = async () => {
-      const userInfo = await getFarcaterUserName({fid: Number(id)});
+      const userInfo = await getFarcasterUserName({
+        fid: Number(id),
+      });
       setUserFarcasterInfo(userInfo);
     };
     fetchUserInfo();
