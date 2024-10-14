@@ -67,7 +67,7 @@ const AiValueComponent = () => {
         AI Value analysis
       </h2>
       <div className="w-full md:hidden my-2">
-        <AlignmentSearchSheet buttonText="Check Alignment w/ Farcaster user" />
+        <AlignmentSearchSheet buttonText="Check Alignment w/ Farcaster users" />
       </div>
       <Tabs
         defaultValue={user?.twitter?.subject ? "twitter" : "warpcast"}

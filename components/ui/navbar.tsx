@@ -36,7 +36,7 @@ const Navbar = () => {
 
       <div className="hidden md:flex flex-row gap-4 mt-[-12px]">
         {pathname === "/" && (
-          <AlignmentSearchSheet buttonText="Check Alignment w/ Farcaster user" />
+          <AlignmentSearchSheet buttonText="Check Alignment w/ Farcaster users" />
         )}
         {ready && authenticated ? (
           <Button variant={"secondary"} onClick={logout}>
