@@ -38,13 +38,9 @@ const Navbar = () => {
         {pathname === "/" && (
           <AlignmentSearchSheet buttonText="Check Alignment w/ Farcaster users" />
         )}
-        {ready && authenticated ? (
+        {ready && authenticated && (
           <Button variant={"secondary"} onClick={logout}>
             Logout
-          </Button>
-        ) : (
-          <Button onClick={login} disabled={!ready}>
-            Login
           </Button>
         )}
       </div>
