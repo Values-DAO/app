@@ -228,14 +228,16 @@ const useValuesHook = () => {
     viewerFid: number;
   }): Promise<{error: string} | {alignmentScore: string}> => {
     const {data} = await axios.get(
-      `/api/users/alignment-score?fid=${viewerFid}&targetFid=${fid}`
+      `/api/users/alignment-score?fid=${viewerFid}&target=${fid}`
     );
 
     if ("error" in data) {
       return {error: data.error};
     }
-
-    return data;
+    if (data.scores.length === 0) {
+      return {error: "something went wrong"};
+    }
+    return {alignmentScore: data.scores[0].score};
   };
 
   const searchFarcasterUser = async ({
