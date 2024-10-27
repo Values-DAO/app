@@ -2,11 +2,9 @@
 import AiValueComponent from "@/components/ai-value-component";
 import {Button} from "@/components/ui/button";
 import SpectrumCard from "@/components/ui/spectrum-card";
-import ValuesWordCloud from "@/components/word-cloud";
 import {SPECTRUMS} from "@/constants";
 import {useUserContext} from "@/providers/user-context-provider";
 import {usePrivy} from "@privy-io/react-auth";
-import Image from "next/image";
 
 export default function Home() {
   const {userInfo, isLoading} = useUserContext();
@@ -15,7 +13,7 @@ export default function Home() {
     <main className="mt-8">
       {!isLoading && (
         <>
-          {authenticated && <ValuesWordCloud />}
+          {/*{authenticated && <ValuesWordCloud />}*/}
           {authenticated && <AiValueComponent />}
           {ready && !authenticated && (
             <div className="flex flex-col items-center px-6 mt-12">
