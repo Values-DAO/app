@@ -93,6 +93,7 @@ const useValuesHook = () => {
     return data;
   };
 
+  // Error Handling: Refactored.
   const generateValues = async ({
     source,
     userId,
@@ -105,7 +106,9 @@ const useValuesHook = () => {
     twitter?: {id: string; username: string};
   }): Promise<{error: string} | IUser> => {
     if (!userId || !source) {
-      return {error: "Please provide userId and source"};
+      return {
+        error: "Please provide userId and source.",
+      };
     }
 
     if (source === "farcaster" && farcaster && farcaster.fid) {
@@ -114,7 +117,17 @@ const useValuesHook = () => {
         source,
         farcaster: {fid: farcaster.fid},
       });
-      return data;
+
+      console.log(data)
+
+      if (data.error) {
+        return {
+          error: data.message,
+        };
+      }
+
+      // ! change this to data instead of data.user if it's not working
+      return data.user;
     } else if (
       source === "twitter" &&
       twitter &&
@@ -127,19 +140,24 @@ const useValuesHook = () => {
           source,
           twitter: {id: twitter.id, username: twitter.username},
         });
+
         if (data.error) {
           return {
-            error: data.error,
+            error: data.message,
           };
         }
+
         return data.user;
       } catch (error) {
         return {
-          error: "Error generating values",
+          error: "Error generating values.",
         };
       }
     }
-    return {error: "Invalid source"};
+
+    return {
+      error: "Invalid source."
+    };
   };
 
   //todo mint Wallet, add farcaster, add twitter
