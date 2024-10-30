@@ -9,6 +9,8 @@ import {GraphQLClient} from "graphql-request";
 const useValuesHook = () => {
   // Fetches a list of all Values from /values endpoint in the backend. Returns an array of objects containing name, valueId and mintersCount.
   // mintersCount is the number of users who have minted this particular Value
+  // Error Handling: Refactored.
+  // This is only used in word cloud component which is no longer used in the app.
   const getAllValues = async (): Promise<
     {
       name: string;
@@ -17,11 +19,17 @@ const useValuesHook = () => {
     }[]
   > => {
     const {data} = await axios.get(`${API_BASE_URL}/values`);
+
+    if (data.error) {
+      return [];
+    }
+
     return data;
   };
 
   // Fetches user data based on userId, fid (farcaster id) or email.
   // Returns an object containing user data as an IUser object or an error object
+  // Error Handling: Refactored.
   const getUserData = async ({
     userId,
     fid,
@@ -42,6 +50,7 @@ const useValuesHook = () => {
       const {data} = await axios.get(`${API_BASE_URL}/users?email=${email}`);
       return data;
     }
+
     return {error: "Please provide either userId, fid or email"};
   };
 
@@ -117,8 +126,6 @@ const useValuesHook = () => {
         source,
         farcaster: {fid: farcaster.fid},
       });
-
-      console.log(data)
 
       if (data.error) {
         return {
@@ -250,6 +257,7 @@ const useValuesHook = () => {
 
     return response;
   };
+
 
   const getAlignmentScore = async ({
     fid,

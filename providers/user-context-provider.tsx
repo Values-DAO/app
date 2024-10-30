@@ -52,6 +52,7 @@ export const UserContextProvider = ({
             });
 
             if ("error" in newUser) {
+              console.error("Error creating user:", newUser.error);
             } else {
               setUserInfo(newUser);
             }
