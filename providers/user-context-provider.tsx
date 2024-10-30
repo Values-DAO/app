@@ -27,6 +27,12 @@ export const UserContextProvider = ({
   const {authenticated, user, ready} = usePrivy();
   const {getUserData, createUser, addWallet} = useValuesHook();
 
+  // usePrivy's user object will have either farcaster or email as shown in the modal on frontend
+
+  // This effect runs when the user object changes, and it checks if the user is authenticated and whether user information already exists.
+  // If the user is authenticated but doesn't have an existing userId, it fetches user data using getUserData
+  // It basically updates the userInfo state with the user data fetched from the backend
+
   useEffect(() => {
     const userExists = async () => {
       if (!authenticated) return;
@@ -59,6 +65,8 @@ export const UserContextProvider = ({
     };
     userExists();
   }, [user]);
+
+  // This effect checks if the user has any wallets. If not, it fetches the user's Farcaster wallets and adds the first one to the user's profile
 
   useEffect(() => {
     const updateUserWalletsIfNotExists = async () => {

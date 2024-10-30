@@ -4,7 +4,11 @@ import {FarcasterSearchUserType, IUser} from "@/types";
 import axios from "axios";
 import {GraphQLClient} from "graphql-request";
 
+// This hook contains multiple async functions to interact with the backend APIs.
+
 const useValuesHook = () => {
+  // Fetches a list of all Values from /values endpoint in the backend. Returns an array of objects containing name, valueId and mintersCount.
+  // mintersCount is the number of users who have minted this particular Value
   const getAllValues = async (): Promise<
     {
       name: string;
@@ -15,6 +19,9 @@ const useValuesHook = () => {
     const {data} = await axios.get(`${API_BASE_URL}/values`);
     return data;
   };
+
+  // Fetches user data based on userId, fid (farcaster id) or email.
+  // Returns an object containing user data as an IUser object or an error object
   const getUserData = async ({
     userId,
     fid,
@@ -38,6 +45,7 @@ const useValuesHook = () => {
     return {error: "Please provide either userId, fid or email"};
   };
 
+  // Creates a new user based on either fid or email.
   const createUser = async ({
     fid,
     email,
@@ -64,6 +72,7 @@ const useValuesHook = () => {
     return {error: "Please provide either fid or email"};
   };
 
+  // Adds a wallet address to the user's profile and returns the updated user object/
   const addWallet = async ({
     userId,
     walletAddress,
