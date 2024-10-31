@@ -60,3 +60,9 @@ export type FarcasterSearchUserType = {
     }[];
   };
 };
+
+export interface UserData {
+  username: string
+  spectrum: {name: string; score: number; description: string}[];
+  values: string[];
+}

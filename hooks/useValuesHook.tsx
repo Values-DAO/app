@@ -1,7 +1,6 @@
-import {AIRSTACK_API_URL, API_BASE_URL} from "@/constants";
-import {FarcasterSearchUserType, IUser} from "@/types";
+import { API_BASE_URL} from "@/constants";
+import { IUser, UserData} from "@/types";
 import axios from "axios";
-import {GraphQLClient} from "graphql-request";
 
 // This hook contains multiple async functions to interact with the backend APIs.
 
@@ -244,19 +243,6 @@ const useValuesHook = () => {
     return data;
   };
 
-  // const getFarcasterUserName = async ({
-  //   fid,
-  // }: {
-  //   fid: number;
-  // }): Promise<Object> => {
-  //   if (!fid) {
-  //     return {error: "Please provide fid"};
-  //   }
-  //   const response = await getFarcasterUser(fid);
-  //
-  //   return response;
-  // };
-
   const getFarcasterUserName = async ({
                                         fid,
                                       }: {
@@ -270,58 +256,6 @@ const useValuesHook = () => {
 
     return response.data;
   };
-
-  // This function gets the alignment score between two users based on their fid.
-  const getAlignmentScore = async ({
-    fid,
-    viewerFid,
-  }: {
-    fid: number;
-    viewerFid: number;
-  }): Promise<{error: string} | {alignmentScore: string}> => {
-    const {data} = await axios.get(
-      `${API_BASE_URL}/users/alignment-score?fid=${viewerFid}&targetFid=${fid}`
-    );
-
-    if ("error" in data) {
-      return {error: data.error};
-    }
-
-    return data;
-  };
-
-  // const searchFarcasterUser = async ({
-  //   username,
-  // }: {
-  //   username: string;
-  // }): Promise<{username: string; fid: string}[] | {error: any}> => {
-  //   const query = `query SearchFarcasterUser {
-  //       Socials(
-  //         input: {filter: {profileName: {_regex: "${username.toLowerCase()}"}}, blockchain: ethereum, limit: 10, order: {farRank: ASC}}
-  //       ) {
-  //         Social {
-  //           fid: userId
-  //           username:profileName
-  //         }
-  //       }
-  //     }`;
-  //
-  //   const graphQLClient = new GraphQLClient(AIRSTACK_API_URL, {
-  //     headers: {
-  //       Authorization: process.env.NEXT_PUBLIC_AIRSTACK_API_KEY || "",
-  //     },
-  //   });
-  //
-  //   try {
-  //     const data: FarcasterSearchUserType = await graphQLClient.request(query);
-  //
-  //     console.log("Data: ", data.Socials.Social || [])
-  //
-  //     return data.Socials.Social || [];
-  //   } catch (error) {
-  //     return {error: error};
-  //   }
-  // };
 
   const searchFarcasterUser = async ({
                                        username,
@@ -341,6 +275,32 @@ const useValuesHook = () => {
     }
   };
 
+  const searchAllUsers = async ({username}: {username: string;}): Promise<{username: string; fid: string}[] | {error: any}> => {
+    try {
+      const {data} = await axios.get(`${API_BASE_URL}/searchUsers?username=${username}`);
+
+      if (data.error) {
+        return {error: data.error};
+      }
+
+      return data
+    } catch (error) {
+      return {error: error};
+    }
+  };
+
+  const getAlignment = async ({viewer, target}: {viewer: string; target: string}): Promise<{error: string} | {alignment: {alignmentScore: number, viewerInfo: UserData, targetInfo: UserData}}> => {
+    console.log("HERE")
+    const {data} = await axios.get(`${API_BASE_URL}/users/get-alignment?viewer=${viewer}&target=${target}`);
+    console.log("DATA: ", data)
+    if (data.error) {
+      return {error: data.message};
+    }
+
+    return data
+  }
+
+
   return {
     getAllValues,
     getUserData,
@@ -351,8 +311,9 @@ const useValuesHook = () => {
     mintValues,
     attachFarcaster,
     getFarcasterUserName,
-    getAlignmentScore,
+    getAlignment,
     searchFarcasterUser,
+    searchAllUsers
   };
 };
 

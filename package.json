@@ -24,7 +24,7 @@
     "lucide-react": "^0.429.0",
     "mongodb": "^6.5.0",
     "mongoose": "^8.3.2",
-    "next": "^15.0.2-canary.8",
+    "next": "^15.0.2",
     "nodemailer": "^6.9.14",
     "openai": "^4.56.0",
     "pino": "^9.4.0",
