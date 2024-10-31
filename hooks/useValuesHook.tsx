@@ -223,9 +223,11 @@ const useValuesHook = () => {
   const attachFarcaster = async ({
     userId,
     fid,
+    farcasterUsername,
   }: {
     userId: string;
     fid: number;
+    farcasterUsername: string;
   }): Promise<{error: string} | IUser> => {
     if (!userId || !fid) {
       return {error: "Please provide userId and fid"};
@@ -235,6 +237,7 @@ const useValuesHook = () => {
       method: "link_farcaster",
       userDataToUpdate: {
         fid,
+        farcasterUsername
       },
     });
     if (data.error) {

@@ -35,6 +35,7 @@ const AiValueComponent = () => {
         const response = await attachFarcaster({
           userId: userInfo?.userId!,
           fid: user?.farcaster?.fid!,
+          farcasterUsername: user?.farcaster?.username!,
         });
 
         if ("error" in response) {
