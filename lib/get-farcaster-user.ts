@@ -8,6 +8,7 @@ type FarcasterSocialData = {
     }[];
   };
 };
+
 export async function getFarcasterUser(fid: number) {
   const query = `query GetFarcasterUsername {
   Socials(

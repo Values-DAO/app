@@ -10,6 +10,7 @@ type FarcasterSocialData = {
     }[];
   };
 };
+
 export const getUserFarcasterWallets = async (fid: number) => {
   const query = gql`
       query MyQuery {

@@ -1,9 +1,10 @@
 "use client";
 import useValuesHook from "@/hooks/useValuesHook";
-import {getUserFarcasterWallets} from "@/lib/get-user-farcaster-wallets";
 import {IUser} from "@/types";
 import {usePrivy} from "@privy-io/react-auth";
 import {createContext, useContext, useEffect, useState} from "react";
+import axios from "axios";
+import {API_BASE_URL} from "@/constants";
 
 interface IUserContext {
   userInfo: IUser | null;
@@ -74,9 +75,12 @@ export const UserContextProvider = ({
       if (!userInfo) return;
       if (userInfo.wallets.length === 0) {
         if (!user?.farcaster?.fid) return;
-        const userFarcasterWallets = await getUserFarcasterWallets(
-          user?.farcaster?.fid
-        );
+        // const userFarcasterWallets = await getUserFarcasterWallets(
+        //   user?.farcaster?.fid
+        // );
+
+        const response = await axios.get(`${API_BASE_URL}/farcaster/wallet?fid=${user?.farcaster?.fid}`);
+        const userFarcasterWallets = response.data;
 
         if (userFarcasterWallets.length === 0) return;
 
