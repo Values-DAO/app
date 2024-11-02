@@ -19,8 +19,14 @@ interface UserData {
   values: string[];
 }
 
-const Page = ({params}: {params: {id: string}}) => {
-  const {id} = params;
+const Page = ({params}: {params: Promise<{ id: string}>}) => {
+  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null);
+
+  useEffect(() => {
+    params.then(setResolvedParams).catch(console.error);
+  }, [params]);
+
+  const id = resolvedParams?.id;
   const searchParams = useSearchParams();
   const viewer = searchParams.get("viewer");
 
@@ -30,70 +36,82 @@ const Page = ({params}: {params: {id: string}}) => {
   const [alignmentScore, setAlignmentScore] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [userFarcasterInfo, setUserFarcasterInfo] = useState<any | null>(null);
-  const [viewerFarcasterInfo, setViewerFarcasterInfo] = useState<any | null>(
-    null
-  );
+  const [viewerFarcasterInfo, setViewerFarcasterInfo] = useState<any | null>(null);
 
-  const {getUserData, getFarcasterUserName, getAlignmentScore} =
-    useValuesHook();
+  const {getUserData, getFarcasterUserName, getAlignmentScore} = useValuesHook();
 
+
+  // Fetch target user and viewer user data
   useEffect(() => {
     const fetchData = async () => {
       if (!id || isNaN(parseInt(id))) return;
+
       try {
         setIsLoading(true);
+
         const targetUser = await getUserData({fid: Number(id)});
+
         if ("error" in targetUser) {
           setError(targetUser.error);
           setIsLoading(false);
           return;
         }
 
+        // Combine warpcast and twitter values to a unique array
         const targetUserValues = Array.from(
           new Set([
             ...(targetUser.generatedValues.warpcast || []),
             ...(targetUser.generatedValues.twitter || []),
           ])
         );
+
+        // Get the spectrum for the target user
         const targetUserSpectrum = getSpectrumForUser(targetUser);
+
         if (targetUserSpectrum.length === 0) {
           setError(
             "Values not generated, Visit ValuesDAO app to generate values."
           );
         }
+
         setUserData({
           values: targetUserValues,
           spectrum: targetUserSpectrum,
         });
 
         if (!viewer || isNaN(parseInt(viewer))) return;
-        const viewerUser = viewer
-          ? await getUserData({fid: Number(viewer)})
-          : null;
+
+        const viewerUser = viewer ? await getUserData({fid: Number(viewer)}) : null;
+
         if (viewerUser) {
           if ("error" in viewerUser) {
             setError(viewerUser.error);
             setIsLoading(false);
             return;
           }
+
+          // Combine warpcast and twitter values to a unique array
           const viewerUserValues = Array.from(
             new Set([
               ...(viewerUser.generatedValues.warpcast || []),
               ...(viewerUser.generatedValues.twitter || []),
             ])
           );
+
+          // Get the spectrum for the viewer user
           const viewerUserSpectrum = getSpectrumForUser(viewerUser);
+
           if (viewerUserSpectrum.length === 0) {
             setError(
               "Values not generated, Visit ValuesDAO app to generate values."
             );
           }
+
           setViewerData({
             values: viewerUserValues,
             spectrum: viewerUserSpectrum,
           });
         }
-        setIsLoading(false);
       } catch (err: any) {
         setError(err.message);
         setIsLoading(false);
@@ -101,9 +119,11 @@ const Page = ({params}: {params: {id: string}}) => {
         setIsLoading(false);
       }
     };
+
     fetchData();
   }, [id, viewer]);
 
+  // Fetch farcaster info for viewer user and viewer user from airstack
   useEffect(() => {
     if (!viewer) return;
 
@@ -111,45 +131,43 @@ const Page = ({params}: {params: {id: string}}) => {
       const viewerInfo = await getFarcasterUserName({fid: Number(viewer)});
       setViewerFarcasterInfo(viewerInfo);
     };
+
     fetchViewerInfo();
   }, [viewer]);
 
+  // Fetch farcaster info for target user from airstack
   useEffect(() => {
     if (!id) return;
+
     const fetchUserInfo = async () => {
       const userInfo = await getFarcasterUserName({
         fid: Number(id),
       });
       setUserFarcasterInfo(userInfo);
     };
+
     fetchUserInfo();
   }, [id]);
 
+  // Calculate alignment score
   useEffect(() => {
     if (!id || !viewer) return;
+
     const calculateAlignmentScore = async () => {
       const score = await getAlignmentScore({
         fid: parseInt(id),
         viewerFid: parseInt(viewer),
       });
+
       if ("error" in score) {
         return;
       }
+
       setAlignmentScore(score.alignmentScore);
     };
 
     calculateAlignmentScore();
   }, [userData, viewerData]);
-
-  if (isNaN(parseInt(id))) {
-    return (
-      <div className="fixed inset-0 flex flex-col items-center justify-center bg-opacity-50 backdrop-filter backdrop-blur-lg">
-        <h4 className="scroll-m-20 text-lg font-light tracking-tight">
-          Invalid User Id
-        </h4>
-      </div>
-    );
-  }
 
   if (isLoading) {
     return (
@@ -162,8 +180,18 @@ const Page = ({params}: {params: {id: string}}) => {
     );
   }
 
+  if (isNaN(parseInt(id as string))) {
+    return (
+      <div className="fixed inset-0 flex flex-col items-center justify-center bg-opacity-50 backdrop-filter backdrop-blur-lg">
+        <h4 className="scroll-m-20 text-lg font-light tracking-tight">
+          Invalid User Id
+        </h4>
+      </div>
+    );
+  }
+
   return (
-    <>
+    <div className={"container"}>
       {error ? (
         <Alert variant="destructive" className="w-[96%] m-auto mt-8">
           <MessageCircleWarningIcon className="h-4 w-4" />
@@ -257,7 +285,7 @@ const Page = ({params}: {params: {id: string}}) => {
           )}
         </section>
       )}
-    </>
+    </div>
   );
 };
 
