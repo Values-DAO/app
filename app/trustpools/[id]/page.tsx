@@ -80,14 +80,8 @@ const useDebounce = (value: string, delay: number) => {
 	return debouncedValue
 }
 
-export default function Dashboard({ params }: {params: Promise<{id: string}>}) {
-	const [resolvedParams, setResolvedParams] = useState<{id: string} | null>(null)
-
-	useEffect(() => {
-		params.then(setResolvedParams).catch(console.error)
-	}, [])
-
-	const trustPoolId = resolvedParams?.id!
+export default function Dashboard({ params }: {params: {id: string}}) {
+	const trustPoolId = params.id!
 	const router = useRouter()
 	const { userInfo } = useUserContext()
 	const queryClient = useQueryClient()

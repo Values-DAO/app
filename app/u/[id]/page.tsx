@@ -19,14 +19,8 @@ interface UserData {
   values: string[];
 }
 
-const Page = ({params}: {params: Promise<{ id: string}>}) => {
-  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null);
-
-  useEffect(() => {
-    params.then(setResolvedParams).catch(console.error);
-  }, [params]);
-
-  const id = resolvedParams?.id;
+const Page = ({params}: {params: { id: string}}) => {
+  const id = params.id!;
   const searchParams = useSearchParams();
   const viewer = searchParams.get("viewer");
 

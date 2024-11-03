@@ -42,14 +42,8 @@ const formSchema = z.object({
 
 type TrustPool = z.infer<typeof formSchema>
 
-export default function EditTrustPool({ params }: { params: Promise<{id: string}>}) {
-	const [resolvedParams, setResolvedParams] = useState<{id: string} | null>(null)
-
-	useEffect(() => {
-		params.then(setResolvedParams).catch(console.error)
-	}, [params])
-
-	const trustPoolId = resolvedParams?.id!
+export default function EditTrustPool({ params }: { params: {id: string}}) {
+	const trustPoolId = params.id!
 
 	const router = useRouter()
 	const [isLoading, setIsLoading] = useState(true)
