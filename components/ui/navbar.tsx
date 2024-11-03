@@ -38,7 +38,7 @@ const Navbar = () => {
         {pathname !== "/trustpools" && (
           <Link href="/trustpools">
             <Button variant="default" className="flex items-center">
-              Trustpools
+              Trust Pools
               <span className="ml-2 px-2 py-1 text-xs font-semibold text-black bg-white rounded-full">New</span>
             </Button>
           </Link>
@@ -67,7 +67,7 @@ const Navbar = () => {
             {pathname !== "/trustpools" && (
               <DropdownMenuItem asChild>
                 <Link href="/trustpools" className="flex items-center gap-2">
-                  Trustpools
+                  Trust Pools
                   <span className="px-2 py-1 text-xs font-semibold text-white bg-primary rounded-full">New</span>
                 </Link>
               </DropdownMenuItem>
