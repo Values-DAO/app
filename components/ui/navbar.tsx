@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 
-import {Button} from "../ui/button";
+import { Button } from "../ui/button";
 import Link from "next/link";
 import {
   DropdownMenu,
@@ -24,20 +24,26 @@ const Navbar = () => {
       setUserInfo(null);
     },
   });
+
   return (
     <div className="flex flex-row justify-between items-center  p-4 md:p-6 relative">
       <Link href="/">
-        <img
-          src={"/logo.png"}
-          alt="logo"
-          className="w-[200px] h-[40px] md:w-[300px] md:h-[60px] cursor-pointer"
-        />
+        <img src={"/logo.png"} alt="logo" className="w-[200px] h-[40px] md:w-[300px] md:h-[60px] cursor-pointer" />
       </Link>
 
-      <div className="hidden md:flex flex-row gap-4 mt-[-12px]">
-        {pathname === "/" && (
-          <AlignmentSearchSheet buttonText="Check Alignment w/ Farcaster user" />
+      <div className="hidden md:flex flex-row gap-4 mt-[-12px] items-center">
+        {pathname === "/" && <AlignmentSearchSheet buttonText="Check Alignment w/ Farcaster user" />}
+
+        {/* Trustpools button with "New" badge */}
+        {pathname !== "/trustpools" && (
+          <Link href="/trustpools">
+            <Button variant="default" className="flex items-center">
+              Trustpools
+              <span className="ml-2 px-2 py-1 text-xs font-semibold text-black bg-white rounded-full">New</span>
+            </Button>
+          </Link>
         )}
+
         {ready && authenticated ? (
           <Button variant={"secondary"} onClick={logout}>
             Logout
@@ -48,7 +54,8 @@ const Navbar = () => {
           </Button>
         )}
       </div>
-      <div className=" flex flex-row gap-2  md:hidden mt-[-12px]">
+
+      <div className="flex flex-row gap-2 md:hidden mt-[-12px]">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <div className="p-2 border-[2px] border-gray-500/45 rounded-md">
@@ -56,18 +63,22 @@ const Navbar = () => {
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="mr-4">
+            {/* Trustpools menu item with "New" badge for mobile */}
+            {pathname !== "/trustpools" && (
+              <DropdownMenuItem asChild>
+                <Link href="/trustpools" className="flex items-center gap-2">
+                  Trustpools
+                  <span className="px-2 py-1 text-xs font-semibold text-white bg-primary rounded-full">New</span>
+                </Link>
+              </DropdownMenuItem>
+            )}
+
             {authenticated ? (
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={() => logout()}
-              >
+              <DropdownMenuItem className="cursor-pointer" onClick={() => logout()}>
                 Logout
               </DropdownMenuItem>
             ) : (
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={() => login()}
-              >
+              <DropdownMenuItem className="cursor-pointer" onClick={() => login()}>
                 Login
               </DropdownMenuItem>
             )}
