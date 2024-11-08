@@ -32,8 +32,9 @@ interface TrustPool {
   logo?: string;
   owners?: User[];
   members?: User[];
-  telegramLink?: string;
+  communityLink?: string;
   twitterHandle?: string;
+  farcasterHandle?: string;
   organizerTwitterHandle?: string;
 }
 
@@ -163,16 +164,14 @@ export default function Dashboard({ params }: { params: { id: string } }) {
             {user.twitterUsername && (
               <Button size="sm" variant="outline" asChild>
                 <Link href={`https://twitter.com/${user.twitterUsername}`} target="_blank">
-                  <Twitter className="h-3 w-3" />
+                  <Image src="/x.svg" alt="x icon" height={16} width={16} />
                 </Link>
               </Button>
             )}
             {user.farcasterUsername && (
               <Button size="sm" className="bg-[#9c6bff] text-white hover:bg-[#7c4dff]" asChild>
                 <Link href={`https://warpcast.com/${user.farcasterUsername}`} target="_blank">
-                  <svg viewBox="0 0 32 32" className="h-3 w-3 fill-current">
-                    <path d="M16 0C7.163 0 0 7.163 0 16s7.163 16 16 16 16-7.163 16-16S24.837 0 16 0zm8.5 18.5H22v3a1 1 0 01-1 1h-2.5v-4h-5v4H11a1 1 0 01-1-1v-3H7.5v-3h3V11a1 1 0 011-1h9a1 1 0 011 1v4.5h3v3z" />
-                  </svg>
+                  <Image src="/farcaster.svg" alt="farcaster icon" height={16} width={16} />
                 </Link>
               </Button>
             )}
@@ -201,20 +200,18 @@ export default function Dashboard({ params }: { params: { id: string } }) {
                 target="_blank"
                 onClick={(e) => e.stopPropagation()}
               >
-                <Twitter className="h-3 w-3" />
+                <Image src="/x.svg" alt="x icon" height={16} width={16} />
               </Link>
             </Button>
           )}
           {user.farcasterUsername && (
-            <Button size="sm" className="bg-[#9c6bff] text-white hover:bg-[#7c4dff]" asChild>
+            <Button size="sm" className="bg-[#855DCD] text-white hover:bg-[#9770df]" asChild>
               <Link
                 href={`https://warpcast.com/${user.farcasterUsername}`}
                 target="_blank"
                 onClick={(e) => e.stopPropagation()}
               >
-                <svg viewBox="0 0 32 32" className="h-3 w-3 fill-current">
-                  <path d="M16 0C7.163 0 0 7.163 0 16s7.163 16 16 16 16-7.163 16-16S24.837 0 16 0zm8.5 18.5H22v3a1 1 0 01-1 1h-2.5v-4h-5v4H11a1 1 0 01-1-1v-3H7.5v-3h3V11a1 1 0 011-1h9a1 1 0 011 1v4.5h3v3z" />
-                </svg>
+                <Image src="/farcaster.svg" alt="farcaster icon" height={16} width={16} />
               </Link>
             </Button>
           )}
@@ -251,7 +248,7 @@ export default function Dashboard({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background md:container">
       {/* Hero Section */}
       <section className="bg-primary py-4 sm:py-6 text-primary-foreground rounded-lg mb-3 mx-2">
         <div className="px-2 sm:px-4 lg:px-6">
@@ -273,35 +270,28 @@ export default function Dashboard({ params }: { params: { id: string } }) {
               </p>
             </div>
             <div className="mt-2 md:mt-0 flex-shrink-0 flex flex-row md:flex-col md:space-y-2 gap-2">
-              <Button
-                variant="secondary"
-                className="bg-white w-full mb-2 md:mb-0"
-                onClick={handleJoinButton}
-                size="sm"
-              >
+              <Button variant="secondary" className="bg-white w-full mb-2 md:mb-0" onClick={handleJoinButton} size="sm">
                 {buttonText || "Join Pool"}
               </Button>
               <Button
                 variant="secondary"
-                className="hover:bg-gray-700 bg-black text-white border-black font-semibold w-full mb-2 md:mb-0"
+                className="border-black font-semibold w-full mb-2 md:mb-0 pr-6"
                 size="sm"
                 asChild
               >
                 <Link href={`https://twitter.com/${trustPool?.twitterHandle || ""}`} target="_blank">
-                  <Twitter className="h-4 w-4 mr-1" />
+                  <Image src="/x.svg" alt="x icon" height={24} width={24} className="pl-2" />
                   Twitter
                 </Link>
               </Button>
               <Button
                 variant="secondary"
-                className="hover:bg-[#967fda] bg-[#7C65C1] border-[#7C65C1] text-white font-semibold w-full mb-2 md:mb-0"
+                className="pr-6 hover:bg-[#967fda] bg-[#855DCD] border-[#855DCD] text-white font-semibold w-full mb-2 md:mb-0"
                 size="sm"
                 asChild
               >
                 <Link href={`https://warpcast.com/${trustPool?.organizerTwitterHandle || ""}`} target="_blank">
-                  <svg viewBox="0 0 32 32" className="h-4 w-4 mr-1 fill-current">
-                    <path d="M16 0C7.163 0 0 7.163 0 16s7.163 16 16 16 16-7.163 16-16S24.837 0 16 0zm8.5 18.5H22v3a1 1 0 01-1 1h-2.5v-4h-5v4H11a1 1 0 01-1-1v-3H7.5v-3h3V11a1 1 0 011-1h9a1 1 0 011 1v4.5h3v3z" />
-                  </svg>
+                  <Image src="/farcaster.svg" alt="farcaster icon" height={32} width={32} className="pl-2" />
                   Farcaster
                 </Link>
               </Button>
@@ -339,19 +329,18 @@ export default function Dashboard({ params }: { params: { id: string } }) {
                               href={`https://twitter.com/intent/tweet?text=Hey%20@${user.twitterUsername}%2C%20apparently%20the%20ValuesDAO%20wizards%20did%20some%20alignment%20magic%20and%20decided%20we%E2%80%99re%20a%20perfect%20match%E2%80%94for%20world%20domination%2C%20or%20at%20least%20a%20solid%20conversation.%0ACare%20to%20jump%20into%20DMs%20and%20see%20if%20these%20guys%20actually%20know%20what%20they%E2%80%99re%20talking%20about%3F%20%F0%9F%98%84`}
                               target="_blank"
                             >
-                              <Twitter className="h-3 w-3" />
+                              {/* <Image src="/farcaster.svg" alt="farcaster icon" height={20} width={20} /> */}
+                              <Image src="/x.svg" alt="x icon" height={16} width={16} />
                             </Link>
                           </Button>
                         )}
                         {user.farcasterUsername && (
-                          <Button size="sm" className="bg-[#9c6bff] text-white hover:bg-[#7c4dff]" asChild>
+                          <Button size="sm" className="bg-[#855DCD] text-white hover:bg-[#9770df]" asChild>
                             <Link
                               href={`https://warpcast.com/~/compose?text=Hey%20@${user.farcasterUsername}%2C%20apparently%20the%20valuesdao%20wizards%20did%20some%20alignment%20magic%20and%20decided%20we%E2%80%99re%20a%20perfect%20match%E2%80%94for%20world%20domination%2C%20or%20at%20least%20a%20solid%20conversation.%0ACare%20to%20jump%20into%20DMs%20and%20see%20if%20these%20guys%20actually%20know%20what%20they%E2%80%99re%20talking%20about%3F%20%F0%9F%98%84`}
                               target="_blank"
                             >
-                              <svg viewBox="0 0 32 32" className="h-3 w-3 fill-current">
-                                <path d="M16 0C7.163 0 0 7.163 0 16s7.163 16 16 16 16-7.163 16-16S24.837 0 16 0zm8.5 18.5H22v3a1 1 0 01-1 1h-2.5v-4h-5v4H11a1 1 0 01-1-1v-3H7.5v-3h3V11a1 1 0 011-1h9a1 1 0 011 1v4.5h3v3z" />
-                              </svg>
+                              <Image src="/farcaster.svg" alt="farcaster icon" height={16} width={16} />
                             </Link>
                           </Button>
                         )}
@@ -388,19 +377,17 @@ export default function Dashboard({ params }: { params: { id: string } }) {
                               href={`https://twitter.com/intent/tweet?text=Hey%20@${user.twitterUsername}%2C%20apparently%20the%20ValuesDAO%20wizards%20did%20some%20alignment%20magic%20and%20decided%20we%E2%80%99re%20a%20perfect%20match%E2%80%94for%20world%20domination%2C%20or%20at%20least%20a%20solid%20conversation.%0ACare%20to%20jump%20into%20DMs%20and%20see%20if%20these%20guys%20actually%20know%20what%20they%E2%80%99re%20talking%20about%3F%20%F0%9F%98%84`}
                               target="_blank"
                             >
-                              <Twitter className="h-3 w-3" />
+                              <Image src="/x.svg" alt="x icon" height={16} width={16} />
                             </Link>
                           </Button>
                         )}
                         {user.farcasterUsername && (
-                          <Button size="sm" className="bg-[#9c6bff] text-white hover:bg-[#7c4dff]" asChild>
+                          <Button size="sm" className="bg-[#855DCD] text-white hover:bg-[#9770df]" asChild>
                             <Link
                               href={`https://warpcast.com/~/compose?text=Hey%20@${user.farcasterUsername}%2C%20apparently%20the%20valuesdao%20wizards%20did%20some%20alignment%20magic%20and%20decided%20we%E2%80%99re%20a%20perfect%20match%E2%80%94for%20world%20domination%2C%20or%20at%20least%20a%20solid%20conversation.%0ACare%20to%20jump%20into%20DMs%20and%20see%20if%20these%20guys%20actually%20know%20what%20they%E2%80%99re%20talking%20about%3F%20%F0%9F%98%84`}
                               target="_blank"
                             >
-                              <svg viewBox="0 0 32 32" className="h-3 w-3 fill-current">
-                                <path d="M16 0C7.163 0 0 7.163 0 16s7.163 16 16 16 16-7.163 16-16S24.837 0 16 0zm8.5 18.5H22v3a1 1 0 01-1 1h-2.5v-4h-5v4H11a1 1 0 01-1-1v-3H7.5v-3h3V11a1 1 0 011-1h9a1 1 0 011 1v4.5h3v3z" />
-                              </svg>
+                              <Image src="/farcaster.svg" alt="farcaster icon" height={16} width={16} />
                             </Link>
                           </Button>
                         )}

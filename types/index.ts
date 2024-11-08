@@ -4,6 +4,7 @@ export interface IUser {
   userId: string;
   email?: string;
   fid?: number;
+  farcasterUsername?: string;
   twitterUsername?: string;
   twitterId?: string;
   wallets: string[];
