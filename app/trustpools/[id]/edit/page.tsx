@@ -33,12 +33,12 @@ import axios from "axios";
 import {useUserContext} from "@/providers/user-context-provider";
 
 const formSchema = z.object({
-	name: z.string().min(1, 'Please provide a name'),
-	description: z.string().min(1, 'Please provide a description'),
-	telegramLink: z.string().url('Invalid URL'),
-	twitterHandle: z.string().url('Invalid URL'),
-	organizerTwitterHandle: z.string().url('Invalid URL'),
-})
+  name: z.string().min(1, "Please provide a name").max(32, "Name is too long"),
+  description: z.string().min(1, "Please provide a description").max(500, "Description is too long"),
+  telegramLink: z.string().url("Invalid URL"),
+  twitterHandle: z.string().url("Invalid URL"),
+  organizerTwitterHandle: z.string().url("Invalid URL"),
+});
 
 type TrustPool = z.infer<typeof formSchema>
 

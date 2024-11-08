@@ -240,134 +240,144 @@ export default function Dashboard({ params }: {params: {id: string}}) {
 	}
 
 	return (
-		<main className="min-h-screen bg-background container">
-			{/* Hero Section */}
-			<section className="bg-primary py-10 text-primary-foreground rounded-2xl mb-4">
-				<div className="container mx-auto px-8">
-					<div className="flex flex-col items-center gap-6 md:flex-row md:items-start">
-						<Image
-							src={trustPool?.logo || '/valuesDAO.png'}
-							alt={`${trustPool?.name} logo`}
-							width={100}
-							height={100}
-							className="rounded-full"
-						/>
-						<div className="flex-1 text-center md:text-left">
-							<h1 className="mb-2 text-3xl font-bold md:text-4xl">{trustPool?.name}</h1>
-							<p className="mb-4 text-lg">{trustPool?.description}</p>
-						</div>
-						<Button variant="secondary" onClick={handleJoinButton}>
-							{buttonText}
-						</Button>
-					</div>
-				</div>
-			</section>
+    <div className="min-h-screen bg-background">
+      {/* Hero Section */}
+      <section className="bg-primary py-6 sm:py-10 text-primary-foreground rounded-2xl mb-4 mx-4">
+        <div className="px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col items-center gap-4 sm:gap-6 md:flex-row md:items-start">
+            <Image
+              src={trustPool?.logo || "/valuesDAO.png"}
+              alt={`${trustPool?.name || "Trust Pool"} logo`}
+              width={100}
+              height={100}
+              className="rounded-full w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 flex-shrink-0"
+            />
+            <div className="flex-1 text-center md:text-left overflow-hidden">
+              <h1 className="mb-2 text-2xl sm:text-3xl font-bold md:text-4xl truncate">
+                {trustPool?.name || "Trust Pool Name"}
+              </h1>
+              <p className="mb-4 text-sm sm:text-base md:text-lg break-words">
+                {trustPool?.description ||
+                  "Trust Pool description goes here. This is a placeholder text that will be replaced with the actual description of the trust pool. It can be a longer text that wraps to multiple lines as needed, providing more information about the trust pool and its purpose."}
+              </p>
+            </div>
+            <div className="mt-4 md:mt-0 flex-shrink-0">
+              <Button variant="secondary" onClick={handleJoinButton}>
+                {buttonText || "Join Pool"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
 
-			{/* Alignment Section */}
-			<section className="py-4 rounded-2xl">
-				<div className="container mx-auto px-4">
-					<h2 className="mb-4 text-2xl font-bold">Community Alignment</h2>
-					<div className="grid gap-6 md:grid-cols-2">
-						{/* Most Aligned Users */}
-						<div className="bg-card p-6 border-2 rounded-2xl shadow-xl">
-							<h3 className="mb-4 text-xl font-semibold">Most Aligned</h3>
-							{isLoadingAlignment ? (
-								<AlignmentSkeleton />
-							) : (
-								alignedUsers?.topAlignedUsers?.map((user: User) => (
-									<div key={user.userId} className="mb-4 flex items-center justify-between">
-										<div className="flex items-center gap-2">
-											<span>{user.farcasterUsername || user.twitterUsername}</span>
-										</div>
-										<div className="flex items-center gap-2">
-											<span className="font-semibold">|| {user.alignmentScore}%</span>
-											{user.twitterUsername && (
-												<Button size="icon" variant="outline" asChild>
-													<Link href={`https://twitter.com/${user.twitterUsername}`} target="_blank">
-														<Twitter className="h-4 w-4" />
-													</Link>
-												</Button>
-											)}
-											{user.farcasterUsername && (
-												<Button size="icon" className="bg-[#9c6bff] text-white hover:bg-[#7c4dff]" asChild>
-													<Link href={`https://warpcast.com/${user.farcasterUsername}`} target="_blank">
-														<svg viewBox="0 0 32 32" className="h-4 w-4 fill-current">
-															<path d="M16 0C7.163 0 0 7.163 0 16s7.163 16 16 16 16-7.163 16-16S24.837 0 16 0zm8.5 18.5H22v3a1 1 0 01-1 1h-2.5v-4h-5v4H11a1 1 0 01-1-1v-3H7.5v-3h3V11a1 1 0 011-1h9a1 1 0 011 1v4.5h3v3z" />
-														</svg>
-													</Link>
-												</Button>
-											)}
-										</div>
-									</div>
-								))
-							) || <p>No data available</p>}
-						</div>
+      {/* Alignment Section */}
+      {/* Alignment Section */}
+      <section className="py-4 rounded-2xl">
+        <div className="container mx-auto px-4">
+          <h2 className="mb-4 text-2xl font-bold">Community Alignment</h2>
+          <div className="grid gap-6 md:grid-cols-2">
+            {/* Most Aligned Users */}
+            <div className="bg-card p-6 border-2 rounded-2xl shadow-xl">
+              <h3 className="mb-4 text-xl font-semibold">Most Aligned</h3>
+              {isLoadingAlignment ? (
+                <AlignmentSkeleton />
+              ) : alignedUsers?.topAlignedUsers?.length > 0 ? (
+                alignedUsers.topAlignedUsers.map((user: User) => (
+                  <div key={user.userId} className="mb-4 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span>{user.farcasterUsername || user.twitterUsername}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold">|| {user.alignmentScore}%</span>
+                      {user.twitterUsername && (
+                        <Button size="icon" variant="outline" asChild>
+                          <Link href={`https://twitter.com/${user.twitterUsername}`} target="_blank">
+                            <Twitter className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                      )}
+                      {user.farcasterUsername && (
+                        <Button size="icon" className="bg-[#9c6bff] text-white hover:bg-[#7c4dff]" asChild>
+                          <Link href={`https://warpcast.com/${user.farcasterUsername}`} target="_blank">
+                            <svg viewBox="0 0 32 32" className="h-4 w-4 fill-current">
+                              <path d="M16 0C7.163 0 0 7.163 0 16s7.163 16 16 16 16-7.163 16-16S24.837 0 16 0zm8.5 18.5H22v3a1 1 0 01-1 1h-2.5v-4h-5v4H11a1 1 0 01-1-1v-3H7.5v-3h3V11a1 1 0 011-1h9a1 1 0 011 1v4.5h3v3z" />
+                            </svg>
+                          </Link>
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p>There are not enough users to show alignment, please invite your community members.</p>
+              )}
+            </div>
 
-						{/* Most Diverse Users */}
-						<div className="bg-card p-6 border-2 rounded-2xl shadow-xl">
-							<h3 className="mb-4 text-xl font-semibold">Most Diverse</h3>
-							{isLoadingAlignment ? (
-								<AlignmentSkeleton />
-							) : (
-								alignedUsers?.topDiverseUsers?.map((user: User) => (
-									<div key={user.userId} className="mb-4 flex items-center justify-between">
-										<div className="flex items-center gap-2">
-											<span>{user.farcasterUsername || user.twitterUsername}</span>
-										</div>
-										<div className="flex items-center gap-2">
-											<span className="font-semibold">|| {user.alignmentScore}%</span>
-											{user.twitterUsername && (
-												<Button size="icon" variant="outline" asChild>
-													<Link href={`https://twitter.com/${user.twitterUsername}`} target="_blank">
-														<Twitter className="h-4 w-4" />
-													</Link>
-												</Button>
-											)}
-											{user.farcasterUsername && (
-												<Button size="icon" className="bg-[#9c6bff] text-white hover:bg-[#7c4dff]" asChild>
-													<Link href={`https://warpcast.com/${user.farcasterUsername}`} target="_blank">
-														<svg viewBox="0 0 32 32" className="h-4 w-4 fill-current">
-															<path d="M16 0C7.163 0 0 7.163 0 16s7.163 16 16 16 16-7.163 16-16S24.837 0 16 0zm8.5 18.5H22v3a1 1 0 01-1 1h-2.5v-4h-5v4H11a1 1 0 01-1-1v-3H7.5v-3h3V11a1 1 0 011-1h9a1 1 0 011 1v4.5h3v3z" />
-														</svg>
-													</Link>
-												</Button>
-											)}
-										</div>
-									</div>
-								))
-							)}
-						</div>
-					</div>
-				</div>
-			</section>
+            {/* Most Diverse Users */}
+            <div className="bg-card p-6 border-2 rounded-2xl shadow-xl">
+              <h3 className="mb-4 text-xl font-semibold">Most Diverse</h3>
+              {isLoadingAlignment ? (
+                <AlignmentSkeleton />
+              ) : alignedUsers?.topDiverseUsers?.length > 0 ? (
+                alignedUsers.topDiverseUsers.map((user: User) => (
+                  <div key={user.userId} className="mb-4 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span>{user.farcasterUsername || user.twitterUsername}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold">|| {user.alignmentScore}%</span>
+                      {user.twitterUsername && (
+                        <Button size="icon" variant="outline" asChild>
+                          <Link href={`https://twitter.com/${user.twitterUsername}`} target="_blank">
+                            <Twitter className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                      )}
+                      {user.farcasterUsername && (
+                        <Button size="icon" className="bg-[#9c6bff] text-white hover:bg-[#7c4dff]" asChild>
+                          <Link href={`https://warpcast.com/${user.farcasterUsername}`} target="_blank">
+                            <svg viewBox="0 0 32 32" className="h-4 w-4 fill-current">
+                              <path d="M16 0C7.163 0 0 7.163 0 16s7.163 16 16 16 16-7.163 16-16S24.837 0 16 0zm8.5 18.5H22v3a1 1 0 01-1 1h-2.5v-4h-5v4H11a1 1 0 01-1-1v-3H7.5v-3h3V11a1 1 0 011-1h9a1 1 0 011 1v4.5h3v3z" />
+                            </svg>
+                          </Link>
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p>There are not enough users to show alignment, please invite your community members.</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
 
-			{/* Members Section */}
-			<section className="py-12">
-				<div className="container mx-auto px-4">
-					<div className="flex justify-between items-center mb-6">
-						<h2 className="text-2xl font-bold">Pool Owners and Members</h2>
-						<div className="flex items-center gap-4 w-1/3">
-							<div className="relative w-full">
-								<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"/>
-								<Input
-									type="search"
-									placeholder="Search members..."
-									value={searchTerm}
-									onChange={(e) => setSearchTerm(e.target.value)}
-									className="pl-10 w-full"
-								/>
-							</div>
-						</div>
-					</div>
+      {/* Members Section */}
+      <section className="py-12">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold">Pool Owners and Members</h2>
+            <div className="flex items-center gap-4 w-1/3">
+              <div className="relative w-full">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  type="search"
+                  placeholder="Search members..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 w-full"
+                />
+              </div>
+            </div>
+          </div>
 
-					{/* List View of Members */}
-					<div className="rounded-lg border bg-card">
-						<ul className="divide-y">
-							{renderUserList()}
-						</ul>
-					</div>
-				</div>
-			</section>
-		</main>
-	)
+          {/* List View of Members */}
+          <div className="rounded-lg border bg-card">
+            <ul className="divide-y">{renderUserList()}</ul>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
 }
