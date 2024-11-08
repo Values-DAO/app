@@ -135,7 +135,7 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-background md:container sm:px-2">
+    <main className="min-h-screen bg-background md:container px-2">
       {/* Hero Section */}
       <section className="bg-primary py-8 md:py-12 text-primary-foreground rounded-lg mb-4 sm:px-2">
         <div className="container mx-auto px-4">
