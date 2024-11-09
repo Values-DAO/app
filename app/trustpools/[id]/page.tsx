@@ -289,6 +289,11 @@ export default function Dashboard({ params }: { params: { id: string } }) {
                     />
                   </svg>
                 </div>
+                <div title="Organizer Twitter Handle">
+                  <Link href={`${trustPool?.organizerTwitterHandle || ""}`} target="_blank">
+                    <Image src="/x.svg" alt="x icon" height={24} width={24} className="" />
+                  </Link>
+                </div>
               </div>
               <p className="mb-2 text-xs sm:text-sm md:text-base break-words">
                 {trustPool?.description ||
@@ -299,28 +304,32 @@ export default function Dashboard({ params }: { params: { id: string } }) {
               <Button variant="secondary" className="bg-white w-full mb-2 md:mb-0" onClick={handleJoinButton} size="sm">
                 {buttonText || "Join Pool"}
               </Button>
-              <Button
-                variant="secondary"
-                className="border-black font-semibold w-full mb-2 md:mb-0 pr-6"
-                size="sm"
-                asChild
-              >
-                <Link href={`https://twitter.com/${trustPool?.twitterHandle || ""}`} target="_blank">
-                  <Image src="/x.svg" alt="x icon" height={24} width={24} className="pl-2" />
-                  Twitter
-                </Link>
-              </Button>
-              <Button
-                variant="secondary"
-                className="pr-6 hover:bg-[#967fda] bg-[#855DCD] border-[#855DCD] text-white font-semibold w-full mb-2 md:mb-0"
-                size="sm"
-                asChild
-              >
-                <Link href={`https://warpcast.com/${trustPool?.organizerTwitterHandle || ""}`} target="_blank">
-                  <Image src="/farcaster.svg" alt="farcaster icon" height={32} width={32} className="pl-2" />
-                  Farcaster
-                </Link>
-              </Button>
+              {trustPool?.twitterHandle && (
+                <Button
+                  variant="secondary"
+                  className="border-black font-semibold w-full mb-2 md:mb-0 pr-6"
+                  size="sm"
+                  asChild
+                >
+                  <Link href={`${trustPool?.twitterHandle || ""}`} target="_blank">
+                    <Image src="/x.svg" alt="x icon" height={24} width={24} className="pl-2" />
+                    Twitter
+                  </Link>
+                </Button>
+              )}
+              {trustPool?.farcasterHandle && (
+                <Button
+                  variant="secondary"
+                  className="pr-6 hover:bg-[#967fda] bg-[#855DCD] border-[#855DCD] text-white font-semibold w-full mb-2 md:mb-0"
+                  size="sm"
+                  asChild
+                >
+                  <Link href={`${trustPool?.farcasterHandle || ""}`} target="_blank">
+                    <Image src="/farcaster.svg" alt="farcaster icon" height={32} width={32} className="pl-2" />
+                    Farcaster
+                  </Link>
+                </Button>
+              )}
               <ShareButton />
             </div>
           </div>
