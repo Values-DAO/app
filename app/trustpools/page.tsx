@@ -133,6 +133,10 @@ export default function Home() {
 
     router.push(`/trustpools/${response.data.data._id}`);
   }
+  
+  const handleRedirect = (id: string) => {
+    router.push(`/trustpools/${id}`);
+  }
 
   return (
     <main className="min-h-screen bg-background md:container px-2">
@@ -270,7 +274,7 @@ export default function Home() {
       </section>
 
       {/* Trust Pool Cards/List Section */}
-        <section className="mx-auto px-4 pb-12">
+      <section className="mx-auto px-4 pb-12">
         {isMobile ? (
           <ul className="space-y-4">
             {isLoading ? (
@@ -287,7 +291,8 @@ export default function Home() {
               displayPools.map((pool) => (
                 <li
                   key={pool._id || pool.name}
-                  className="bg-card p-4 rounded-lg shadow-md flex items-center gap-4 border border-gray-200"
+                  className="bg-card p-4 rounded-lg shadow-md flex items-center gap-4 border border-gray-200 cursor-pointer"
+                  onClick={() => handleRedirect(pool._id)}
                 >
                   <img src={pool.logo || "/valuesDAO.png"} alt={pool.name} className="w-12 h-12 rounded-full" />
                   <div className="flex-1 min-w-0">
@@ -295,13 +300,38 @@ export default function Home() {
                     <p className="text-sm text-muted-foreground truncate">{pool.description}</p>
                   </div>
                   <div className="flex gap-6">
-                    <Link href={pool.twitterHandle || ""} target="_blank" rel="noopener noreferrer">
-                      <Image src="/x.svg" alt="x icon" height={24} width={24} />
+                    <Link
+                      href={pool.twitterHandle || ""}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Image
+                        src="/x.svg"
+                        alt="x icon"
+                        height={24}
+                        width={24}
+                      />
                     </Link>
-                    <Link href={pool.farcasterHandle || ""} target="_blank" rel="noopener noreferrer">
-                      <Image src="/farcaster.svg" alt="farcaster icon" height={24} width={24} />
+                    <Link
+                      href={pool.farcasterHandle || ""}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Image
+                        src="/farcaster.svg"
+                        alt="farcaster icon"
+                        height={24}
+                        width={24}
+                      />
                     </Link>
-                    <Link href={pool.communityLink || ""} target="_blank" rel="noopener noreferrer">
+                    <Link
+                      href={pool.communityLink || ""}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"

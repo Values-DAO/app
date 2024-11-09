@@ -145,6 +145,14 @@ export default function Dashboard({ params }: { params: { id: string } }) {
     // @ts-ignore 
     queryClient.invalidateQueries(["trustPool", trustPoolId]);
   };
+  
+  const handleCommunity = () => {
+    if (trustPool?.communityLink) {
+      router.push(trustPool?.communityLink);
+    } else {
+      alert("No community link found.");
+    }
+  }
 
   const renderUserList = () => {
     if (searchTerm) {
@@ -261,9 +269,27 @@ export default function Dashboard({ params }: { params: { id: string } }) {
               className="rounded-full w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0"
             />
             <div className="flex-1 text-center md:text-left overflow-hidden">
-              <h1 className="mb-1 text-xl sm:text-2xl font-bold md:text-3xl truncate">
-                {trustPool?.name || "Trust Pool Name"}
-              </h1>
+              <div className="gap-3 flex justify-center items-center">
+                <h1 className="mb-1 text-xl sm:text-2xl font-bold md:text-3xl truncate">
+                  {trustPool?.name || "Trust Pool Name"}
+                </h1>
+                <div title="Community Link" onClick={handleCommunity}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="2"
+                    stroke="currentColor"
+                    className="size-7 cursor-pointer"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"
+                    />
+                  </svg>
+                </div>
+              </div>
               <p className="mb-2 text-xs sm:text-sm md:text-base break-words">
                 {trustPool?.description ||
                   "Trust Pool description goes here. This is a placeholder text that will be replaced with the actual description of the trust pool."}
