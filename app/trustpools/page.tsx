@@ -163,16 +163,27 @@ export default function Home() {
             />
             <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
           </div>
-          <Button
-            size="icon"
-            variant="outline"
-            onClick={() => setIsFormVisible(!isFormVisible)}
-            aria-label={isFormVisible ? "Close form" : "Open create trust pool form"}
-          >
-            {isFormVisible ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-          </Button>
+          <div className="hidden md:block">
+            <Button
+              variant="default"
+              onClick={() => setIsFormVisible(!isFormVisible)}
+              aria-label={isFormVisible ? "Close form" : "Open create trust pool form"}
+            >
+              {isFormVisible ? "Close Form" : "Create Trust Pool"}
+            </Button>
+          </div>
+          <div className="block md:hidden">
+            <Button
+              size="icon"
+              variant="default"
+              onClick={() => setIsFormVisible(!isFormVisible)}
+              aria-label={isFormVisible ? "Close form" : "Open create trust pool form"}
+            >
+              {isFormVisible ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+            </Button>
+          </div>
         </div>
-
+      
         {/* Create Trust Pool Form */}
         <div
           className={`overflow-hidden transition-all duration-300 ease-in-out ${
