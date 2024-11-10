@@ -143,13 +143,14 @@ export default function Home() {
       <section className="bg-primary py-8 md:py-12 text-primary-foreground rounded-lg mb-4 sm:px-2">
         <div className="container mx-auto px-4">
           <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">Trust Pools</h1>
-          <p className="text-md sm:text-lg">
-            Trust Pool is a curated group of people, whether by self-selection or some other method.
-            Each community, cohort, event - any ephemeral or permanent gathering of people - is a Trust Pool.
-            Communities of size {">"}30 survive on people having strong bonds between certain members. Each member will have 3-10 people that they really bond with.
-            We provide top 3 value-aligned people and top 3 people with the most diverse values.
-            Connect with them and have fun.
-          </p>
+            <p className="text-md sm:text-lg">
+              Trust Pool is a curated group of people, whether by self-selection or some other method.<br />
+              Each community, cohort, event - any ephemeral or permanent gathering of people - is a Trust Pool.<br />
+              Communities of size {">"}30 survive on people having strong bonds between certain members.<br />
+              Each member will have 3-10 people that they really bond with.<br />
+              We provide top 3 value-aligned people and top 3 people with the most diverse values.<br />
+              Connect with them and have fun.
+            </p>
         </div>
       </section>
 
