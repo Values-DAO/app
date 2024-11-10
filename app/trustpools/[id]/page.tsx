@@ -256,6 +256,8 @@ export default function Dashboard({ params }: { params: { id: string } }) {
       return "bg-red-500";
     }
   };
+  
+  const hasUserGeneratedValues = userInfo?.generatedValues.twitter && userInfo?.generatedValues.twitter.length > 0 || userInfo?.generatedValues.warpcast && userInfo?.generatedValues.warpcast.length > 0;
 
   if (isLoadingPool) {
     return (
@@ -350,7 +352,7 @@ export default function Dashboard({ params }: { params: { id: string } }) {
                   </Link>
                 </Button>
               )} */}
-              <ShareButton trustPool={trustPool}/>
+              <ShareButton trustPool={trustPool} />
             </div>
           </div>
         </div>
@@ -367,22 +369,29 @@ export default function Dashboard({ params }: { params: { id: string } }) {
               {!userInfo && (
                 <p className="text-gray-500 text-sm">Please sign in to see the most aligned users in the trust pool.</p>
               )}
-              {isLoadingAlignment ? (
-                <AlignmentSkeleton />
-              ) : alignedUsers?.topAlignedUsers?.length > 0 ? (
-                alignedUsers.topAlignedUsers.map((user: User) => (
-                  <div key={user.userId} className="mb-2 flex items-center justify-between">
-                    <div className="flex items-center gap-1">
-                      <span className="">{user.farcasterUsername || user.twitterUsername}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      {/* <span className="font-semibold text-sm pr-5">|| {user.alignmentScore}%</span> */}
-                      <span className="font-semibold pr-5">
-                        <Badge className={`${getBadgeColor(user.alignmentScore!)} p-1 px-2 text-white text-sm`}>
-                          || {user.alignmentScore}%
-                        </Badge>
-                      </span>
-                      {/* {user.twitterUsername && (
+              {userInfo && !hasUserGeneratedValues && (
+                <p className="text-gray-500 text-sm">
+                  Please generate your values to see the most aligned users in the trust pool.
+                </p>
+              )}
+              {userInfo &&
+                hasUserGeneratedValues &&
+                (isLoadingAlignment ? (
+                  <AlignmentSkeleton />
+                ) : alignedUsers?.topAlignedUsers?.length > 0 ? (
+                  alignedUsers.topAlignedUsers.map((user: User) => (
+                    <div key={user.userId} className="mb-2 flex items-center justify-between">
+                      <div className="flex items-center gap-1">
+                        <span className="">{user.farcasterUsername || user.twitterUsername}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        {/* <span className="font-semibold text-sm pr-5">|| {user.alignmentScore}%</span> */}
+                        <span className="font-semibold pr-5">
+                          <Badge className={`${getBadgeColor(user.alignmentScore!)} p-1 px-2 text-white text-sm`}>
+                            || {user.alignmentScore}%
+                          </Badge>
+                        </span>
+                        {/* {user.twitterUsername && (
                         <Button size="sm" variant="outline" asChild>
                           <Link
                             href={`https://twitter.com/intent/tweet?text=Hey%20@${user.twitterUsername}%2C%20apparently%20the%20ValuesDAO%20wizards%20did%20some%20alignment%20magic%20and%20decided%20we%E2%80%99re%20a%20perfect%20match%E2%80%94for%20world%20domination%2C%20or%20at%20least%20a%20solid%20conversation.%0ACare%20to%20jump%20into%20DMs%20and%20see%20if%20these%20guys%20actually%20know%20what%20they%E2%80%99re%20talking%20about%3F%20%F0%9F%98%84`}
@@ -402,15 +411,15 @@ export default function Dashboard({ params }: { params: { id: string } }) {
                           </Link>
                         </Button>
                       )} */}
-                      <ConnectButton user={user} type={"align"} />
+                        <ConnectButton user={user} type={"align"} />
+                      </div>
                     </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-500 text-sm">
-                  There are not enough users to show alignment, please invite your community members.
-                </p>
-              )}
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-sm">
+                    There are not enough users to show alignment, please invite your community members.
+                  </p>
+                ))}
             </div>
 
             {/* Most Diverse Users */}
@@ -419,7 +428,12 @@ export default function Dashboard({ params }: { params: { id: string } }) {
               {!userInfo && (
                 <p className="text-gray-500 text-sm">Please sign in to see the most diverse users in the trust pool.</p>
               )}
-              {userInfo &&
+              {userInfo && !hasUserGeneratedValues && (
+                <p className="text-gray-500 text-sm">
+                  Please generate your values to see the most aligned users in the trust pool.
+                </p>
+              )}
+              {userInfo && hasUserGeneratedValues &&
                 (isLoadingAlignment ? (
                   <AlignmentSkeleton />
                 ) : alignedUsers?.topDiverseUsers?.length > 0 ? (
