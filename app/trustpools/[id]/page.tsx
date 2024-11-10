@@ -15,6 +15,7 @@ import { useUserContext } from "@/providers/user-context-provider";
 import { API_BASE_URL } from "@/constants";
 import axios from "axios";
 import ShareButton from "@/components/ShareButton";
+import ConnectButton from "@/components/ConnectButton";
 
 // Type definitions
 interface User {
@@ -163,7 +164,7 @@ export default function Dashboard({ params }: { params: { id: string } }) {
           onClick={() => handleAlignmentPage(user.farcasterUsername || user.twitterUsername || "")}
         >
           <div className="flex items-center gap-2">
-            <span className="text-sm">{user.farcasterUsername || user.twitterUsername}</span>
+            <span className="text pl-2">{user.farcasterUsername || user.twitterUsername}</span>
             <Badge variant="outline" className="text-xs">
               {trustPool?.owners?.some((owner) => owner.userId === user.userId) ? "Creator" : "Member"}
             </Badge>
@@ -177,7 +178,7 @@ export default function Dashboard({ params }: { params: { id: string } }) {
               </Button>
             )}
             {user.farcasterUsername && (
-              <Button size="sm" className="bg-[#9c6bff] text-white hover:bg-[#7c4dff]" asChild>
+              <Button size="sm" className="bg-[#855DCD] text-white hover:bg-[#9770df]" asChild>
                 <Link href={`https://warpcast.com/${user.farcasterUsername}`} target="_blank">
                   <Image src="/farcaster.svg" alt="farcaster icon" height={16} width={16} />
                 </Link>
@@ -196,7 +197,7 @@ export default function Dashboard({ params }: { params: { id: string } }) {
         className="flex items-center justify-between p-2 border-b cursor-pointer"
         onClick={() => handleAlignmentPage(user.farcasterUsername || user.twitterUsername || "")}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 pl-2">
           <span className="text-sm">{user.farcasterUsername || user.twitterUsername}</span>
           {index === 0 && <Badge className="text-xs">Creator</Badge>}
         </div>
@@ -245,6 +246,16 @@ export default function Dashboard({ params }: { params: { id: string } }) {
       ))}
     </div>
   );
+  
+  const getBadgeColor = (score: number) => {
+    if (score >= 70) {
+      return "bg-[#23C55E]";
+    } else if (score >= 30) {
+      return "bg-primary";
+    } else {
+      return "bg-red-500";
+    }
+  };
 
   if (isLoadingPool) {
     return (
@@ -339,7 +350,7 @@ export default function Dashboard({ params }: { params: { id: string } }) {
                   </Link>
                 </Button>
               )} */}
-              <ShareButton />
+              <ShareButton trustPool={trustPool}/>
             </div>
           </div>
         </div>
@@ -365,14 +376,18 @@ export default function Dashboard({ params }: { params: { id: string } }) {
                       <span className="">{user.farcasterUsername || user.twitterUsername}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <span className="font-semibold text-sm pr-5">|| {user.alignmentScore}%</span>
-                      {user.twitterUsername && (
+                      {/* <span className="font-semibold text-sm pr-5">|| {user.alignmentScore}%</span> */}
+                      <span className="font-semibold pr-5">
+                        <Badge className={`${getBadgeColor(user.alignmentScore!)} p-1 px-2 text-white text-sm`}>
+                          || {user.alignmentScore}%
+                        </Badge>
+                      </span>
+                      {/* {user.twitterUsername && (
                         <Button size="sm" variant="outline" asChild>
                           <Link
                             href={`https://twitter.com/intent/tweet?text=Hey%20@${user.twitterUsername}%2C%20apparently%20the%20ValuesDAO%20wizards%20did%20some%20alignment%20magic%20and%20decided%20we%E2%80%99re%20a%20perfect%20match%E2%80%94for%20world%20domination%2C%20or%20at%20least%20a%20solid%20conversation.%0ACare%20to%20jump%20into%20DMs%20and%20see%20if%20these%20guys%20actually%20know%20what%20they%E2%80%99re%20talking%20about%3F%20%F0%9F%98%84`}
                             target="_blank"
                           >
-                            {/* <Image src="/farcaster.svg" alt="farcaster icon" height={20} width={20} /> */}
                             <Image src="/x.svg" alt="x icon" height={16} width={16} />
                           </Link>
                         </Button>
@@ -386,7 +401,8 @@ export default function Dashboard({ params }: { params: { id: string } }) {
                             <Image src="/farcaster.svg" alt="farcaster icon" height={16} width={16} />
                           </Link>
                         </Button>
-                      )}
+                      )} */}
+                      <ConnectButton user={user} type={"align"} />
                     </div>
                   </div>
                 ))
@@ -413,8 +429,13 @@ export default function Dashboard({ params }: { params: { id: string } }) {
                         <span className="">{user.farcasterUsername || user.twitterUsername}</span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <span className="font-semibold text-sm pr-5">|| {user.alignmentScore}%</span>
-                        {user.twitterUsername && (
+                        {/* <span className="font-semibold text-sm pr-5">|| {user.alignmentScore}%</span> */}
+                        <span className="font-semibold pr-5">
+                          <Badge className={`${getBadgeColor(user.alignmentScore!)} p-1 px-2 text-white text-sm`}>
+                            || {user.alignmentScore}%
+                          </Badge>
+                        </span>
+                        {/* {user.twitterUsername && (
                           <Button size="sm" variant="outline" asChild>
                             <Link
                               href={`https://twitter.com/intent/tweet?text=Hey%20@${user.twitterUsername}%2C%20apparently%2C%20ValuesDAO%20thinks%20we%E2%80%99re%20the%20yin%20and%20yang%20of%20value-alignment.%20We%20got%20diverse%20values.%20I%20would%20like%20to%20understand%20how%20you%20think.%0AWant%20to%20DM%20and%20see%20if%20we%E2%80%99re%20more%20like%20fire%20and%20ice%2C%20or%20just%20two%20people%20who%20shouldn%E2%80%99t%20be%20left%20alone%20in%20the%20same%20room%3F%20%F0%9F%98%84`}
@@ -433,7 +454,8 @@ export default function Dashboard({ params }: { params: { id: string } }) {
                               <Image src="/farcaster.svg" alt="farcaster icon" height={16} width={16} />
                             </Link>
                           </Button>
-                        )}
+                        )} */}
+                        <ConnectButton user={user} type={"diverse"} />
                       </div>
                     </div>
                   ))
