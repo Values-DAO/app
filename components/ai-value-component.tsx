@@ -325,12 +325,10 @@ const TwitterTab = ({
     <div className="w-full flex flex-col py-2 mb-8">
       {(error || accountLinkError) && (
         <Alert className="border-red-600 text-red-600">
-          <AlertDescription className="text-md font-light">
-            {error || accountLinkError}
-          </AlertDescription>
+          <AlertDescription className="text-md font-light">{error || accountLinkError}</AlertDescription>
         </Alert>
       )}
-      {userInfo && userInfo.generatedValues.twitter.length === 0 && (
+      {userInfo && userInfo.generatedValues.twitter && userInfo.generatedValues.twitter.length === 0 && (
         <div className="w-full flex flex-col gap-4 items-center">
           <h4 className="scroll-m-20 text-md md:text-xl font-medium tracking-tight">
             Generate your values from your Twitter data
@@ -361,65 +359,46 @@ const TwitterTab = ({
         </div>
       )}
 
-      {userInfo &&
-        Object.keys(userInfo.generatedValuesWithWeights.twitter).length > 0 && (
-          <div className="w-full flex flex-col gap-4">
-            {userInfo &&
-              userInfo.generatedValues.twitter.length > 0 &&
-              userInfo.socialValuesMinted.includes("twitter") && (
-                <Alert className="bg-green-300 text-black">
-                  <AlertDescription className="text-md font-light">
-                    You have minted these Values.
-                  </AlertDescription>
-                </Alert>
-              )}
-            <h4 className="scroll-m-20 border-b text-3xl font-medium tracking-tight mb-2 mt-4">
-              Values
-            </h4>
-            <div className="w-full flex flex-row gap-2 items-center flex-wrap">
-              {Object.keys(userInfo.generatedValuesWithWeights.twitter)
-                .slice(0, 7)
-                .map((value, index) => (
-                  <ValueBadge
-                    key={index}
-                    value={value}
-                    weight={userInfo.generatedValuesWithWeights.warpcast[value]}
-                  />
-                ))}
-            </div>
+      {userInfo && Object.keys(userInfo.generatedValuesWithWeights.twitter).length > 0 && (
+        <div className="w-full flex flex-col gap-4">
+          {userInfo &&
+            userInfo.generatedValues.twitter &&
+            userInfo.generatedValues.twitter.length > 0 &&
+            userInfo.socialValuesMinted.includes("twitter") && (
+              <Alert className="bg-green-300 text-black">
+                <AlertDescription className="text-md font-light">You have minted these Values.</AlertDescription>
+              </Alert>
+            )}
+          <h4 className="scroll-m-20 border-b text-3xl font-medium tracking-tight mb-2 mt-4">Values</h4>
+          <div className="w-full flex flex-row gap-2 items-center flex-wrap">
+            {Object.keys(userInfo.generatedValuesWithWeights.twitter)
+              .slice(0, 7)
+              .map((value, index) => (
+                <ValueBadge key={index} value={value} weight={userInfo.generatedValuesWithWeights.warpcast[value]} />
+              ))}
           </div>
-        )}
+        </div>
+      )}
       {userInfo &&
+        userInfo.generatedValues.twitter &&
         userInfo.generatedValues.twitter.length > 0 &&
-        userInfo.wallets.length === 0 && (
-          <LinkWalletComponent linkWallet={linkWallet} />
-        )}
+        userInfo.wallets.length === 0 && <LinkWalletComponent linkWallet={linkWallet} />}
       {userInfo &&
+        userInfo.generatedValues.twitter &&
         userInfo.generatedValues.twitter.length > 0 &&
         !userInfo.socialValuesMinted.includes("twitter") &&
         userInfo.wallets.length > 0 && (
-          <Button
-            className="mt-4 w-full text-md"
-            onClick={handleMint}
-            disabled={mintingValues}
-          >
+          <Button className="mt-4 w-full text-md" onClick={handleMint} disabled={mintingValues}>
             {mintingValues ? "Minting Values" : "Mint my Values"}
           </Button>
         )}
 
-      {userInfo && userInfo.spectrum.twitter.length > 0 && (
+      {userInfo && userInfo.generatedValues.twitter && userInfo.spectrum.twitter.length > 0 && (
         <div className="w-full flex flex-col gap-4 mt-8">
-          <h4 className="scroll-m-20 border-b text-3xl font-medium tracking-tight mb-2 mt-4">
-            Value Spectrum
-          </h4>
+          <h4 className="scroll-m-20 border-b text-3xl font-medium tracking-tight mb-2 mt-4">Value Spectrum</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {userInfo.spectrum.twitter.map((value, index) => (
-              <SpectrumCard
-                key={index}
-                name={value.name}
-                score={value.score}
-                description={value.description}
-              />
+              <SpectrumCard key={index} name={value.name} score={value.score} description={value.description} />
             ))}
           </div>
         </div>
