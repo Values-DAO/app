@@ -49,6 +49,7 @@ export const UserContextProvider = ({
             // user does not exist, create user
             const newUser = await createUser({
               ...(user?.farcaster?.fid && {fid: user?.farcaster?.fid}),
+              ...(user?.farcaster?.username && {farcasterUsername: user?.farcaster?.username}),
               ...(user?.email?.address && {email: user?.email?.address}),
             });
 

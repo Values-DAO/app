@@ -55,14 +55,17 @@ const useValuesHook = () => {
   // Creates a new user based on either fid or email.
   const createUser = async ({
     fid,
+    farcasterUsername,
     email,
   }: {
     fid?: number;
+    farcasterUsername?: string;
     email?: string;
   }): Promise<{error: string} | IUser> => {
     if (fid) {
       const {data} = await axios.post(`${API_BASE_URL}/users`, {
         fid,
+        farcasterUsername,
         method: "create_user",
         referrer: "app.valuesdao.io",
       });

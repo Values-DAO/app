@@ -356,46 +356,45 @@ export default function Dashboard({ params }: { params: { id: string } }) {
               {!userInfo && (
                 <p className="text-gray-500 text-sm">Please sign in to see the most aligned users in the trust pool.</p>
               )}
-              {userInfo &&
-                (isLoadingAlignment ? (
-                  <AlignmentSkeleton />
-                ) : alignedUsers?.topAlignedUsers?.length > 0 ? (
-                  alignedUsers.topAlignedUsers.map((user: User) => (
-                    <div key={user.userId} className="mb-2 flex items-center justify-between">
-                      <div className="flex items-center gap-1">
-                        <span className="">{user.farcasterUsername || user.twitterUsername}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <span className="font-semibold text-sm pr-5">|| {user.alignmentScore}%</span>
-                        {user.twitterUsername && (
-                          <Button size="sm" variant="outline" asChild>
-                            <Link
-                              href={`https://twitter.com/intent/tweet?text=Hey%20@${user.twitterUsername}%2C%20apparently%20the%20ValuesDAO%20wizards%20did%20some%20alignment%20magic%20and%20decided%20we%E2%80%99re%20a%20perfect%20match%E2%80%94for%20world%20domination%2C%20or%20at%20least%20a%20solid%20conversation.%0ACare%20to%20jump%20into%20DMs%20and%20see%20if%20these%20guys%20actually%20know%20what%20they%E2%80%99re%20talking%20about%3F%20%F0%9F%98%84`}
-                              target="_blank"
-                            >
-                              {/* <Image src="/farcaster.svg" alt="farcaster icon" height={20} width={20} /> */}
-                              <Image src="/x.svg" alt="x icon" height={16} width={16} />
-                            </Link>
-                          </Button>
-                        )}
-                        {user.farcasterUsername && (
-                          <Button size="sm" className="bg-[#855DCD] text-white hover:bg-[#9770df]" asChild>
-                            <Link
-                              href={`https://warpcast.com/~/compose?text=Hey%20@${user.farcasterUsername}%2C%20apparently%20the%20valuesdao%20wizards%20did%20some%20alignment%20magic%20and%20decided%20we%E2%80%99re%20a%20perfect%20match%E2%80%94for%20world%20domination%2C%20or%20at%20least%20a%20solid%20conversation.%0ACare%20to%20jump%20into%20DMs%20and%20see%20if%20these%20guys%20actually%20know%20what%20they%E2%80%99re%20talking%20about%3F%20%F0%9F%98%84`}
-                              target="_blank"
-                            >
-                              <Image src="/farcaster.svg" alt="farcaster icon" height={16} width={16} />
-                            </Link>
-                          </Button>
-                        )}
-                      </div>
+              {isLoadingAlignment ? (
+                <AlignmentSkeleton />
+              ) : alignedUsers?.topAlignedUsers?.length > 0 ? (
+                alignedUsers.topAlignedUsers.map((user: User) => (
+                  <div key={user.userId} className="mb-2 flex items-center justify-between">
+                    <div className="flex items-center gap-1">
+                      <span className="">{user.farcasterUsername || user.twitterUsername}</span>
                     </div>
-                  ))
-                ) : (
-                  <p className="text-gray-500 text-sm">
-                    There are not enough users to show alignment, please invite your community members.
-                  </p>
-                ))}
+                    <div className="flex items-center gap-1">
+                      <span className="font-semibold text-sm pr-5">|| {user.alignmentScore}%</span>
+                      {user.twitterUsername && (
+                        <Button size="sm" variant="outline" asChild>
+                          <Link
+                            href={`https://twitter.com/intent/tweet?text=Hey%20@${user.twitterUsername}%2C%20apparently%20the%20ValuesDAO%20wizards%20did%20some%20alignment%20magic%20and%20decided%20we%E2%80%99re%20a%20perfect%20match%E2%80%94for%20world%20domination%2C%20or%20at%20least%20a%20solid%20conversation.%0ACare%20to%20jump%20into%20DMs%20and%20see%20if%20these%20guys%20actually%20know%20what%20they%E2%80%99re%20talking%20about%3F%20%F0%9F%98%84`}
+                            target="_blank"
+                          >
+                            {/* <Image src="/farcaster.svg" alt="farcaster icon" height={20} width={20} /> */}
+                            <Image src="/x.svg" alt="x icon" height={16} width={16} />
+                          </Link>
+                        </Button>
+                      )}
+                      {user.farcasterUsername && (
+                        <Button size="sm" className="bg-[#855DCD] text-white hover:bg-[#9770df]" asChild>
+                          <Link
+                            href={`https://warpcast.com/~/compose?text=Hey%20@${user.farcasterUsername}%2C%20apparently%20the%20ValuesDao%20wizards%20did%20some%20alignment%20magic%20and%20decided%20we%E2%80%99re%20a%20perfect%20match%E2%80%94for%20world%20domination%2C%20or%20at%20least%20a%20solid%20conversation.%0ACare%20to%20jump%20into%20DMs%20and%20see%20if%20these%20guys%20actually%20know%20what%20they%E2%80%99re%20talking%20about%3F%20%F0%9F%98%84`}
+                            target="_blank"
+                          >
+                            <Image src="/farcaster.svg" alt="farcaster icon" height={16} width={16} />
+                          </Link>
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-sm">
+                  There are not enough users to show alignment, please invite your community members.
+                </p>
+              )}
             </div>
 
             {/* Most Diverse Users */}
@@ -418,7 +417,7 @@ export default function Dashboard({ params }: { params: { id: string } }) {
                         {user.twitterUsername && (
                           <Button size="sm" variant="outline" asChild>
                             <Link
-                              href={`https://twitter.com/intent/tweet?text=Hey%20@${user.twitterUsername}%2C%20apparently%20the%20ValuesDAO%20wizards%20did%20some%20alignment%20magic%20and%20decided%20we%E2%80%99re%20a%20perfect%20match%E2%80%94for%20world%20domination%2C%20or%20at%20least%20a%20solid%20conversation.%0ACare%20to%20jump%20into%20DMs%20and%20see%20if%20these%20guys%20actually%20know%20what%20they%E2%80%99re%20talking%20about%3F%20%F0%9F%98%84`}
+                              href={`https://twitter.com/intent/tweet?text=Hey%20@${user.twitterUsername}%2C%20apparently%2C%20ValuesDAO%20thinks%20we%E2%80%99re%20the%20yin%20and%20yang%20of%20value-alignment.%20We%20got%20diverse%20values.%20I%20would%20like%20to%20understand%20how%20you%20think.%0AWant%20to%20DM%20and%20see%20if%20we%E2%80%99re%20more%20like%20fire%20and%20ice%2C%20or%20just%20two%20people%20who%20shouldn%E2%80%99t%20be%20left%20alone%20in%20the%20same%20room%3F%20%F0%9F%98%84`}
                               target="_blank"
                             >
                               <Image src="/x.svg" alt="x icon" height={16} width={16} />
@@ -428,7 +427,7 @@ export default function Dashboard({ params }: { params: { id: string } }) {
                         {user.farcasterUsername && (
                           <Button size="sm" className="bg-[#855DCD] text-white hover:bg-[#9770df]" asChild>
                             <Link
-                              href={`https://warpcast.com/~/compose?text=Hey%20@${user.farcasterUsername}%2C%20apparently%20the%20valuesdao%20wizards%20did%20some%20alignment%20magic%20and%20decided%20we%E2%80%99re%20a%20perfect%20match%E2%80%94for%20world%20domination%2C%20or%20at%20least%20a%20solid%20conversation.%0ACare%20to%20jump%20into%20DMs%20and%20see%20if%20these%20guys%20actually%20know%20what%20they%E2%80%99re%20talking%20about%3F%20%F0%9F%98%84`}
+                              href={`https://warpcast.com/~/compose?text=Hey%20@${user.twitterUsername}%2C%20apparently%2C%20ValuesDAO%20thinks%20we%E2%80%99re%20the%20yin%20and%20yang%20of%20value-alignment.%20We%20got%20diverse%20values.%20I%20would%20like%20to%20understand%20how%20you%20think.%0AWant%20to%20DM%20and%20see%20if%20we%E2%80%99re%20more%20like%20fire%20and%20ice%2C%20or%20just%20two%20people%20who%20shouldn%E2%80%99t%20be%20left%20alone%20in%20the%20same%20room%3F%20%F0%9F%98%84`}
                               target="_blank"
                             >
                               <Image src="/farcaster.svg" alt="farcaster icon" height={16} width={16} />
