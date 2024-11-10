@@ -38,7 +38,7 @@ export const TrustPoolCard = ({ pool }: TrustPoolCardProps) => {
         <p className="text-sm text-muted-foreground line-clamp-3">{pool.description}</p>
       </CardContent>
       <CardFooter className="flex flex-col items-stretch gap-2 pt-2">
-        <div className="flex justify-between gap-2">
+        {/* <div className="flex justify-between gap-2">
           {pool.twitterHandle && (
             <Button variant="outline" size="sm" className="flex-1" asChild>
               <Link href={`https://twitter.com/${pool.twitterHandle}`} target="_blank" rel="noopener noreferrer">
@@ -81,7 +81,7 @@ export const TrustPoolCard = ({ pool }: TrustPoolCardProps) => {
               </Link>
             </Button>
           )}
-        </div>
+        </div> */}
         <div className="flex justify-between gap-2">
           <Button variant="default" size="sm" className="flex-1" onClick={() => router.push(`/trustpools/${pool._id}`)}>
             View Pool

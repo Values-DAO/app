@@ -289,11 +289,20 @@ export default function Dashboard({ params }: { params: { id: string } }) {
                     />
                   </svg>
                 </div>
-                <div title="Organizer Twitter Handle">
-                  <Link href={`${trustPool?.organizerTwitterHandle || ""}`} target="_blank">
-                    <Image src="/x.svg" alt="x icon" height={24} width={24} className="" />
-                  </Link>
-                </div>
+                {trustPool?.twitterHandle && (
+                  <div>
+                    <Link href={trustPool?.twitterHandle}>
+                      <Image src={"/x.svg"} alt={"x icon"} width={24} height={24} />
+                    </Link>
+                  </div>
+                )}
+                {trustPool?.farcasterHandle && (
+                  <div>
+                    <Link href={trustPool?.farcasterHandle}>
+                      <Image src={"/farcaster.svg"} alt={"farcaster icon"} width={24} height={24} />
+                    </Link>
+                  </div>
+                )}
               </div>
               <p className="mb-2 text-xs sm:text-sm md:text-base break-words">
                 {trustPool?.description ||
@@ -304,7 +313,7 @@ export default function Dashboard({ params }: { params: { id: string } }) {
               <Button variant="secondary" className="bg-white w-full mb-2 md:mb-0" onClick={handleJoinButton} size="sm">
                 {buttonText || "Join Pool"}
               </Button>
-              {trustPool?.twitterHandle && (
+              {/* {trustPool?.twitterHandle && (
                 <Button
                   variant="secondary"
                   className="border-black font-semibold w-full mb-2 md:mb-0 pr-6"
@@ -329,7 +338,7 @@ export default function Dashboard({ params }: { params: { id: string } }) {
                     Farcaster
                   </Link>
                 </Button>
-              )}
+              )} */}
               <ShareButton />
             </div>
           </div>
