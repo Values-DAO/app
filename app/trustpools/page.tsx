@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { Search, Plus, X, Twitter } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -57,6 +57,7 @@ export default function Home() {
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
   const router = useRouter();
   const { userInfo } = useUserContext();
+  const queryClient = useQueryClient();
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -66,6 +67,7 @@ export default function Home() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  // Queries
   const {
     data: trustPools = [],
     isLoading: isInitialLoading,
@@ -73,6 +75,7 @@ export default function Home() {
   } = useQuery({
     queryKey: ["trustPools"],
     queryFn: fetchTrustPools,
+    staleTime: 0,
   });
 
   const handleSearchInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -115,23 +118,19 @@ export default function Home() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const { name, description, communityLink, twitterHandle, organizerTwitterHandle, farcasterHandle } = values;
-    const response = await axios.post(`${API_BASE_URL}/trustpools/new`, {
-      name,
-      description,
-      communityLink,
-      twitterHandle,
-      farcasterHandle,
-      organizerTwitterHandle,
-      userId: userInfo?.userId,
-    });
+    try {
+      const response = await axios.post(`${API_BASE_URL}/trustpools/new`, {
+        ...values,
+        userId: userInfo?.userId,
+      });
 
-    if ("error" in response) {
-      console.error("Error creating trust pool:", response.error);
-      return;
-    }
-
-    router.push(`/trustpools/${response.data.data._id}`);
+      if (response.data) {
+        await queryClient.invalidateQueries({ queryKey: ["trustPools"] });
+        router.push(`/trustpools/${response.data.data._id}`);
+      }
+    } catch (error) {
+      console.error("Error creating trust pool:", error);
+    } 
   }
   
   const handleRedirect = (id: string) => {
