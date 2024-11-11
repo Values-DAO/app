@@ -37,8 +37,20 @@ export const getSpectrumForUser = (user: IUser) => {
 export const formSchema = z.object({
   name: z.string().min(1, "Please provide a name").max(32, "Name is too long"),
   description: z.string().max(500, "Description is too long").optional(),
-  communityLink: z.string().url("Invalid URL"),
-  twitterHandle: z.string().optional().refine(val => !val || /^https?:\/\/.+\..+/.test(val), "Invalid URL"),
-  farcasterHandle: z.string().optional().refine(val => !val || /^https?:\/\/.+\..+/.test(val), "Invalid URL"),
-  organizerTwitterHandle: z.string().url("Invalid URL"),
+  communityLink: z
+    .string()
+    .optional()
+    .refine((val) => !val || /^https?:\/\/.+\..+/.test(val), "Invalid URL"),
+  twitterHandle: z
+    .string()
+    .optional()
+    .refine((val) => !val || /^https?:\/\/.+\..+/.test(val), "Invalid URL"),
+  farcasterHandle: z
+    .string()
+    .optional()
+    .refine((val) => !val || /^https?:\/\/.+\..+/.test(val), "Invalid URL"),
+  organizerTwitterHandle: z
+    .string()
+    .optional()
+    .refine((val) => !val || /^https?:\/\/.+\..+/.test(val), "Invalid URL"),
 });

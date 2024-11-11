@@ -295,22 +295,24 @@ export default function Dashboard({ params }: { params: { id: string } }) {
                 <h1 className="mb-1 text-xl sm:text-2xl font-bold md:text-3xl truncate">
                   {trustPool?.name || "Trust Pool Name"}
                 </h1>
-                <div title="Community Link" onClick={handleCommunity}>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="2"
-                    stroke="currentColor"
-                    className="size-7 cursor-pointer"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"
-                    />
-                  </svg>
-                </div>
+                {trustPool?.communityLink && (
+                  <div title="Community Link" onClick={handleCommunity}>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="2"
+                      stroke="currentColor"
+                      className="size-7 cursor-pointer"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"
+                      />
+                    </svg>
+                  </div>
+                )}
                 {trustPool?.twitterHandle && (
                   <div>
                     <Link href={trustPool?.twitterHandle}>
@@ -326,10 +328,9 @@ export default function Dashboard({ params }: { params: { id: string } }) {
                   </div>
                 )}
               </div>
-              <p className="mb-2 text-xs sm:text-sm md:text-base break-words">
-                {trustPool?.description ||
-                  "Trust Pool description goes here. This is a placeholder text that will be replaced with the actual description of the trust pool."}
-              </p>
+              {trustPool?.description && (
+                <p className="mb-2 text-xs sm:text-sm md:text-base break-words">{trustPool?.description}</p>
+              )}
             </div>
             <div className="mt-2 md:mt-0 flex-shrink-0 flex flex-row md:flex-col md:space-y-2 gap-2">
               <Button variant="secondary" className="bg-white w-full mb-2 md:mb-0" onClick={handleJoinButton} size="sm">
@@ -442,7 +443,8 @@ export default function Dashboard({ params }: { params: { id: string } }) {
                   Please generate your values to see the most aligned users in the trust pool.
                 </p>
               )}
-              {userInfo && hasUserGeneratedValues &&
+              {userInfo &&
+                hasUserGeneratedValues &&
                 (isLoadingAlignment ? (
                   <AlignmentSkeleton />
                 ) : alignedUsers?.topDiverseUsers?.length > 0 ? (
