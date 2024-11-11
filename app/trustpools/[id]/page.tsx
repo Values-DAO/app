@@ -24,6 +24,7 @@ interface User {
   farcasterUsername?: string;
   twitterUsername?: string;
   alignmentScore?: number;
+  email?: string;
 }
 
 interface TrustPool {
@@ -160,11 +161,11 @@ export default function Dashboard({ params }: { params: { id: string } }) {
       return searchResults?.map((user) => (
         <li
           key={user._id}
-          className="flex items-center justify-between p-2 border-b cursor-pointer"
+          className="flex items-center justify-between p-2 border-b cursor-pointer min-h-[56px]"
           onClick={() => handleAlignmentPage(user.farcasterUsername || user.twitterUsername || "")}
         >
           <div className="flex items-center gap-2">
-            <span className="text pl-2">{user.farcasterUsername || user.twitterUsername}</span>
+            <span className="text pl-2">{user.farcasterUsername || user.twitterUsername || user.email}</span>
             <Badge variant="outline" className="text-xs">
               {trustPool?.owners?.some((owner) => owner.userId === user.userId) ? "Creator" : "Member"}
             </Badge>
@@ -172,14 +173,22 @@ export default function Dashboard({ params }: { params: { id: string } }) {
           <div className="flex items-center gap-1">
             {user.twitterUsername && (
               <Button size="sm" variant="outline" asChild>
-                <Link href={`https://twitter.com/${user.twitterUsername}`} target="_blank">
+                <Link
+                  href={`https://twitter.com/${user.twitterUsername}`}
+                  target="_blank"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <Image src="/x.svg" alt="x icon" height={16} width={16} />
                 </Link>
               </Button>
             )}
             {user.farcasterUsername && (
               <Button size="sm" className="bg-[#855DCD] text-white hover:bg-[#9770df]" asChild>
-                <Link href={`https://warpcast.com/${user.farcasterUsername}`} target="_blank">
+                <Link
+                  href={`https://warpcast.com/${user.farcasterUsername}`}
+                  target="_blank"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <Image src="/farcaster.svg" alt="farcaster icon" height={16} width={16} />
                 </Link>
               </Button>
@@ -194,14 +203,14 @@ export default function Dashboard({ params }: { params: { id: string } }) {
     return combinedUsers.map((user, index) => (
       <li
         key={user._id || index}
-        className="flex items-center justify-between p-2 border-b cursor-pointer"
+        className="flex items-center justify-between p-2 border-b cursor-pointer min-h-[56px]"
         onClick={() => handleAlignmentPage(user.farcasterUsername || user.twitterUsername || "")}
       >
         <div className="flex items-center gap-2 pl-2">
-          <span className="text-sm">{user.farcasterUsername || user.twitterUsername}</span>
+          <span className="text-sm">{user.farcasterUsername || user.twitterUsername || user.email}</span>
           {index === 0 && <Badge className="text-xs">Creator</Badge>}
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           {user.twitterUsername && (
             <Button size="sm" variant="outline" asChild>
               <Link
