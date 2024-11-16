@@ -25,15 +25,12 @@ export function AlignmentSearchSheet({
 }) {
   const [usernameInput, setUsernameInput] = useState<string>("");
   const [targetUsernameInput, setTargetUsernameInput] = useState<string>("");
-  const [user, setUser] = useState<{username: string; fid: string} | null>(null);
-  const [targetUser, setTargetUser] = useState<{
-    username: string;
-    fid: string;
-  } | null>(null);
+  const [user, setUser] = useState<{username: string} | null>(null);
+  const [targetUser, setTargetUser] = useState<{username: string;} | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = () => {
-    if (!user?.fid || !targetUser?.fid) {
+    if (!user?.username || !targetUser?.username) {
       console.error("Please select a user to compare with.");
       setError("Please select a user to compare with.");
       return;
@@ -98,10 +95,10 @@ function UserPicker({
   labelText: string;
   value: string;
   onChange: (value: string) => void;
-  selected: { username: string; fid: string } | null;
-  setSelected: (value: { username: string; fid: string } | null) => void;
+  selected: { username: string} | null;
+  setSelected: (value: { username: string} | null) => void;
 }) {
-  const [searchResults, setSearchResults] = useState<{ username: string; fid: string }[]>([]);
+  const [searchResults, setSearchResults] = useState<{ username: string}[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const { searchAllUsers } = useValuesHook();
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
@@ -144,7 +141,7 @@ function UserPicker({
           className="inline-flex items-center gap-2 py-1 px-2 bg-gray-100 text-black border border-gray-300 rounded-lg"
           style={{ maxWidth: "fit-content" }}
         >
-          {selected.username} (fid:{selected.fid})
+          {selected.username}
           <X
             onClick={() => setSelected(null)}
             className="hover:text-gray-600 cursor-pointer"
@@ -174,10 +171,10 @@ function UserPicker({
           ) : (
             searchResults.map((result) => (
               <div
-                key={result.fid}
+                key={result.username}
                 className="px-4 py-2 hover:bg-gray-100 cursor-pointer transition duration-150 ease-in-out"
                 onClick={() => {
-                  setSelected({ username: result.username, fid: result.fid });
+                  setSelected({ username: result.username});
                   setSearchResults([]);
                 }}
               >
