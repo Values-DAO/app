@@ -67,3 +67,13 @@ export interface UserData {
   spectrum: {name: string; score: number; description: string}[];
   values: string[];
 }
+
+export interface Post {
+  _id: string;
+  posterUsername: string;
+  content: string;
+  title: string;
+  timestamp: Date;
+  values: string[];
+  source: "Twitter" | "Youtube" | "Farcaster" | "Telegram";
+}

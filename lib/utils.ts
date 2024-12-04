@@ -54,3 +54,14 @@ export const formSchema = z.object({
     .optional()
     .refine((val) => !val || /^https?:\/\/.+\..+/.test(val), "Invalid URL"),
 });
+
+export const formatISODate = (isoDate: Date) => {
+    const dateObj = new Date(isoDate);  // Create a Date object
+
+    const day = dateObj.getUTCDate();  // Get day (1-31)
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const month = monthNames[dateObj.getUTCMonth()];  // Get month name
+    const year = dateObj.getUTCFullYear();  // Get year
+
+    return `${day} ${month} ${year}`;
+}
