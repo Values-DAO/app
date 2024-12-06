@@ -39,13 +39,13 @@ export function CultureCard({ post }: { post: Post }) {
           <p className="text-sm">{post.content}</p>
         </div>
       </div>
-      <div className="flex items-center my-2 text-sm">
+      {/* <div className="flex items-center my-2 text-sm">
         {post.values.slice(0, 3).map((value) => (
           <div className="pr-2">
             <ValueBadge key={value} value={value} />
           </div>
         ))}
-      </div>
+      </div> */}
       <div className="flex items-center justify-between text-sm text-gray-500">
         <span>By {post.posterUsername}</span>
         <span>{formatISODate(post.timestamp)}</span>

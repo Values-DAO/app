@@ -11,13 +11,13 @@ import { CultureBookSkeletonCard } from "./culture-book-skeleton-card";
 import { CultureCard } from "./culture-book-card";
 import type { Post } from "@/types";
 
-interface CultureBook {
+interface Response {
   posts: Post[];
   ticker: string;
   tokenPrice: number;
 }
 
-const fetchCultureBook = async (trustPoolId: string): Promise<CultureBook> => {
+const fetchCultureBook = async (trustPoolId: string): Promise<Response> => {
   const response = await axios.get(`${API_BASE_URL}/cultureBook?trustPoolId=${trustPoolId}`);
   
   if (response.status !== 200) {
@@ -35,7 +35,7 @@ export default function CultureBook() {
   const displayName = userInfo?.farcasterUsername || userInfo?.twitterUsername || userInfo?.email || "Guest";
   
   // Queries
-  const {data: cultureBook, isLoading, isError} = useQuery<CultureBook>({
+  const {data: cultureBook, isLoading, isError} = useQuery<Response>({
     queryKey: ["cultureBook", trustPoolId],
     queryFn: () => fetchCultureBook(trustPoolId),
   })

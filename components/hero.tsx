@@ -3,18 +3,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import ShareButton from "@/components/ShareButton";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { API_BASE_URL } from "@/constants";
-
-interface TrustPool {
-  _id: string;
-  name: string;
-  description: string;
-  logo?: string;
-  communityLink?: string;
-  twitterHandle?: string;
-  farcasterHandle?: string;
-}
+import { useUserContext } from "@/providers/user-context-provider";
+import { useCallback, useEffect, useState } from "react";
+import type { TrustPool } from "@/types";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 
 const fetchTrustPool = async (trustPoolId: string): Promise<TrustPool> => {
   const response = await fetch(`${API_BASE_URL}/trustpools/find?trustPoolId=${trustPoolId}`);
@@ -22,11 +17,54 @@ const fetchTrustPool = async (trustPoolId: string): Promise<TrustPool> => {
   return data.data || {};
 };
 
+// This component is used to display the hero section of a trust pool page.
 export default function Hero({ trustPoolId }: { trustPoolId: string }) {
+  const { userInfo } = useUserContext();
+  const [buttonText, setButtonText] = useState<string>("Loading...");
+  const router = useRouter(); 
+  const queryClient  = useQueryClient();
+
   const { data: trustPool, isLoading } = useQuery({
     queryKey: ["trustPool", trustPoolId],
     queryFn: () => fetchTrustPool(trustPoolId),
   });
+
+  // Define callback and effect unconditionally
+  const updateButtonText = useCallback(() => {
+    if (!trustPool || !userInfo) return;
+    const isOwner = trustPool.owners?.some((owner) => owner.userId === userInfo.userId);
+    const isMember = trustPool.members?.some((member) => member.userId === userInfo.userId);
+    setButtonText(isOwner ? "Edit" : isMember ? "Leave" : "Join");
+  }, [trustPool, userInfo]);
+
+  useEffect(() => {
+    updateButtonText();
+  }, [updateButtonText]);
+
+  const handleJoinButton = async () => {
+    const isOwner = trustPool?.owners?.some((owner) => owner.userId === userInfo?.userId);
+    const isMember = trustPool?.members?.some((member) => member.userId === userInfo?.userId);
+
+    if (isOwner) {
+      router.push(`/trustpools/${trustPoolId}/edit`);
+    } else if (isMember) {
+      await axios.put(`${API_BASE_URL}/trustpools/join`, {
+        userId: userInfo?.userId,
+        trustPoolId,
+        action: "leave",
+      });
+      setButtonText("Join");
+    } else {
+      await axios.put(`${API_BASE_URL}/trustpools/join`, {
+        userId: userInfo?.userId,
+        trustPoolId,
+        action: "join",
+      });
+      setButtonText("Leave");
+    }
+
+    queryClient.invalidateQueries({ queryKey: ["trustPool", trustPoolId] });
+  };
 
   if (isLoading) {
     return (
@@ -83,8 +121,8 @@ export default function Hero({ trustPoolId }: { trustPoolId: string }) {
             {trustPool?.description && <p className="mb-2 text-sm break-words">{trustPool.description}</p>}
           </div>
           <div className="flex-shrink-0 flex gap-2">
-            <Button variant="secondary" className="bg-white w-full mb-2" size="sm">
-              Join Pool
+            <Button variant="secondary" className="bg-white w-full mb-2 md:mb-0" onClick={handleJoinButton} size="sm">
+              {buttonText}
             </Button>
             <ShareButton trustPool={trustPool} />
           </div>

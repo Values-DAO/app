@@ -6,14 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import ConnectButton from "@/components/ConnectButton";
 import { useUserContext } from "@/providers/user-context-provider";
 import { API_BASE_URL } from "@/constants";
-
-interface User {
-  _id: string;
-  userId: string;
-  farcasterUsername?: string;
-  twitterUsername?: string;
-  alignmentScore?: number;
-}
+import type { IUser } from "@/types";
 
 const fetchAlignedUsers = async ({ trustPoolId, userId }: { trustPoolId: string; userId: string }) => {
   const response = await fetch(`${API_BASE_URL}/trustpools/alignment?trustPoolId=${trustPoolId}&userId=${userId}`);
@@ -83,7 +76,7 @@ export default function AlignmentSection({ trustPoolId }: { trustPoolId: string 
               (isLoading ? (
                 <AlignmentSkeleton />
               ) : alignedUsers?.topAlignedUsers?.length > 0 ? (
-                alignedUsers.topAlignedUsers.map((user: User) => (
+                alignedUsers.topAlignedUsers.map((user: IUser) => (
                   <div key={user.userId} className="mb-2 flex items-center justify-between">
                     <div className="flex items-center gap-1">
                       <span className="">{user.farcasterUsername || user.twitterUsername}</span>
@@ -121,7 +114,7 @@ export default function AlignmentSection({ trustPoolId }: { trustPoolId: string 
               (isLoading ? (
                 <AlignmentSkeleton />
               ) : alignedUsers?.topDiverseUsers?.length > 0 ? (
-                alignedUsers.topDiverseUsers.map((user: User) => (
+                alignedUsers.topDiverseUsers.map((user: IUser) => (
                   <div key={user.userId} className="mb-2 flex items-center justify-between">
                     <div className="flex items-center gap-1">
                       <span className="">{user.farcasterUsername || user.twitterUsername}</span>

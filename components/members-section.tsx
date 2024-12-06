@@ -11,21 +11,7 @@ import { API_BASE_URL } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useUserContext } from "@/providers/user-context-provider";
 import { useDebounce } from "@/hooks/useDebounce";
-
-interface User {
-  _id: string;
-  userId: string;
-  farcasterUsername?: string;
-  twitterUsername?: string;
-  email?: string;
-}
-
-interface TrustPool {
-  _id: string;
-  name: string;
-  owners?: User[];
-  members?: User[];
-}
+import type { IUser, TrustPool } from "@/types";
 
 const fetchTrustPool = async (trustPoolId: string): Promise<TrustPool> => {
   const response = await fetch(`${API_BASE_URL}/trustpools/find?trustPoolId=${trustPoolId}`);
@@ -39,7 +25,7 @@ const fetchSearchResults = async ({
 }: {
   trustPoolId: string;
   username: string;
-}): Promise<User[]> => {
+}): Promise<IUser[]> => {
   if (!username) return [];
   const response = await fetch(`${API_BASE_URL}/trustpools/userSearch?trustPoolId=${trustPoolId}&username=${username}`);
   const data = await response.json();
@@ -71,13 +57,14 @@ export default function MembersSection({ trustPoolId }: { trustPoolId: string })
 
   const renderUserList = () => {
     if (isLoadingPool || isLoadingSearch) {
-      return <li>Loading...</li>;
+      return <li className={"p-4 text"}>Loading...</li>;
     }
 
     if (debouncedSearch) {
       return searchResults?.map((user) => (
         <li
-          key={user._id}
+
+          key={user.userId}
           className="flex items-center justify-between p-2 border-b cursor-pointer min-h-[56px]"
           onClick={() => handleAlignmentPage(user.farcasterUsername || user.twitterUsername || "")}
         >
@@ -119,7 +106,7 @@ export default function MembersSection({ trustPoolId }: { trustPoolId: string })
 
     return combinedUsers.map((user, index) => (
       <li
-        key={user._id || index}
+        key={user.userId || index}
         className="flex items-center justify-between p-2 border-b cursor-pointer min-h-[56px]"
         onClick={() => handleAlignmentPage(user.farcasterUsername || user.twitterUsername || "")}
       >

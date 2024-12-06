@@ -2,28 +2,7 @@ import { useState } from "react";
 import { ChevronDownIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
-
-interface User {
-  _id: string;
-  userId: string;
-  farcasterUsername?: string;
-  twitterUsername?: string;
-  alignmentScore?: number;
-}
-
-interface TrustPool {
-  _id: string;
-  name: string;
-  description: string;
-  logo?: string;
-  owners?: User[];
-  members?: User[];
-  communityLink?: string;
-  twitterHandle?: string;
-  farcasterHandle?: string;
-  organizerTwitterHandle?: string;
-}
-
+import {TrustPool} from "@/types";
 
 const ShareButton = ({trustPool}: {trustPool: TrustPool | undefined}) => {
   if (!trustPool) {

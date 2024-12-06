@@ -77,3 +77,18 @@ export interface Post {
   values: string[];
   source: "Twitter" | "Youtube" | "Farcaster" | "Telegram";
 }
+
+export interface TrustPool {
+  _id: Schema.Types.ObjectId
+  name: string;
+  description?: string;
+  logo?: string;
+  communityLink?: string;
+  twitterHandle?: string;
+  farcasterHandle?: string;
+  organizerTwitterHandle?: string;
+  owners: IUser[];
+  members: IUser[];
+  cultureBook: Schema.Types.ObjectId;
+  cultureBotCommunity: Schema.Types.ObjectId;
+}
