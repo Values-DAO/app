@@ -68,14 +68,33 @@ export interface UserData {
   values: string[];
 }
 
+export enum SourceEnum {
+  Twitter = "Twitter",
+  Youtube = "Youtube",
+  Farcaster = "Farcaster",
+  Telegram = "Telegram",
+}
+
 export interface Post {
-  _id: string;
+  _id: Schema.Types.ObjectId;
   posterUsername: string;
   content: string;
-  title: string;
   timestamp: Date;
-  values: string[];
-  source: "Twitter" | "Youtube" | "Farcaster" | "Telegram";
+  title: string;
+  source: SourceEnum;
+  onchain: boolean;
+  eligibleForVoting: boolean;
+  votes: {
+    count: number;
+    alignedUsers: {
+      userId: string;
+    }[];
+    notAlignedUsers: {
+      userId: string;
+    }[];
+  };
+  transactionHash?: string;
+  ipfsHash?: string;
 }
 
 export interface TrustPool {
@@ -91,4 +110,10 @@ export interface TrustPool {
   members: IUser[];
   cultureBook: Schema.Types.ObjectId;
   cultureBotCommunity: Schema.Types.ObjectId;
+}
+
+export interface ipfsResponse {
+  IpfsHash: string;
+  PinSize: number;
+  Timestamp: string;
 }

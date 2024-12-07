@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, BookOpen, Users } from "lucide-react";
+import { BarChart3, BookOpen, ChartSpline, FileCheck2, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function BottomNav() {
@@ -31,6 +31,26 @@ export default function BottomNav() {
         >
           <Users className="h-5 w-5" />
           <span className="text-xs mt-1">Members</span>
+        </Link>
+        <Link
+          href="charts"
+          className={cn(
+            "flex flex-col items-center justify-center flex-1 h-full",
+            currentTab === "charts" && "text-primary"
+          )}
+        >
+          <ChartSpline className="h-5 w-5" />
+          <span className="text-xs mt-1">Charts</span>
+        </Link>
+        <Link
+          href="curate"
+          className={cn(
+            "flex flex-col items-center justify-center flex-1 h-full",
+            currentTab === "curate" && "text-primary"
+          )}
+        >
+          <FileCheck2 className="h-5 w-5" />
+          <span className="text-xs mt-1">Curate</span>
         </Link>
         <Link
           href="culture"

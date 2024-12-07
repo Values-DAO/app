@@ -7,10 +7,12 @@ import {Alert, AlertDescription} from "./ui/alert";
 import useValuesHook from "@/hooks/useValuesHook";
 import ValueGeneratingLoader from "./ui/value-generating-loader";
 import SpectrumCard from "./ui/spectrum-card";
-import {useLinkAccount, usePrivy} from "@privy-io/react-auth";
+import {useLinkAccount, usePrivy, useWallets} from "@privy-io/react-auth";
 import {NFT_CONTRACT_ADDRESS} from "@/constants";
 import LinkWalletComponent from "./ui/link-wallet-component";
 import {AlignmentSearchSheet} from "./alignment-search-sheet";
+import { encodeFunctionData, parseEther } from "viem";
+import { ABI, factoryAddress } from "@/contracts/abi";
 
 const AiValueComponent = () => {
   const {user} = usePrivy();
@@ -62,45 +64,71 @@ const AiValueComponent = () => {
       else setAccountLinkError("Error linking account");
     },
   });
+  
+  // const { ready, wallets } = useWallets();
+  // const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === "privy");
+  // console.log(embeddedWallet);
+  
+  // const signMessage = async () => {
+  //   try {
+  //     await embeddedWallet!.switchChain(84532);
+  //     const provider = await embeddedWallet!.getEthereumProvider();
+      
+  //     const data = encodeFunctionData({
+  //       abi: ABI,
+  //       functionName: "init",
+  //       args: [
+  //         "names",
+  //         "symbols",
+  //         [
+  //           "0xf941d25ceb9a56f36b2e246ec13c125305544283", "0xee6ba7cd79bb52d2e0947b86155743b22db78eae",
+  //           "0x6aa95bf77616b89658f98e50390f6514214fe536",
+  //         ],
+  //         [45000000000, 45000000000, 10000000000],
+  //       ],
+  //     });
+      
+  //     const transactionRequest = {
+  //       to: factoryAddress,
+  //       data: data,
+  //       value: "0x0",
+  //     };
+  //     const transactionHash = await provider.request({
+  //       method: "eth_sendTransaction",
+  //       params: [transactionRequest],
+        
+  //     });
+
+  //     console.log(transactionHash);
+  //   } catch (error) {
+  //     console.error("Error signing message: ", error);
+  //   }
+  // }
+  
+  
   return (
     <section className="w-[92%] md:w-[70%] m-auto mt-0 md:mt-12">
       <h2 className="scroll-m-20 border-b pb-2 text-2xl md:text-4xl font-medium tracking-tight text-center mb-2 md:mb-8">
         AI Value analysis
       </h2>
+      {/* <Button onClick={signMessage}>Sign</Button> */}
       <div className="w-full md:hidden my-2">
         <AlignmentSearchSheet buttonText="Check Alignment w/ Farcaster user" />
       </div>
-      <Tabs
-        defaultValue={user?.twitter?.subject ? "twitter" : "warpcast"}
-        className="w-full"
-      >
+      <Tabs defaultValue={user?.twitter?.subject ? "twitter" : "warpcast"} className="w-full">
         <TabsList className="w-full h-12 p-2">
-          <TabsTrigger
-            className="w-[50%] font-semibold text-md"
-            value="warpcast"
-          >
+          <TabsTrigger className="w-[50%] font-semibold text-md" value="warpcast">
             Warpcast
           </TabsTrigger>
-          <TabsTrigger
-            className="w-[50%] font-semibold text-md"
-            value="twitter"
-          >
+          <TabsTrigger className="w-[50%] font-semibold text-md" value="twitter">
             Twitter
           </TabsTrigger>
         </TabsList>
         <TabsContent value="warpcast">
-          <WarpcastTab
-            linkFarcaster={linkFarcaster}
-            accountLinkError={accountLinkError}
-            linkWallet={linkWallet}
-          />
+          <WarpcastTab linkFarcaster={linkFarcaster} accountLinkError={accountLinkError} linkWallet={linkWallet} />
         </TabsContent>
         <TabsContent value="twitter">
-          <TwitterTab
-            linkTwitter={linkTwitter}
-            accountLinkError={accountLinkError}
-            linkWallet={linkWallet}
-          />
+          <TwitterTab linkTwitter={linkTwitter} accountLinkError={accountLinkError} linkWallet={linkWallet} />
         </TabsContent>
       </Tabs>
     </section>

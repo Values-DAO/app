@@ -42,41 +42,38 @@ export default function CultureBook() {
   
   const posts: Post[] = cultureBook?.posts || [];
   
-  if (posts.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full">
-        <div className="flex flex-col items-center gap-4">
-          <h1 className="text-2xl font-bold">No posts yet</h1>
-          <p className="text-center ">
-            No posts yet in this culture book. Make sure to use our Telegram Bot in your community to capture culture and post it here.
-          </p>
-        </div>
-      </div>
-    );
-  }
-  
   if (isError) {
     return <div>Failed to load culture book data.</div>
   }
   
   return (
     <div className="pb-20">
-      <div className="px-4 flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-bold">${cultureBook?.ticker}</h1>
+      {/* <div className="px-4 flex items-center justify-between mb-4">
+        <h1 className="text-2xl font-bold">${cultureBook?.ticker}</h1> TOOO: Update this
         <div className="flex items-center gap-1">
           <span className="px-3 py-1 rounded-full bg-gray-100 font-bold">${cultureBook?.tokenPrice}</span>
         </div>
-      </div>
+      </div> */}
 
       <div className="space-y-4">
-        {isLoading ? (
+        {isLoading && (
           <>
             <CultureBookSkeletonCard />
             <CultureBookSkeletonCard />
           </>
-        ) : (
-          posts.map((post) => <CultureCard key={post._id} post={post} />)
         )}
+        {!isLoading && posts.length === 0 && (
+          <div className="flex flex-col items-center justify-center h-full">
+            <div className="flex flex-col items-center gap-4">
+              <h1 className="text-2xl font-bold">No posts yet</h1>
+              <p className="text-center ">
+                No posts yet in this culture book. Make sure to use our Telegram Bot in your community to capture
+                culture and post it here.
+              </p>
+            </div>
+          </div>
+        )}
+        {!isLoading && posts.map((post) => <CultureCard key={post._id.toString()} post={post} />)}
       </div>
     </div>
   );

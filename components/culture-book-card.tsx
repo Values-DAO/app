@@ -10,7 +10,7 @@ export function CultureCard({ post }: { post: Post }) {
   let icon = "";
   switch (post.source) {
     case "Twitter":
-      icon = "/twitter.svg";
+      icon = "/x.svg";
       break;
     case "Youtube":
       icon = "/youtube.svg";
@@ -33,7 +33,12 @@ export function CultureCard({ post }: { post: Post }) {
       <div className="flex items-center gap-2 mb-3">
         <div>
           <div className="flex gap-x-2 items-center mb-2">
-            <Image src={icon} alt={"source icon"} height={48} width={48} />
+            <Image
+              src={icon}
+              alt={"source icon"}
+              height={post.source === "Twitter" ? 32 : 48}
+              width={post.source === "Twitter" ? 32 : 48}
+            />
             <h2 className="font-bold text-lg">{post.title}</h2>
           </div>
           <p className="text-sm">{post.content}</p>

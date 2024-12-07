@@ -20,6 +20,9 @@ import { useUserContext } from "@/providers/user-context-provider";
 import { formSchema } from "@/lib/utils";
 import Link from "next/link";
 import Image from "next/image";
+import { useWallets } from "@privy-io/react-auth";
+import { encodeFunctionData } from "viem";
+import { ABI, adminTreasuryAllocation, factoryAddress } from "@/contracts/abi";
 
 interface TrustPool {
   _id: string;
@@ -114,8 +117,24 @@ export default function Home() {
       twitterHandle: "",
       farcasterHandle: "",
       organizerTwitterHandle: "",
+      tokenName: "",
+      tokenSymbol: "",
+      curatorTreasuryAllocation: "",
+      treasuryAllocation: "",
     },
   });
+  
+  const { ready, wallets } = useWallets();
+  const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === "privy");
+  // console.log(embeddedWallet);
+
+  const signMessage = async () => {
+    try {
+      
+    } catch (error) {
+      console.error("Error signing message: ", error);
+    }
+  };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -123,6 +142,36 @@ export default function Home() {
         ...values,
         userId: userInfo?.userId,
       });
+      
+      await embeddedWallet!.switchChain(84532);
+      const provider = await embeddedWallet!.getEthereumProvider();
+
+      const data = encodeFunctionData({
+        abi: ABI,
+        functionName: "init",
+        args: [
+          "names",
+          "symbols",
+          [
+            "0xf941d25ceb9a56f36b2e246ec13c125305544283",
+            "0xee6ba7cd79bb52d2e0947b86155743b22db78eae",
+            adminTreasuryAllocation,
+          ],
+          [45000000000, 45000000000, 10000000000],
+        ],
+      });
+
+      const transactionRequest = {
+        to: factoryAddress,
+        data: data,
+        value: "0x0",
+      };
+      const transactionHash = await provider.request({
+        method: "eth_sendTransaction",
+        params: [transactionRequest],
+      });
+
+      console.log(transactionHash);
 
       if (response.data) {
         await queryClient.invalidateQueries({ queryKey: ["trustPools"] });
@@ -143,14 +192,19 @@ export default function Home() {
       <section className="bg-primary py-8 md:py-12 text-primary-foreground rounded-lg mb-4 sm:px-2">
         <div className="container mx-auto px-4">
           <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">Trust Pools</h1>
-            <p className="text-md sm:text-lg">
-              Trust Pool is a curated group of people, whether by self-selection or some other method.<br />
-              Each community, cohort, event - any ephemeral or permanent gathering of people - is a Trust Pool.<br />
-              Communities of size {">"}30 survive on people having strong bonds between certain members.<br />
-              Each member will have 3-10 people that they really bond with.<br />
-              We provide top 3 value-aligned people and top 3 people with the most diverse values.<br />
-              Connect with them and have fun.
-            </p>
+          <p className="text-md sm:text-lg">
+            Trust Pool is a curated group of people, whether by self-selection or some other method.
+            <br />
+            Each community, cohort, event - any ephemeral or permanent gathering of people - is a Trust Pool.
+            <br />
+            Communities of size {">"}30 survive on people having strong bonds between certain members.
+            <br />
+            Each member will have 3-10 people that they really bond with.
+            <br />
+            We provide top 3 value-aligned people and top 3 people with the most diverse values.
+            <br />
+            Connect with them and have fun.
+          </p>
         </div>
       </section>
 
@@ -186,7 +240,7 @@ export default function Home() {
             </Button>
           </div>
         </div>
-      
+
         {/* Create Trust Pool Form */}
         <div
           className={`overflow-hidden transition-all duration-300 ease-in-out ${
@@ -270,6 +324,65 @@ export default function Home() {
                       <FormLabel>Organizer Twitter Handle</FormLabel>
                       <FormControl>
                         <Input placeholder="https://x.com/organizertwitter" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {/* Culture Token Fields */}
+                <div>
+                  <h3 className="text-lg font-semibold">Culture Token</h3>
+                  <p className="text-sm text-muted-foreground">
+                    The Culture Token is a token that represents the culture of your community.
+                  </p>
+                </div>
+                <FormField
+                  control={form.control}
+                  name="tokenName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Token Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Culture Coin" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="tokenSymbol"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Token Symbol</FormLabel>
+                      <FormControl>
+                        <Input placeholder="CULTURE" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="curatorTreasuryAllocation"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Curator Treasury Allocation</FormLabel>
+                      <FormControl>
+                        <Input placeholder="0x..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="treasuryAllocation"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Treasury Allocation</FormLabel>
+                      <FormControl>
+                        <Input placeholder="0x..." {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
