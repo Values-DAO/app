@@ -141,7 +141,7 @@ export default function Home() {
           form.getValues("tokenName"),
           form.getValues("tokenSymbol"),
           [form.getValues("treasuryAllocation"), curatorTreasuryAllocation, adminTreasuryAllocation],
-          [45000000000 * 10 ** 18, 45000000000 * 10 ** 18, 10000000000 * 10 ** 18],
+          [4500000000 * 10 ** 18, 4500000000 * 10 ** 18, 1000000000 * 10 ** 18],
         ],
       });
 
