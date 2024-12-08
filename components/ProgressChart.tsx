@@ -1,36 +1,75 @@
 "use client";
-
-import { Line, LineChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Scatter } from "recharts";
-import { ChartContainer } from "@/components/ui/chart";
+import { Line, LineChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 const data = [
-  { day: "M", submissions: 6, purchase: [3, 5] },
-  { day: "T", submissions: 4, purchase: [4, 8] },
-  { day: "W", submissions: 4, purchase: [5, 10] },
-  { day: "T", submissions: 8, purchase: [8, 14] },
-  { day: "F", submissions: 10, purchase: [9, 16] },
-  { day: "S", submissions: 7, purchase: [10, 17] },
-  { day: "S", submissions: 7, purchase: [12, 19] },
+  { day: "M", submissions: 6, purchase: 500 },
+  { day: "T", submissions: 4, purchase: 800 },
+  { day: "W", submissions: 4, purchase: 1000 },
+  { day: "T", submissions: 8, purchase: 1400 },
+  { day: "F", submissions: 10, purchase: 1600 },
+  { day: "S", submissions: 7, purchase: 1700 },
+  { day: "S", submissions: 7, purchase: 1900 },
 ];
 
 export function ProgressChart() {
   return (
     <div className="h-[300px] w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+        <LineChart
+          data={data}
+          margin={{
+            top: 20,
+            right: 40, // Increased right margin for better spacing
+            left: 20, // Increased left margin
+            bottom: 20, // Increased bottom margin
+          }}
+        >
           <CartesianGrid strokeDasharray="3 3" vertical={false} horizontal={true} />
-          <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: "#666" }} />
-          <YAxis yAxisId="left" domain={[0, 20]} axisLine={false} tickLine={false} tick={{ fill: "#666" }} />
+
+          <XAxis
+            dataKey="day"
+            axisLine={false}
+            tickLine={false}
+            tick={{ fill: "#666" }}
+            padding={{ left: 20, right: 20 }} // Added padding to prevent cutting off labels
+          />
+
+          <YAxis
+            yAxisId="left"
+            width={60} // Explicit width to prevent overlapping
+            domain={[0, "auto"]}
+            axisLine={false}
+            tickLine={false}
+            tick={{ fill: "#666" }}
+            label={{
+              value: "Submissions",
+              angle: -90,
+              position: "insideLeft",
+              offset: 10, // Added offset to prevent overlapping
+              style: { textAnchor: "middle" },
+            }}
+          />
+
           <YAxis
             yAxisId="right"
             orientation="right"
-            domain={[0, 1000]}
+            width={70} // Explicit width to prevent overlapping
+            domain={[0, "auto"]}
             tickFormatter={(value) => `$${value}`}
             axisLine={false}
             tickLine={false}
             tick={{ fill: "#666" }}
+            label={{
+              value: "Purchase",
+              angle: 90,
+              position: "insideRight",
+              offset: 10, // Added offset to prevent overlapping
+              style: { textAnchor: "middle" },
+            }}
           />
+
           <Tooltip />
+
           <Legend
             verticalAlign="bottom"
             content={({ payload }) => (
@@ -46,8 +85,10 @@ export function ProgressChart() {
               </div>
             )}
           />
-          <Scatter yAxisId="left" dataKey="submissions" fill="#000" line={false} />
-          <Line yAxisId="right" type="monotone" dataKey="purchase" stroke="#10B981" strokeWidth={2} dot={false} />
+
+          <Line yAxisId="left" dataKey="submissions" stroke="#000" strokeWidth={2} dot={true} />
+
+          <Line yAxisId="right" dataKey="purchase" stroke="#10B981" strokeWidth={2} dot={true} />
         </LineChart>
       </ResponsiveContainer>
     </div>

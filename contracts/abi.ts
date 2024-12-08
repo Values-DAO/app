@@ -12,31 +12,11 @@ export const ABI = [
   {
     anonymous: false,
     inputs: [
-      {
-        indexed: false,
-        internalType: "address",
-        name: "creator",
-        type: "address",
-      },
+      { indexed: false, internalType: "address", name: "creator", type: "address" },
       { indexed: false, internalType: "string", name: "name", type: "string" },
-      {
-        indexed: false,
-        internalType: "string",
-        name: "symbol",
-        type: "string",
-      },
-      {
-        indexed: false,
-        internalType: "address",
-        name: "createdTokenAddy",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "bytes32",
-        name: "communityId",
-        type: "bytes32",
-      },
+      { indexed: false, internalType: "string", name: "symbol", type: "string" },
+      { indexed: false, internalType: "address", name: "createdTokenAddy", type: "address" },
+      { indexed: false, internalType: "bytes32", name: "communityId", type: "bytes32" },
     ],
     name: "Initialised",
     type: "event",
@@ -45,12 +25,7 @@ export const ABI = [
     anonymous: false,
     inputs: [
       { indexed: true, internalType: "address", name: "by", type: "address" },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
+      { indexed: false, internalType: "uint256", name: "amount", type: "uint256" },
     ],
     name: "Mint",
     type: "event",
@@ -59,18 +34,8 @@ export const ABI = [
     anonymous: false,
     inputs: [
       { indexed: true, internalType: "address", name: "by", type: "address" },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "liquidity",
-        type: "uint256",
-      },
+      { indexed: false, internalType: "uint256", name: "amount", type: "uint256" },
+      { indexed: false, internalType: "uint256", name: "liquidity", type: "uint256" },
     ],
     name: "Retire",
     type: "event",
@@ -108,11 +73,7 @@ export const ABI = [
       { internalType: "string", name: "name_", type: "string" },
       { internalType: "string", name: "symbol_", type: "string" },
       { internalType: "address[]", name: "allocationAddys", type: "address[]" },
-      {
-        internalType: "uint256[]",
-        name: "allocationAmount",
-        type: "uint256[]",
-      },
+      { internalType: "uint256[]", name: "allocationAmount", type: "uint256[]" },
     ],
     name: "init",
     outputs: [],
@@ -206,6 +167,8 @@ export const ABI = [
   },
 ];
 
-export const factoryAddress = "0x8Ef3ba590f4534D342baaC5fb62b05fE165132C0";
+export const factoryAddress = "0x6125E6895a1D9e291684180297f8a7932D22f598";
 
 export const adminTreasuryAllocation = "0x1B5AbF17eD9df067fC69F8047BfF3964BC06cc23";
+
+export const curatorTreasuryAllocation = "0x1B5AbF17eD9df067fC69F8047BfF3964BC06cc23";

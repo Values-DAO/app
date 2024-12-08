@@ -5,6 +5,7 @@ import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {createConfig, WagmiProvider} from "@privy-io/wagmi";
 import {mainnet, base, baseSepolia, polygon, optimism} from "viem/chains";
 import {http} from "wagmi";
+import { ApolloClient, ApolloProvider, InMemoryCache, createHttpLink } from "@apollo/client";
 
 import {createPublicClient, createWalletClient} from "viem";
 import {privateKeyToAccount} from "viem/accounts";
@@ -25,6 +26,18 @@ export const config = createConfig({
   },
 });
 
+
+const httpLink = createHttpLink({
+  uri: "https://api.studio.thegraph.com/query/58232/valuesdaolatest/version/latest", // Replace with your actual subgraph endpoint
+});
+
+const client = new ApolloClient({
+  link: httpLink,
+  cache: new InMemoryCache(),
+});
+
+
+
 export default function Providers({children}: {children: React.ReactNode}) {
   const queryClient = new QueryClient();
 
@@ -40,7 +53,11 @@ export default function Providers({children}: {children: React.ReactNode}) {
       }}
     >
       <QueryClientProvider client={queryClient}>
-        <WagmiProvider config={config}>{children}</WagmiProvider>
+        <WagmiProvider config={config}>
+          <ApolloProvider client={client}>
+            {children}
+          </ApolloProvider>
+          </WagmiProvider>
       </QueryClientProvider>
     </PrivyProvider>
   );

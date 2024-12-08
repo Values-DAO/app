@@ -17,12 +17,15 @@ import { API_BASE_URL } from "@/constants";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useUserContext } from "@/providers/user-context-provider";
-import { formSchema } from "@/lib/utils";
+import { calculateCommunityId, formSchema, useInitialisedEvents } from "@/lib/utils";
 import Link from "next/link";
 import Image from "next/image";
-import { useWallets } from "@privy-io/react-auth";
-import { encodeFunctionData } from "viem";
-import { ABI, adminTreasuryAllocation, factoryAddress } from "@/contracts/abi";
+import { usePrivy, useWallets } from "@privy-io/react-auth";
+import { createPublicClient, encodeAbiParameters, encodeFunctionData, http, keccak256, parseAbiParameters } from "viem";
+import { ABI, adminTreasuryAllocation, curatorTreasuryAllocation, factoryAddress } from "@/contracts/abi";
+import { baseSepolia } from "viem/chains";
+
+
 
 interface TrustPool {
   _id: string;
@@ -119,30 +122,15 @@ export default function Home() {
       organizerTwitterHandle: "",
       tokenName: "",
       tokenSymbol: "",
-      curatorTreasuryAllocation: "",
       treasuryAllocation: "",
     },
   });
   
   const { ready, wallets } = useWallets();
   const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === "privy");
-  // console.log(embeddedWallet);
-
-  const signMessage = async () => {
-    try {
-      
-    } catch (error) {
-      console.error("Error signing message: ", error);
-    }
-  };
-
+  
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const response = await axios.post(`${API_BASE_URL}/trustpools/new`, {
-        ...values,
-        userId: userInfo?.userId,
-      });
-      
       await embeddedWallet!.switchChain(84532);
       const provider = await embeddedWallet!.getEthereumProvider();
 
@@ -150,14 +138,10 @@ export default function Home() {
         abi: ABI,
         functionName: "init",
         args: [
-          "names",
-          "symbols",
-          [
-            "0xf941d25ceb9a56f36b2e246ec13c125305544283",
-            "0xee6ba7cd79bb52d2e0947b86155743b22db78eae",
-            adminTreasuryAllocation,
-          ],
-          [45000000000, 45000000000, 10000000000],
+          form.getValues("tokenName"),
+          form.getValues("tokenSymbol"),
+          [form.getValues("treasuryAllocation"), curatorTreasuryAllocation, adminTreasuryAllocation],
+          [45000000000 * 10 ** 18, 45000000000 * 10 ** 18, 10000000000 * 10 ** 18],
         ],
       });
 
@@ -170,12 +154,18 @@ export default function Home() {
         method: "eth_sendTransaction",
         params: [transactionRequest],
       });
-
+      
       console.log(transactionHash);
+      
+      const response = await axios.post(`${API_BASE_URL}/trustpools/new`, {
+        ...values,
+        userId: userInfo?.userId,
+      });
 
       if (response.data) {
-        await queryClient.invalidateQueries({ queryKey: ["trustPools"] });
+        // TODO: Redirect to trust pool page 
         router.push(`/trustpools/${response.data.data._id}`);
+        await queryClient.invalidateQueries({ queryKey: ["trustPools"] });
       }
     } catch (error) {
       console.error("Error creating trust pool:", error);
@@ -185,7 +175,7 @@ export default function Home() {
   const handleRedirect = (id: string) => {
     router.push(`/trustpools/${id}`);
   }
-
+  
   return (
     <main className="min-h-screen bg-background md:container px-2">
       {/* Hero Section */}
@@ -357,19 +347,6 @@ export default function Home() {
                       <FormLabel>Token Symbol</FormLabel>
                       <FormControl>
                         <Input placeholder="CULTURE" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="curatorTreasuryAllocation"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Curator Treasury Allocation</FormLabel>
-                      <FormControl>
-                        <Input placeholder="0x..." {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

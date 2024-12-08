@@ -36,8 +36,8 @@ export function CultureCard({ post }: { post: Post }) {
             <Image
               src={icon}
               alt={"source icon"}
-              height={post.source === "Twitter" ? 32 : 48}
-              width={post.source === "Twitter" ? 32 : 48}
+              height={post.source === "Twitter" ? 28 : 48}
+              width={post.source === "Twitter" ? 28 : 48}
             />
             <h2 className="font-bold text-lg">{post.title}</h2>
           </div>

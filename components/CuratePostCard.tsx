@@ -64,8 +64,8 @@ export function CurateTabPostCard({
           <Image
             src={icon}
             alt={`${source} icon`}
-            height={source === "Twitter" ? 32 : 48}
-            width={source === "Twitter" ? 32 : 48}
+            height={source === "Twitter" ? 28 : 48}
+            width={source === "Twitter" ? 28 : 48}
           />
           <h2 className="font-bold text-lg">{title}</h2>
         </div>
