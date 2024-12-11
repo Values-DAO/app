@@ -12,7 +12,7 @@ export default function BottomNav() {
   return (
     <div className="fixed bottom-0 left-0 right-0 border-t bg-background">
       <nav className="flex justify-around items-center h-16">
-        <Link
+        {/* <Link
           href="alignment"
           className={cn(
             "flex flex-col items-center justify-center flex-1 h-full",
@@ -31,8 +31,8 @@ export default function BottomNav() {
         >
           <Users className="h-5 w-5" />
           <span className="text-xs mt-1">Members</span>
-        </Link>
-        <Link
+        </Link> */}
+        {/* <Link
           href="charts"
           className={cn(
             "flex flex-col items-center justify-center flex-1 h-full",
@@ -41,7 +41,7 @@ export default function BottomNav() {
         >
           <ChartSpline className="h-5 w-5" />
           <span className="text-xs mt-1">Charts</span>
-        </Link>
+        </Link> */}
         <Link
           href="curate"
           className={cn(

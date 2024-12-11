@@ -8,11 +8,8 @@ import useValuesHook from "@/hooks/useValuesHook";
 import ValueGeneratingLoader from "./ui/value-generating-loader";
 import SpectrumCard from "./ui/spectrum-card";
 import {useLinkAccount, usePrivy, useWallets} from "@privy-io/react-auth";
-import {NFT_CONTRACT_ADDRESS} from "@/constants";
 import LinkWalletComponent from "./ui/link-wallet-component";
 import {AlignmentSearchSheet} from "./alignment-search-sheet";
-import { encodeFunctionData, parseEther } from "viem";
-import { ABI, factoryAddress } from "@/contracts/abi";
 
 const AiValueComponent = () => {
   const {user} = usePrivy();

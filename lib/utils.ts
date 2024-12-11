@@ -55,9 +55,9 @@ export const formSchema = z.object({
     .string()
     .optional()
     .refine((val) => !val || /^https?:\/\/.+\..+/.test(val), "Invalid URL"),
-  tokenName: z.string().min(1, "Please provide a name").max(32, "Name is too long"),
-  tokenSymbol: z.string().min(1, "Please provide a symbol").max(8, "Symbol is too long"),
-  treasuryAllocation: z.string().min(1, "Please provide an allocation"),
+  // tokenName: z.string().min(1, "Please provide a name").max(32, "Name is too long"),
+  // tokenSymbol: z.string().min(1, "Please provide a symbol").max(8, "Symbol is too long"),
+  // treasuryAllocation: z.string().min(1, "Please provide an allocation"),
 });
 
 export const formatISODate = (isoDate: Date) => {
