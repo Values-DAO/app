@@ -94,7 +94,7 @@ export function CurateTabPostCard({
       {(hasVoted || !userId) && (
         <div className="space-y-2 mt-4">
           <Progress value={alignedPercentage} className="h-2" />
-          <div className="flex justify-between text-sm text-gray-500">
+          <div className="flex justify-between text-sm text-gray-400 font-semibold">
             <span>Aligned: {votes.alignedUsers.length}</span>
             <span>Not Aligned: {votes.notAlignedUsers.length}</span>
           </div>
