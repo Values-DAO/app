@@ -36,7 +36,7 @@ export function CultureCard({ post }: { post: Post }) {
             <Image src={icon} alt={"source icon"} height={24} width={24} />
           </div>
         </div>
-        <div className="flex flex-col gap-y-1">
+        <div className="flex flex-col gap-y-1 w-full">
           <h2 className="font-semibold text-base">{post.title}</h2>
           <p className="font-semibold text-gray-400 text-sm">{post.content}</p>
           <div className="flex items-center justify-between font-semibold text-gray-400 text-sm mt-1">

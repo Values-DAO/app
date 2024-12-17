@@ -80,7 +80,7 @@ export function CurateTabPostCard({
               <Image src={icon} alt={"source icon"} height={24} width={24} className="invert" />
             </div>
           </div>
-          <div className="flex flex-col gap-y-1">
+          <div className="flex flex-col gap-y-1 w-full">
             <h2 className="font-semibold text-base">{title}</h2>
             <p className="font-semibold text-gray-400 text-sm">{description}</p>
             <div className="flex items-center justify-between font-semibold text-gray-400 text-sm mt-1">
