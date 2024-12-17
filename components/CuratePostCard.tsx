@@ -56,37 +56,38 @@ export function CurateTabPostCard({
   let icon = "";
   switch (source) {
     case "Twitter":
-      icon = "/x.svg";
+      icon = "/x.png";
       break;
     case "Youtube":
-      icon = "/youtube.svg";
+      icon = "/youtube.png";
       break;
     case "Farcaster":
-      icon = "/farcaster.svg";
+      icon = "/farcaster.png";
       break;
     case "Telegram":
-      icon = "/telegram.svg";
+      icon = "/telegram.png";
       break;
     default:
-      icon = "/twitter.svg";
+      icon = "/telegram.png";
   }
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-lg space-y-4">
-      <div className="space-y-3">
-        <div className="flex gap-x-2 items-center">
-          <Image
-            src={icon}
-            alt={`${source} icon`}
-            height={source === "Twitter" ? 28 : 48}
-            width={source === "Twitter" ? 28 : 48}
-          />
-          <h2 className="font-bold text-lg">{title}</h2>
-        </div>
-        <p className="text-sm">{description}</p>
-        <div className="flex items-center justify-between text-sm text-gray-500">
-          <span>By {author}</span>
-          <span>{formatISODate(date)}</span>
+    <div className="pb-4">
+      <div className="bg-white p-4 rounded-xl">
+        <div className="flex gap-x-3">
+          <div className="flex gap-x-2">
+            <div className="bg-black rounded-full h-10 w-10 flex items-center justify-center">
+              <Image src={icon} alt={"source icon"} height={24} width={24} className="invert" />
+            </div>
+          </div>
+          <div className="flex flex-col gap-y-1">
+            <h2 className="font-semibold text-base">{title}</h2>
+            <p className="font-semibold text-gray-400 text-sm">{description}</p>
+            <div className="flex items-center justify-between font-semibold text-gray-400 text-sm mt-1">
+              <span>By {author}</span>
+              <span>{formatISODate(date)}</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -101,11 +102,11 @@ export function CurateTabPostCard({
       )}
 
       {userId && !hasVoted && (
-        <div className="grid grid-cols-2 gap-6 mt-4">
+        <div className="grid grid-cols-2 gap-3 mt-4">
           <Button
             variant="outline"
             size="lg"
-            className="w-full rounded-full text-lg font-semibold border-black border-2"
+            className="w-full rounded-full text-base font-semibold border-black border-2"
             onClick={() => handleVote(handleUpvote)}
             disabled={isLoading}
           >
@@ -114,7 +115,7 @@ export function CurateTabPostCard({
           <Button
             variant="outline"
             size="lg"
-            className="w-full rounded-full text-lg font-semibold border-black border-2"
+            className="w-full rounded-full text-base font-semibold border-black border-2"
             onClick={() => handleVote(handleDownvote)}
             disabled={isLoading}
           >
@@ -124,4 +125,5 @@ export function CurateTabPostCard({
       )}
     </div>
   );
+  
 }

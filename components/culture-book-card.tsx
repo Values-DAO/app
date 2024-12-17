@@ -10,50 +10,40 @@ export function CultureCard({ post }: { post: Post }) {
   let icon = "";
   switch (post.source) {
     case "Twitter":
-      icon = "/x.svg";
+      icon = "/x.png";
       break;
     case "Youtube":
-      icon = "/youtube.svg";
+      icon = "/youtube.png";
       break;
     // case "Instagram":
     //   icon = "instagram.svg";
     //   break;
     case "Farcaster":
-      icon = "/farcaster.svg";
+      icon = "/farcaster.png";
       break;
     case "Telegram":
-      icon = "/telegram.svg";
+      icon = "/telegram.png";
       break;
     default:
-      icon = "/twitter.svg";
+      icon = "/telegram.png";
   }
   
   return (
-    <div className="bg-white p-4 mx-4 rounded-lg shadow-lg">
-      <div className="flex items-center gap-2 mb-3">
-        <div>
-          <div className="flex gap-x-2 items-center mb-2">
-            <Image
-              src={icon}
-              alt={"source icon"}
-              height={post.source === "Twitter" ? 28 : 48}
-              width={post.source === "Twitter" ? 28 : 48}
-            />
-            <h2 className="font-bold text-lg">{post.title}</h2>
+    <div className="bg-white p-4 mx-4 rounded-xl">
+      <div className="flex gap-x-3">
+        <div className="flex gap-x-2">
+          <div className="bg-[#FACC14] rounded-full h-10 w-10 flex items-center justify-center">
+            <Image src={icon} alt={"source icon"} height={24} width={24} />
           </div>
-          <p className="text-sm">{post.content}</p>
         </div>
-      </div>
-      {/* <div className="flex items-center my-2 text-sm">
-        {post.values.slice(0, 3).map((value) => (
-          <div className="pr-2">
-            <ValueBadge key={value} value={value} />
+        <div className="flex flex-col gap-y-1">
+          <h2 className="font-semibold text-base">{post.title}</h2>
+          <p className="font-semibold text-gray-400 text-sm">{post.content}</p>
+          <div className="flex items-center justify-between font-semibold text-gray-400 text-sm mt-1">
+            <span>By {post.posterUsername}</span>
+            <span>{formatISODate(post.timestamp)}</span>
           </div>
-        ))}
-      </div> */}
-      <div className="flex items-center justify-between text-sm text-gray-500">
-        <span>By {post.posterUsername}</span>
-        <span>{formatISODate(post.timestamp)}</span>
+        </div>
       </div>
     </div>
   );
