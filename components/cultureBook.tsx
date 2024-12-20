@@ -10,10 +10,12 @@ import { useUserContext } from "@/providers/user-context-provider";
 import { CultureBookSkeletonCard } from "./culture-book-skeleton-card";
 import { CultureCard } from "./culture-book-card";
 import type { Post } from "@/types";
+import Link from "next/link";
 
 interface Response {
   posts: Post[];
   trustPoolName: string;
+  telegramChannel: string;
   ticker: string;
   tokenPrice: number;
 }
@@ -91,8 +93,11 @@ export default function CultureBook() {
           </div>
         )} */}
         {!isLoading && posts.length !== 0 && (
-          <div className="px-4">
+          <div className="px-4 gap-x-3 flex items-center ">
             <h1 className="text-2xl font-semibold">{cultureBook?.trustPoolName || "Loading..."}</h1>
+            <a href={cultureBook?.telegramChannel}>
+              <Image src="/telegram.png" alt="Telegram" height={30} width={30} />
+            </a>
           </div>
         )}
         {!isLoading && posts.map((post) => <CultureCard key={post._id.toString()} post={post} />)}
