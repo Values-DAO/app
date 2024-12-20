@@ -13,6 +13,7 @@ import type { Post } from "@/types";
 
 interface Response {
   posts: Post[];
+  trustPoolName: string;
   ticker: string;
   tokenPrice: number;
 }
@@ -71,6 +72,27 @@ export default function CultureBook() {
                 culture and post it here.
               </p>
             </div>
+          </div>
+        )}
+        {/* {!isLoading && (
+          <div>
+            <div>
+              {cultureBook?.trustPoolName && (
+                <div>
+                  <h1 className="text-2xl font-">{cultureBook.trustPoolName}</h1>
+                </div>
+              )}
+            </div>
+            <div>
+              {posts.map((post) => (
+                <CultureCard key={post._id.toString()} post={post} />
+              ))}
+            </div>
+          </div>
+        )} */}
+        {!isLoading && (
+          <div className="px-4">
+            <h1 className="text-2xl font-semibold">{cultureBook?.trustPoolName || "Loading..."}</h1>
           </div>
         )}
         {!isLoading && posts.map((post) => <CultureCard key={post._id.toString()} post={post} />)}
