@@ -90,7 +90,7 @@ export default function CultureBook() {
             </div>
           </div>
         )} */}
-        {!isLoading && (
+        {!isLoading && posts.length !== 0 && (
           <div className="px-4">
             <h1 className="text-2xl font-semibold">{cultureBook?.trustPoolName || "Loading..."}</h1>
           </div>
