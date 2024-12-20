@@ -14,7 +14,6 @@ import { useUserContext } from "@/providers/user-context-provider";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { useInitialisedEvents } from "@/lib/utils";
 import { encodeFunctionData, erc20Abi } from "viem";
-import { ABI, factoryAddress } from "@/contracts/abi";
 import {readContract} from "@wagmi/core"
 import { config } from "@/contracts/config";
 

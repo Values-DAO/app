@@ -10,6 +10,11 @@ import SpectrumCard from "./ui/spectrum-card";
 import {useLinkAccount, usePrivy, useWallets} from "@privy-io/react-auth";
 import LinkWalletComponent from "./ui/link-wallet-component";
 import {AlignmentSearchSheet} from "./alignment-search-sheet";
+import { factoryABI, factoryContractAddress } from "@/contracts/factoryABI";
+import { createPublicClient, decodeEventLog, decodeFunctionResult, encodeFunctionData, keccak256, toHex } from "viem";
+import { waitForTransactionReceipt } from "viem/actions";
+import { baseSepolia } from "viem/chains";
+import { config, viemPublicClient } from "@/providers/privy-provider";
 
 const AiValueComponent = () => {
   const {user} = usePrivy();
@@ -64,19 +69,17 @@ const AiValueComponent = () => {
   
   // const { ready, wallets } = useWallets();
   // const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === "privy");
-  // console.log(embeddedWallet);
+  // // console.log(embeddedWallet);
   
   // const signMessage = async () => {
-  //   try {
-  //     await embeddedWallet!.switchChain(84532);
   //     const provider = await embeddedWallet!.getEthereumProvider();
-      
   //     const data = encodeFunctionData({
-  //       abi: ABI,
-  //       functionName: "init",
+  //       abi: factoryABI,
+  //       functionName: "initialiseToken",
   //       args: [
   //         "names",
   //         "symbols",
+  //         "test",
   //         [
   //           "0xf941d25ceb9a56f36b2e246ec13c125305544283", "0xee6ba7cd79bb52d2e0947b86155743b22db78eae",
   //           "0x6aa95bf77616b89658f98e50390f6514214fe536",
@@ -84,9 +87,8 @@ const AiValueComponent = () => {
   //         [45000000000, 45000000000, 10000000000],
   //       ],
   //     });
-      
   //     const transactionRequest = {
-  //       to: factoryAddress,
+  //       to: factoryContractAddress,
   //       data: data,
   //       value: "0x0",
   //     };
@@ -96,12 +98,31 @@ const AiValueComponent = () => {
         
   //     });
 
-  //     console.log(transactionHash);
-  //   } catch (error) {
-  //     console.error("Error signing message: ", error);
-  //   }
+  //     console.log("transaction hash:", transactionHash);
+      
+  //     const receipt = await waitForTransactionReceipt(viemPublicClient, { hash: transactionHash });
+
+  //     await new Promise((resolve) => setTimeout(resolve, 1990));
+
+  //     const initialisedLog = receipt.logs.find((log) =>
+  //       log.topics.some((topic) => topic === keccak256(toHex("TokenCreated(address,string,string,address,address)")))
+  //     );
+      
+  //     console.log("Receipt:", receipt);
+
+  //     if (initialisedLog) {
+  //       // Decode the event log to extract token details
+  //       const decoded = decodeEventLog({
+  //         abi: factoryABI,
+  //         eventName: "Initialised",
+  //         data: initialisedLog.data,
+  //         topics: initialisedLog.topics,
+  //       });
+  //       console.log(decoded)
+  //     } else {
+  //       console.log("No log found");
+  //     }
   // }
-  
   
   return (
     <section className="w-[92%] md:w-[70%] m-auto mt-0 md:mt-12">

@@ -31,8 +31,8 @@ export default function BottomNav() {
         >
           <Users className="h-5 w-5" />
           <span className="text-xs mt-1">Members</span>
-        </Link> */}
-        {/* <Link
+        </Link>  */}
+        <Link
           href="charts"
           className={cn(
             "flex flex-col items-center justify-center flex-1 h-full",
@@ -41,7 +41,7 @@ export default function BottomNav() {
         >
           <ChartSpline className="h-5 w-5" />
           <span className="text-xs mt-1">Charts</span>
-        </Link> */}
+        </Link>
         <Link
           href="curate"
           className={cn(

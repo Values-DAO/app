@@ -19,9 +19,11 @@ import { useRouter } from "next/navigation";
 import { useUserContext } from "@/providers/user-context-provider";
 import { formSchema} from "@/lib/utils";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
-import { createPublicClient, encodeAbiParameters, encodeFunctionData, http, keccak256, parseAbiParameters } from "viem";
-import { ABI, adminTreasuryAllocation, curatorTreasuryAllocation, factoryAddress } from "@/contracts/abi";
+import { createPublicClient, decodeEventLog, encodeAbiParameters, encodeFunctionData, http, keccak256, parseAbiParameters, toHex } from "viem";
 import { baseSepolia } from "viem/chains";
+import { factoryABI, factoryContractAddress } from "@/contracts/factoryABI";
+import { waitForTransactionReceipt } from "viem/actions";
+import { viemPublicClient } from "@/providers/privy-provider";
 
 
 // TODO: Update this when making the token functionality working
@@ -33,6 +35,9 @@ interface TrustPool {
   farcasterHandle: string;
   communityLink: string;
   logo: string;
+  tokenName: "";
+  tokenSymbol: "";
+  treasuryAllocation: "";
 }
 
 const fetchTrustPools = async (): Promise<TrustPool[]> => {
@@ -118,43 +123,81 @@ export default function Home() {
       twitterHandle: "",
       farcasterHandle: "",
       organizerTwitterHandle: "",
-      // tokenName: "",
-      // tokenSymbol: "",
-      // treasuryAllocation: "",
+      tokenName: "",
+      tokenSymbol: "",
+      curatorTreasuryAllocation: "",
     },
   });
   
-  // const { ready, wallets } = useWallets();
-  // const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === "privy");
+  const { ready: walletsReady, wallets } = useWallets();
+  let embeddedWallet = wallets.find((wallet) => wallet.walletClientType === "privy");
+  
+  if (!embeddedWallet) {
+    embeddedWallet = wallets[0];
+  }
+  
+  if (!embeddedWallet) {
+    console.error("No wallet found");
+  }
   
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      // await embeddedWallet!.switchChain(84532);
-      // const provider = await embeddedWallet!.getEthereumProvider();
-
-      // const data = encodeFunctionData({
-      //   abi: ABI,
-      //   functionName: "init",
-      //   args: [
-      //     form.getValues("tokenName"),
-      //     form.getValues("tokenSymbol"),
-      //     [form.getValues("treasuryAllocation"), curatorTreasuryAllocation, adminTreasuryAllocation],
-      //     [4500000000 * 10 ** 18, 4500000000 * 10 ** 18, 1000000000 * 10 ** 18],
-      //   ],
-      // });
-
-      // const transactionRequest = {
-      //   to: factoryAddress,
-      //   data: data,
-      //   value: "0x0",
-      // };
-      // const transactionHash = await provider.request({
-      //   method: "eth_sendTransaction",
-      //   params: [transactionRequest],
-      // });
+      // Token Creation Logic
+      const provider = await embeddedWallet!.getEthereumProvider();
       
-      // console.log(transactionHash);
+      const data = encodeFunctionData({
+        abi: factoryABI,
+        functionName: "initialiseToken",
+        args: [
+          values.tokenName,
+          values.tokenSymbol,
+          values.description, // same description as trust pool
+          [
+            values.curatorTreasuryAllocation,
+            "0x78db1057A9A1102C3E831E5086B75E9a58e7730c",
+            "0x78db1057A9A1102C3E831E5086B75E9a58e7730c",
+          ],
+          [5000000000, 4000000000, 1000000000],
+        ],
+      });
       
+      const transactionRequest = {
+        to: factoryContractAddress,
+        data: data,
+        value: "0x0",
+      };
+      
+      const transactionHash = await provider.request({
+        method: "eth_sendTransaction",
+        params: [transactionRequest],
+
+      });
+
+      console.log("transaction hash:", transactionHash);
+
+      const receipt = await waitForTransactionReceipt(viemPublicClient, { hash: transactionHash });
+
+      await new Promise((resolve) => setTimeout(resolve, 1990));
+
+      const initialisedLog = receipt.logs.find((log) =>
+        log.topics.some((topic) => topic === keccak256(toHex("TokenCreated(address,string,string,address,address)")))
+      );
+
+      console.log("Receipt:", receipt);
+
+      if (initialisedLog) {
+        // Decode the event log to extract token details
+        const decoded = decodeEventLog({
+          abi: factoryABI,
+          eventName: "Initialised",
+          data: initialisedLog.data,
+          topics: initialisedLog.topics,
+        });
+        console.log(decoded)
+      } else {
+        console.log("No log found");
+      }
+
       const response = await axios.post(`${API_BASE_URL}/trustpools/new`, {
         ...values,
         userId: userInfo?.userId,
@@ -166,8 +209,8 @@ export default function Home() {
       }
     } catch (error) {
       console.error("Error creating trust pool:", error);
-    } 
-  }
+    }
+  } 
   
   const handleRedirect = (id: string) => {
     router.push(`/trustpools/${id}`);
@@ -317,7 +360,7 @@ export default function Home() {
                   )}
                 />
                 {/* Culture Token Fields */}
-                {/* <div>
+                <div>
                   <h3 className="text-lg font-semibold">Culture Token</h3>
                   <p className="text-sm text-muted-foreground">
                     The Culture Token is a token that represents the culture of your community.
@@ -351,17 +394,17 @@ export default function Home() {
                 />
                 <FormField
                   control={form.control}
-                  name="treasuryAllocation"
+                  name="curatorTreasuryAllocation"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Treasury Allocation</FormLabel>
+                      <FormLabel>Curator Treasury Allocation</FormLabel>
                       <FormControl>
                         <Input placeholder="0x..." {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
-                /> */}
+                />
                 <div className="flex justify-end gap-2">
                   <Button type="button" variant="outline" onClick={() => setIsFormVisible(false)}>
                     Cancel

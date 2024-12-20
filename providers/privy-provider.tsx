@@ -3,7 +3,7 @@
 import {PrivyProvider} from "@privy-io/react-auth";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {createConfig, WagmiProvider} from "@privy-io/wagmi";
-import {mainnet, base, baseSepolia, polygon, optimism} from "viem/chains";
+import {mainnet, base, baseSepolia, polygon, optimism, sepolia} from "viem/chains";
 import {http} from "wagmi";
 import { ApolloClient, ApolloProvider, InMemoryCache, createHttpLink } from "@apollo/client";
 
@@ -50,14 +50,19 @@ export default function Providers({children}: {children: React.ReactNode}) {
           accentColor: "#f5d442",
         },
         loginMethods: ["farcaster", "email"],
+        embeddedWallets: {
+          createOnLogin: "users-without-wallets", // users-without-wallets, all-users, off
+          requireUserPasswordOnCreate: false,
+          noPromptOnSignature: false,
+        },
+        defaultChain: baseSepolia,
+        supportedChains: [baseSepolia, base, mainnet, sepolia],
       }}
     >
       <QueryClientProvider client={queryClient}>
         <WagmiProvider config={config}>
-          <ApolloProvider client={client}>
-            {children}
-          </ApolloProvider>
-          </WagmiProvider>
+          <ApolloProvider client={client}>{children}</ApolloProvider>
+        </WagmiProvider>
       </QueryClientProvider>
     </PrivyProvider>
   );
