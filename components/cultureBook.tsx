@@ -33,10 +33,7 @@ const fetchCultureBook = async (trustPoolId: string): Promise<Response> => {
 export default function CultureBook() {
   const pathname = usePathname();
   const trustPoolId = pathname.split("/")[2];
-  const queryClient = useQueryClient();
-  const {userInfo} = useUserContext()
-  const displayName = userInfo?.farcasterUsername || userInfo?.twitterUsername || userInfo?.email || "Guest";
-  
+ 
   // Queries
   const {data: cultureBook, isLoading, isError} = useQuery<Response>({
     queryKey: ["cultureBook", trustPoolId],

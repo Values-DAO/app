@@ -95,6 +95,9 @@ export interface Post {
   };
   transactionHash?: string;
   ipfsHash?: string;
+  hasPhoto: boolean;
+  photoUrl?: string;
+  phhotoFileId?: string;
 }
 
 export interface TrustPool {
