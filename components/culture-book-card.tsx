@@ -73,7 +73,7 @@ export function CultureCard({ post }: { post: Post }) {
       <ImageModal
         isOpen={isImageModalOpen}
         onClose={() => setIsImageModalOpen(false)}
-        imageUrl="https://gateway.pinata.cloud/ipfs/bafkreiboqcwf7giobg4j4g4gkix4yloddlqr7mxgj7o6e4srtxbdizma3a"
+        imageUrl={post.photoUrl!}
       />
     </>
   );
