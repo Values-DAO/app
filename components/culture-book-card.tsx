@@ -7,6 +7,7 @@ import { formatISODate } from "@/lib/utils";
 import ValueBadge from "./ui/value-badge";
 import ImageModal from "./ImageModal";
 import { useState } from "react";
+import Link from "next/link";
 
 export function CultureCard({ post }: { post: Post }) {
   // select icon according to source
@@ -44,10 +45,10 @@ export function CultureCard({ post }: { post: Post }) {
             </div>
           </div>
           <div className="flex flex-col gap-y-1 min-w-0 w-full">
-            <h2 className="font-semibold text-base truncate">{post.title}</h2>
-            <p className="font-semibold text-gray-400 text-sm line-clamp-2">
-              {post.content}
-            </p>
+            <Link href={`https://basescan.org/tx/${post.transactionHash}`}>
+              <h2 className="font-semibold text-base truncate underline cursor-pointer">{post.title}</h2>
+            </Link>
+            <p className="font-semibold text-gray-400 text-sm line-clamp-2">{post.content}</p>
             {post.hasPhoto && (
               <div
                 className="relative w-full h-64 md:h-72 overflow-hidden rounded-[18px] cursor-pointer"
@@ -70,11 +71,7 @@ export function CultureCard({ post }: { post: Post }) {
         </div>
       </div>
 
-      <ImageModal
-        isOpen={isImageModalOpen}
-        onClose={() => setIsImageModalOpen(false)}
-        imageUrl={post.photoUrl!}
-      />
+      <ImageModal isOpen={isImageModalOpen} onClose={() => setIsImageModalOpen(false)} imageUrl={post.photoUrl!} />
     </>
   );
 }
