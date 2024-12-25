@@ -35,7 +35,7 @@ const Navbar = () => {
         {pathname === "/" && <AlignmentSearchSheet buttonText="Check Alignment w/ Farcaster user" />}
 
         {/* Trustpools button with "New" badge */}
-        {pathname !== "/trustpools" && pathname !== "/" && (
+        {pathname !== "/trustpools" && (
           <Link href="/trustpools">
             <Button variant="default" className="flex items-center">
               Trust Pools
@@ -64,7 +64,7 @@ const Navbar = () => {
           </DropdownMenuTrigger>
           <DropdownMenuContent className="mr-4">
             {/* Trustpools menu item with "New" badge for mobile */}
-            {pathname !== "/trustpools" && pathname !== "/" && (
+            {pathname !== "/trustpools" && (
               <DropdownMenuItem asChild>
                 <Link href="/trustpools" className="flex items-center gap-2">
                   Trust Pools
