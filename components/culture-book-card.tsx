@@ -50,7 +50,7 @@ export function CultureCard({ post }: { post: Post }) {
             </p>
             {post.hasPhoto && (
               <div
-                className="relative w-full h-40 md:h-64 overflow-hidden rounded-[18px] cursor-pointer"
+                className="relative w-full h-64 md:h-72 overflow-hidden rounded-[18px] cursor-pointer"
                 onClick={() => setIsImageModalOpen(true)}
               >
                 <Image
