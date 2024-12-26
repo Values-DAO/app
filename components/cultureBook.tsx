@@ -43,7 +43,16 @@ export default function CultureBook() {
   const posts: Post[] = cultureBook?.posts || [];
   
   if (isError) {
-    return <div>Failed to load culture book data.</div>
+    return (
+      <div className="flex flex-col items-center justify-center h-full">
+        <div className="flex flex-col items-center gap-4">
+          <h1 className="text-2xl font-bold">ERROR 404: Trust Pool not found!</h1>
+          <p className="text-center ">
+            It looks like either you've hit the wrong route or there's an issue with the trust pool you're looking for. Please check the URL or try again later.
+          </p>
+        </div>
+      </div>
+    );
   }
   
   return (
