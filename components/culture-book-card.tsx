@@ -48,7 +48,9 @@ export function CultureCard({ post }: { post: Post }) {
             <Link href={`https://basescan.org/tx/${post.transactionHash}`}>
               <h2 className="font-semibold text-base truncate underline cursor-pointer">{post.title}</h2>
             </Link>
-            <p className="font-semibold text-gray-400 text-sm line-clamp-2">{post.content}</p>
+            <p className="font-semibold text-gray-400 text-sm break-words hyphens-auto overflow-wrap-break-word whitespace-pre-wrap">
+              {post.content}
+            </p>
             {post.hasPhoto && (
               <div
                 className="relative w-full h-64 md:h-72 overflow-hidden rounded-[18px] cursor-pointer"
