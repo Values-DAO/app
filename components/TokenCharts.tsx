@@ -96,6 +96,7 @@ export function TokenCharts({ trustPoolId }: { trustPoolId: string }) {
   const { ready, wallets } = useWallets();
   const [price, setPrice] = useState(0);
   const [totalSupply, setTotalSupply] = useState(0);
+  const {exportWallet} = usePrivy()
 
   const amountOptions = ["5", "50", "100"];
 
@@ -177,37 +178,69 @@ export function TokenCharts({ trustPoolId }: { trustPoolId: string }) {
     console.error("No wallet found");
   }
   
-  // const getActiveSupply = async () => {
-  //   try {
-  //     const provider = await embeddedWallet!.getEthereumProvider();
+  const getActiveSupply = async () => {
+    try {
+      const provider = await embeddedWallet!.getEthereumProvider();
 
-  //     const data = encodeFunctionData({
-  //       abi: bondingCurveABI,
-  //       functionName: "activeSupply",
-  //       args: [],
-  //     });
+      const data = encodeFunctionData({
+        abi: bondingCurveABI,
+        functionName: "activeSupply",
+        args: [],
+      });
 
-  //     const callRequest = {
-  //       to: tokenData.bondingCurveAddress,
-  //       data: data,
-  //     };
+      const callRequest = {
+        to: tokenData.bondingCurveAddress,
+        data: data,
+      };
 
-  //     const result = await provider.request({
-  //       method: "eth_call",
-  //       params: [callRequest, "latest"],
-  //     });
+      const result = await provider.request({
+        method: "eth_call",
+        params: [callRequest, "latest"],
+      });
 
-  //     const activeSupply = BigInt(result).toString();
-  //     console.log("Active Supply (raw):", activeSupply);
+      const activeSupply = BigInt(result).toString();
+      console.log("Active Supply (raw):", activeSupply);
 
-  //     const formattedSupply = ethers.formatUnits(activeSupply, 18); 
-  //     console.log("Formatted Active Supply:", formattedSupply);
+      const formattedSupply = ethers.formatUnits(activeSupply, 18); 
+      console.log("Formatted Active Supply:", formattedSupply);
 
-  //     return formattedSupply; 
-  //   } catch (error) {
-  //     console.error("Error getting active supply:", error);
-  //   }
-  // }
+      return formattedSupply; 
+    } catch (error) {
+      console.error("Error getting active supply:", error);
+    }
+  }
+  
+  const getMarketCap = async () => {
+    const activeSupply = await getActiveSupply();
+    const price = await getPriceOfToken();
+    
+    console.log("Price: ", price);
+    console.log("active: ", activeSupply);
+    
+    const url = "https://api.g.alchemy.com/prices/v1/tokens/by-symbol?symbols=ETH&symbols=USDC";
+    const headers = {
+      Accept: "application/json",
+      Authorization: `Bearer sCRkeELOK2UImXTjQsv3HsfyvaQ1qlIV`,
+    };
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: headers,
+    });
+
+    const data = await response.json();
+
+    const ethPriceInUsd = data.data[0].prices[0].value;
+    const usdcPriceInUsd = data.data[1].prices[0].value;
+    
+    const ethPrice = ethPriceInUsd / usdcPriceInUsd;
+    
+    console.log("ETH Price for 1 USDC:", ethPrice);
+    
+    setTotalSupply((activeSupply) * (price) * ethPrice);
+    console.log("Market Cap:", (activeSupply) * (price) * ethPrice);
+    return ((activeSupply) * (price) * ethPrice);
+  }
   
   const getTokenQty = async () => {
     try {
@@ -291,6 +324,7 @@ export function TokenCharts({ trustPoolId }: { trustPoolId: string }) {
         to: tokenData.bondingCurveAddress,
         data: data,
         value: ethers.parseEther(equivalentETH!.toString()),
+        gasLimit: 200000,
       };
       
       const transactionHash = await provider.request({
@@ -331,6 +365,7 @@ export function TokenCharts({ trustPoolId }: { trustPoolId: string }) {
       console.log("Formatted Price of Token:", formattedPrice);
       
       setPrice(Number(formattedPrice));
+      return formattedPrice;
     } catch (error) {
       console.error("Error getting price of token:", error);
     }
@@ -365,6 +400,8 @@ export function TokenCharts({ trustPoolId }: { trustPoolId: string }) {
           <div className="flex items-center gap-1">
             <span className="font-medium">${price} USDC</span>
             <Button onClick={getPriceOfToken}>Get Price</Button>
+            <Button onClick={getMarketCap}>Get Market Cap</Button>
+            <Button onClick={exportWallet}>Export Wallet</Button>
           </div>
         </div>
         <ProgressChart />
@@ -459,7 +496,7 @@ export function TokenCharts({ trustPoolId }: { trustPoolId: string }) {
           </div> */}
           <p className="text-sm text-gray-400">Graduate this coin to uniswap at $69,420 market cap.</p>
           <div className="text-sm text-gray-600">
-            <span>Current Market Cap: {totalSupply * price} USDC</span>
+            <span>Current Market Cap: {totalSupply} USDC</span>
           </div>
         </div>
       </div>
