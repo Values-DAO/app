@@ -10,9 +10,12 @@ import { useUserContext } from "@/providers/user-context-provider";
 import { CultureBookSkeletonCard } from "./culture-book-skeleton-card";
 import { CultureCard } from "./culture-book-card";
 import type { Post } from "@/types";
+import Link from "next/link";
 
 interface Response {
   posts: Post[];
+  trustPoolName: string;
+  telegramChannel: string;
   ticker: string;
   tokenPrice: number;
 }
@@ -30,10 +33,7 @@ const fetchCultureBook = async (trustPoolId: string): Promise<Response> => {
 export default function CultureBook() {
   const pathname = usePathname();
   const trustPoolId = pathname.split("/")[2];
-  const queryClient = useQueryClient();
-  const {userInfo} = useUserContext()
-  const displayName = userInfo?.farcasterUsername || userInfo?.twitterUsername || userInfo?.email || "Guest";
-  
+ 
   // Queries
   const {data: cultureBook, isLoading, isError} = useQuery<Response>({
     queryKey: ["cultureBook", trustPoolId],
@@ -43,7 +43,16 @@ export default function CultureBook() {
   const posts: Post[] = cultureBook?.posts || [];
   
   if (isError) {
-    return <div>Failed to load culture book data.</div>
+    return (
+      <div className="flex flex-col items-center justify-center h-full">
+        <div className="flex flex-col items-center gap-4">
+          <h1 className="text-2xl font-bold">ERROR 404: Trust Pool not found!</h1>
+          <p className="text-center ">
+            It looks like either you've hit the wrong route or there's an issue with the trust pool you're looking for. Please check the URL or try again later.
+          </p>
+        </div>
+      </div>
+    );
   }
   
   return (
@@ -71,6 +80,30 @@ export default function CultureBook() {
                 culture and post it here.
               </p>
             </div>
+          </div>
+        )}
+        {/* {!isLoading && (
+          <div>
+            <div>
+              {cultureBook?.trustPoolName && (
+                <div>
+                  <h1 className="text-2xl font-">{cultureBook.trustPoolName}</h1>
+                </div>
+              )}
+            </div>
+            <div>
+              {posts.map((post) => (
+                <CultureCard key={post._id.toString()} post={post} />
+              ))}
+            </div>
+          </div>
+        )} */}
+        {!isLoading && posts.length !== 0 && (
+          <div className="px-4 gap-x-3 flex items-center ">
+            <h1 className="text-2xl font-semibold">{cultureBook?.trustPoolName || "Loading..."}</h1>
+            <a href={cultureBook?.telegramChannel}>
+              <Image src="/telegram.png" alt="Telegram" height={30} width={30} />
+            </a>
           </div>
         )}
         {!isLoading && posts.map((post) => <CultureCard key={post._id.toString()} post={post} />)}

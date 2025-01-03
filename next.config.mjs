@@ -11,11 +11,26 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "*",
+        hostname: "*", // This allows all external image hosts (wildcard)
         port: "",
         pathname: "/**",
       },
     ],
+  },
+  async headers() {
+    return [
+      {
+        source: "/(.*)", // Apply to all routes
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            value: `
+              img-src * blob: data:;
+            `.trim(),
+          },
+        ],
+      },
+    ];
   },
 };
 

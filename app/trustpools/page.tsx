@@ -68,6 +68,7 @@ export default function Home() {
   const { userInfo } = useUserContext();
   const queryClient = useQueryClient();
   const [isMobile, setIsMobile] = useState(false);
+  const {authenticated} = usePrivy()
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -409,7 +410,12 @@ export default function Home() {
                   <Button type="button" variant="outline" onClick={() => setIsFormVisible(false)}>
                     Cancel
                   </Button>
-                  <Button type="submit">Create Trust Pool</Button>
+                  <Button type="submit" disabled={!authenticated}>Create Trust Pool</Button>
+                  {!authenticated && (
+                    <div className="flex items-center text-muted-foreground ml-2">
+                      Please Log In to create a Trust Pool
+                    </div>
+                  )}
                 </div>
               </form>
             </Form>
