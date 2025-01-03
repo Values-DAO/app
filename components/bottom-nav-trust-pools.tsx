@@ -42,7 +42,7 @@ export default function BottomNav() {
           <ChartSpline className="h-5 w-5" />
           <span className="text-xs mt-1">Charts</span>
         </Link>
-        <Link
+        {/* <Link
           href="curate"
           className={cn(
             "flex flex-col items-center justify-center flex-1 h-full",
@@ -51,7 +51,7 @@ export default function BottomNav() {
         >
           <FileCheck2 className="h-5 w-5" />
           <span className="text-xs mt-1">Curate</span>
-        </Link>
+        </Link> */}
         <Link
           href="culture"
           className={cn(

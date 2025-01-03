@@ -16,6 +16,8 @@ import { useInitialisedEvents } from "@/lib/utils";
 import { encodeFunctionData, erc20Abi } from "viem";
 import {readContract} from "@wagmi/core"
 import { config } from "@/contracts/config";
+import { bondingCurveABI } from "@/contracts/bondingCurveABI";
+import { ethers } from "ethers";
 
 
 interface HistoryEntry {
@@ -27,6 +29,8 @@ interface HistoryEntry {
 interface TokenData {
   tokenName: string;
   tokenSymbol: string;
+  tokenAddress: string;
+  bondingCurveAddress: string;
 }
 
 const historyData: HistoryEntry[] = [
@@ -92,9 +96,8 @@ export function TokenCharts({ trustPoolId }: { trustPoolId: string }) {
   const { ready, wallets } = useWallets();
   const [price, setPrice] = useState(0);
   const [totalSupply, setTotalSupply] = useState(0);
-  const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === "privy");
 
-  const amountOptions = ["50", "500", "1000"];
+  const amountOptions = ["5", "50", "100"];
 
   // Queries
   const {
@@ -123,36 +126,36 @@ export function TokenCharts({ trustPoolId }: { trustPoolId: string }) {
   //   queryKey: ["tokenTotalSupply", trustPoolId],
   //   queryFn: () => fetchTokenTotalSupply({ trustPoolId }),
   // });
-  const { initialisedEvents, loading, error: error } = useInitialisedEvents();
+  // const { initialisedEvents, loading, error: error } = useInitialisedEvents();
   
-  const getTokenTotalSupply = async () => {
-    // @ts-ignore
-    const address = initialisedEvents[0].createdTokenAddy;
-    const result = await readContract(config, {
-      abi: erc20Abi,
-      address,
-      functionName: "totalSupply",
-    });
-    console.log("Total Supply: ", result);
-    setTotalSupply(Number(result));
-  };
+  // const getTokenTotalSupply = async () => {
+  //   // @ts-ignore
+  //   const address = initialisedEvents[0].createdTokenAddy;
+  //   const result = await readContract(config, {
+  //     abi: erc20Abi,
+  //     address,
+  //     functionName: "totalSupply",
+  //   });
+  //   console.log("Total Supply: ", result);
+  //   setTotalSupply(Number(result));
+  // };
   
-  const getTokenPrice = async () => {
-    const communityId = initialisedEvents[0].communityId;
-    const result = await readContract(config, {
-      abi: ABI,
-      address: factoryAddress,
-      functionName: "price",
-      args: [communityId],
-    }); 
-    console.log("Price: ", Number(result) / 10 ** 9);
-    setPrice(Number(result)/10**9);
-  }
+  // const getTokenPrice = async () => {
+  //   const communityId = initialisedEvents[0].communityId;
+  //   const result = await readContract(config, {
+  //     abi: ABI,
+  //     address: factoryAddress,
+  //     functionName: "price",
+  //     args: [communityId],
+  //   }); 
+  //   console.log("Price: ", Number(result) / 10 ** 9);
+  //   setPrice(Number(result)/10**9);
+  // }
   
-  useEffect(() => {
-    getTokenPrice();
-    getTokenTotalSupply();
-  })
+  // useEffect(() => {
+  //   getTokenPrice();
+  //   getTokenTotalSupply();
+  // })
 
   
 
@@ -164,42 +167,178 @@ export function TokenCharts({ trustPoolId }: { trustPoolId: string }) {
     return <div>Error loading token data</div>;
   }
 
+  let embeddedWallet = wallets.find((wallet) => wallet.walletClientType === "privy");
+  
+  if (!embeddedWallet) {
+    embeddedWallet = wallets[0];
+  }
+
+  if (!embeddedWallet) {
+    console.error("No wallet found");
+  }
+  
+  // const getActiveSupply = async () => {
+  //   try {
+  //     const provider = await embeddedWallet!.getEthereumProvider();
+
+  //     const data = encodeFunctionData({
+  //       abi: bondingCurveABI,
+  //       functionName: "activeSupply",
+  //       args: [],
+  //     });
+
+  //     const callRequest = {
+  //       to: tokenData.bondingCurveAddress,
+  //       data: data,
+  //     };
+
+  //     const result = await provider.request({
+  //       method: "eth_call",
+  //       params: [callRequest, "latest"],
+  //     });
+
+  //     const activeSupply = BigInt(result).toString();
+  //     console.log("Active Supply (raw):", activeSupply);
+
+  //     const formattedSupply = ethers.formatUnits(activeSupply, 18); 
+  //     console.log("Formatted Active Supply:", formattedSupply);
+
+  //     return formattedSupply; 
+  //   } catch (error) {
+  //     console.error("Error getting active supply:", error);
+  //   }
+  // }
+  
+  const getTokenQty = async () => {
+    try {
+      const provider = await embeddedWallet!.getEthereumProvider();
+      
+      const data = encodeFunctionData({
+        abi: bondingCurveABI,
+        functionName: "calculateCoinAmountOnUSDAmt",
+        args: [
+          amount,
+        ]
+      })
+        
+      const transactionRequest = {
+        to: tokenData.bondingCurveAddress,
+        data: data,
+      }
+      
+      const result = await provider.request({
+        method: "eth_call",
+        params: [transactionRequest, "latest"],
+      })
+      
+      const tokenQty = BigInt(result).toString(); 
+      console.log("Token Quantity (raw):", tokenQty);
+
+      return tokenQty;
+    } catch (error) {
+      console.error("Error getting token quantity:", error);
+    }
+  }
+  
+  const getEquivalentETH = async () => {
+    try {
+      const url = "https://api.g.alchemy.com/prices/v1/tokens/by-symbol?symbols=ETH&symbols=USDC";
+      const headers = {
+        Accept: "application/json",
+        Authorization: `Bearer sCRkeELOK2UImXTjQsv3HsfyvaQ1qlIV`,
+      };
+
+      const response = await fetch(url, {
+        method: "GET",
+        headers: headers,
+      })
+      
+      const data = await response.json();
+        
+      const ethPriceInUsd = data.data[0].prices[0].value;
+      const usdcPriceInUsd = data.data[1].prices[0].value;
+      
+      const ethPrice = ethPriceInUsd / usdcPriceInUsd;
+      
+      const equivalentETH = Number(amount) / ethPrice;
+      
+      console.log("Equivalent ETH:", equivalentETH);
+      
+      return equivalentETH;
+    } catch (error) {
+      console.error("Error getting equivalent ETH:", error);
+    }
+  }
+  
+  
   const handleBuy = async () => {
-    await embeddedWallet!.switchChain(84532);
-    const provider = await embeddedWallet!.getEthereumProvider();
-    const communityId = initialisedEvents[0].communityId; // TODO: Fix this omg
-
-    const data = encodeFunctionData({
-      abi: ABI,
-      functionName: "mint",
-      args: [amount, communityId],
-    });
-
-    const transactionRequest = {
-      to: factoryAddress,
-      data: data,
-      value: "0x0",
-    };
-    const transactionHash = await provider.request({
-      method: "eth_sendTransaction",
-      params: [transactionRequest],
-    });
-
-    console.log(transactionHash);
-
-    const response = await axios.post(`${API_BASE_URL}/cultureToken/buy`, {
-      trustPoolId,
-      amount,
-      userId: userInfo?.userId,
-    });
-
-    if (response.status === 200) {
-      console.log("Successfully bought tokens");
-      // queryClient.invalidateQueries(["userTxHistory", trustPoolId]);
-    } else {
-      console.error("Error buying tokens:", response.data);
+    try {
+      const provider = await embeddedWallet!.getEthereumProvider();
+      
+      const equivalentETH = await getEquivalentETH();
+      const tokenQty = await getTokenQty();
+      
+      const data = encodeFunctionData({
+        abi: bondingCurveABI,
+        functionName: "buyToken",
+        args: [
+          tokenData.tokenAddress,
+          tokenQty
+        ],
+      })
+      
+      const transactionRequest = {
+        to: tokenData.bondingCurveAddress,
+        data: data,
+        value: ethers.parseEther(equivalentETH!.toString()),
+      };
+      
+      const transactionHash = await provider.request({
+        method: "eth_sendTransaction",
+        params: [transactionRequest],
+      });
+      
+      console.log("Transaction Hash: ", transactionHash);
+    } catch (error) {
+      console.error("Error buying tokens:", error);
     }
   };
+  
+  const getPriceOfToken = async () => {
+    try {
+      const provider = await embeddedWallet!.getEthereumProvider();
+      
+      const data = encodeFunctionData({
+        abi: bondingCurveABI,
+        functionName: "getCurrentPrice",
+        args: [],
+      });
+      
+      const transactionRequest = {
+        to: tokenData.bondingCurveAddress,
+        data: data,
+      };
+      
+      const result = await provider.request({
+        method: "eth_call",
+        params: [transactionRequest, "latest"],
+      });
+      
+      const price = BigInt(result).toString();
+      console.log("Price of Token (raw):", price);
+      
+      const formattedPrice = ethers.formatUnits(price, 18);
+      console.log("Formatted Price of Token:", formattedPrice);
+      
+      setPrice(Number(formattedPrice));
+    } catch (error) {
+      console.error("Error getting price of token:", error);
+    }
+  }
+  
+  // useEffect(() => {
+  //   getPriceOfToken();
+  // }, []);
 
   const handleEarn = async () => {
     const response = await axios.post(`${API_BASE_URL}/cultureToken/earn`, {
@@ -225,6 +364,7 @@ export function TokenCharts({ trustPoolId }: { trustPoolId: string }) {
           <h1 className="text-2xl font-bold mb-6">${tokenData.tokenSymbol}</h1>
           <div className="flex items-center gap-1">
             <span className="font-medium">${price} USDC</span>
+            <Button onClick={getPriceOfToken}>Get Price</Button>
           </div>
         </div>
         <ProgressChart />

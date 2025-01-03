@@ -158,7 +158,7 @@ export default function Home() {
             "0x78db1057A9A1102C3E831E5086B75E9a58e7730c",
             "0x78db1057A9A1102C3E831E5086B75E9a58e7730c",
           ],
-          [5000000000, 4000000000, 1000000000],
+          [5000000000000000000000000000, 4000000000000000000000000000, 1000000000000000000000000000], // 5B, 4B, 1B
         ],
       });
       
@@ -185,6 +185,9 @@ export default function Home() {
       );
 
       console.log("Receipt:", receipt);
+      
+      let tokenAddress = "";
+      let bondingCurveAddress = "";
 
       if (initialisedLog) {
         // Decode the event log to extract token details
@@ -195,12 +198,17 @@ export default function Home() {
           topics: initialisedLog.topics,
         });
         console.log(decoded)
+        
+        tokenAddress = decoded.args?.tokenAddress
+        bondingCurveAddress = decoded.args?.bondingCurveAddress;
       } else {
         console.log("No log found");
       }
 
       const response = await axios.post(`${API_BASE_URL}/trustpools/new`, {
         ...values,
+        tokenAddress,
+        bondingCurveAddress,
         userId: userInfo?.userId,
       });
 

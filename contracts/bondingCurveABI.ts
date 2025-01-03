@@ -452,3 +452,4 @@ export const bondingCurveABI = [
   },
 ];
 
+const bondingCurveAddress = ""
