@@ -33,4 +33,4 @@ export const factoryABI = [
   },
 ];
 
-export const factoryContractAddress = "0x5F695228a952348a090bFe9FfC3080a52EC3a761";
+export const factoryContractAddress = "0x9e3b27C397948b56E93878b05C6106CB22144677";

@@ -6,7 +6,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,19 +13,16 @@ import { TrustPoolCardSkeleton } from "@/components/TrustPoolCardSkeleton";
 import { TrustPoolCard } from "@/components/TrustPoolCard";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { API_BASE_URL } from "@/constants";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useUserContext } from "@/providers/user-context-provider";
 import { formSchema} from "@/lib/utils";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
-import { createPublicClient, decodeEventLog, encodeAbiParameters, encodeFunctionData, http, keccak256, parseAbiParameters, toHex } from "viem";
-import { baseSepolia } from "viem/chains";
-import { factoryABI, factoryContractAddress } from "@/contracts/factoryABI";
 import { waitForTransactionReceipt } from "viem/actions";
 import { viemPublicClient } from "@/providers/privy-provider";
+import { encodeCreateTokenData, getProvider, getWallet } from "@/lib/contractUtils";
+import { callForCreateToken, getDecodedLogsForCreateToken } from "@/lib/services/blockchain";
+import { createNewTrustPool } from "@/lib/actions/trustpool.actions";
 
-
-// TODO: Update this when making the token functionality working
 interface TrustPool {
   _id: string;
   name: string;
@@ -130,97 +126,36 @@ export default function Home() {
     },
   });
   
-  const { ready: walletsReady, wallets } = useWallets();
-  let embeddedWallet = wallets.find((wallet) => wallet.walletClientType === "privy");
-  
-  if (!embeddedWallet) {
-    embeddedWallet = wallets[0];
-  }
-  
-  if (!embeddedWallet) {
-    console.error("No wallet found");
-  }
+  const { ready, wallets } = useWallets();
+  const [embeddedWallet, setEmbeddedWallet] = useState<ReturnType<typeof getWallet> | null>(null);
+
+  useEffect(() => {
+    if (ready) {
+      setEmbeddedWallet(getWallet(wallets));
+    }
+  }, [ready, wallets]);
   
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      // Token Creation Logic
-      const provider = await embeddedWallet!.getEthereumProvider();
-      
-      const data = encodeFunctionData({
-        abi: factoryABI,
-        functionName: "initialiseToken",
-        args: [
-          values.tokenName,
-          values.tokenSymbol,
-          values.description, // same description as trust pool
-          [
-            values.curatorTreasuryAllocation,
-            "0x78db1057A9A1102C3E831E5086B75E9a58e7730c",
-            "0x78db1057A9A1102C3E831E5086B75E9a58e7730c",
-          ],
-          [5000000000000000000000000000, 4000000000000000000000000000, 1000000000000000000000000000], // 5B, 4B, 1B
-        ],
+      const provider = await getProvider(embeddedWallet);
+      const encodedData = await encodeCreateTokenData({
+        tokenName: values.tokenName,
+        tokenSymbol: values.tokenSymbol,
+        description: values.description || values.tokenName,
+        curatorTreasuryAllocation: values.curatorTreasuryAllocation,
       });
-      
-      const transactionRequest = {
-        to: factoryContractAddress,
-        data: data,
-        value: "0x0",
-      };
-      
-      const transactionHash = await provider.request({
-        method: "eth_sendTransaction",
-        params: [transactionRequest],
-
-      });
-
-      console.log("transaction hash:", transactionHash);
-
+      const transactionHash = await callForCreateToken(provider, encodedData);
+      console.log("Transaction hash:", transactionHash);
       const receipt = await waitForTransactionReceipt(viemPublicClient, { hash: transactionHash });
-
-      await new Promise((resolve) => setTimeout(resolve, 1990));
-
-      const initialisedLog = receipt.logs.find((log) =>
-        log.topics.some((topic) => topic === keccak256(toHex("TokenCreated(address,string,string,address,address)")))
-      );
-
-      console.log("Receipt:", receipt);
-      
-      let tokenAddress = "";
-      let bondingCurveAddress = "";
-
-      if (initialisedLog) {
-        // Decode the event log to extract token details
-        const decoded = decodeEventLog({
-          abi: factoryABI,
-          eventName: "Initialised",
-          data: initialisedLog.data,
-          topics: initialisedLog.topics,
-        });
-        console.log(decoded)
-        
-        tokenAddress = decoded.args?.tokenAddress
-        bondingCurveAddress = decoded.args?.bondingCurveAddress;
-      } else {
-        console.log("No log found");
-      }
-
-      const response = await axios.post(`${API_BASE_URL}/trustpools/new`, {
-        ...values,
-        tokenAddress,
-        bondingCurveAddress,
-        userId: userInfo?.userId,
-      });
-
-      if (response.data) {
-        router.push(`/trustpools/${response.data.data._id}`);
-        await queryClient.invalidateQueries({ queryKey: ["trustPools"] });
-      }
+      const decodedLogs = await getDecodedLogsForCreateToken(receipt);
+      const newTrustPoolId = await createNewTrustPool(values, decodedLogs, userInfo?.userId!);
+      router.push(`/trustpools/${newTrustPoolId}`);
+      await queryClient.invalidateQueries({ queryKey: ["trustPools"] });
     } catch (error) {
       console.error("Error creating trust pool:", error);
     }
   } 
-  
+
   const handleRedirect = (id: string) => {
     router.push(`/trustpools/${id}`);
   }
@@ -418,7 +353,7 @@ export default function Home() {
                   <Button type="button" variant="outline" onClick={() => setIsFormVisible(false)}>
                     Cancel
                   </Button>
-                  <Button type="submit" disabled={!authenticated}>Create Trust Pool</Button>
+                  <Button type="submit" disabled={!authenticated}>{"Create Trust Pool"}</Button>
                   {!authenticated && (
                     <div className="flex items-center text-muted-foreground ml-2">
                       Please Log In to create a Trust Pool

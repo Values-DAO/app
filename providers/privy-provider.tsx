@@ -26,15 +26,15 @@ export const config = createConfig({
   },
 });
 
+// ! Enable this for subgraph and put the provider
+// const httpLink = createHttpLink({
+//   uri: "https://api.studio.thegraph.com/query/58232/valuesdaolatest/version/latest", // Replace with your actual subgraph endpoint
+// });
 
-const httpLink = createHttpLink({
-  uri: "https://api.studio.thegraph.com/query/58232/valuesdaolatest/version/latest", // Replace with your actual subgraph endpoint
-});
-
-const client = new ApolloClient({
-  link: httpLink,
-  cache: new InMemoryCache(),
-});
+// const client = new ApolloClient({
+//   link: httpLink,
+//   cache: new InMemoryCache(),
+// });
 
 
 
@@ -61,7 +61,7 @@ export default function Providers({children}: {children: React.ReactNode}) {
     >
       <QueryClientProvider client={queryClient}>
         <WagmiProvider config={config}>
-          <ApolloProvider client={client}>{children}</ApolloProvider>
+          {children}
         </WagmiProvider>
       </QueryClientProvider>
     </PrivyProvider>

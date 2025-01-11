@@ -115,6 +115,23 @@ export interface TrustPool {
   cultureBotCommunity: Schema.Types.ObjectId;
 }
 
+export interface TokenData {
+  tokenName: string;
+  tokenSymbol: string;
+  tokenAddress: string;
+  description: string;
+  bondingCurveAddress: string;
+  price: number;
+  marketCap: number;
+  weeksSinceCreation: number;
+}
+
+export interface UserTokenData {
+  transactionHistory: any;
+  tokenBalance: string;
+  num: string
+}
+
 export interface ipfsResponse {
   IpfsHash: string;
   PinSize: number;

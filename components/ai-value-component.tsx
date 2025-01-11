@@ -212,7 +212,7 @@ const WarpcastTab = ({
           </AlertDescription>
         </Alert>
       )}
-      {userInfo && userInfo.generatedValues.warpcast.length === 0 && (
+      {userInfo && userInfo.generatedValues?.warpcast.length === 0 && (
         <div className="w-full flex flex-col gap-4 items-center">
           <h4 className="scroll-m-20 text-md md:text-xl font-medium tracking-tight">
             Generate your Values from your Warpcast data
@@ -244,7 +244,7 @@ const WarpcastTab = ({
       )}
 
       {userInfo &&
-        Object.keys(userInfo.generatedValuesWithWeights.warpcast).length >
+        Object.keys(userInfo.generatedValuesWithWeights?.warpcast).length >
         0 && (
           <div className="w-full flex flex-col gap-4">
             {userInfo &&

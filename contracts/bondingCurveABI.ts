@@ -76,14 +76,84 @@ export const bondingCurveABI = [
   },
   {
     type: "function",
-    name: "addressToTokenMapping",
+    name: "buyToken",
     inputs: [
       {
-        name: "",
-        type: "address",
-        internalType: "address",
+        name: "usdAmount",
+        type: "uint32",
+        internalType: "uint32",
       },
     ],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    stateMutability: "payable",
+  },
+  {
+    type: "function",
+    name: "calculateCoinAmountOnUSDAmt",
+    inputs: [
+      {
+        name: "purchaseAmountInUsd",
+        type: "uint32",
+        internalType: "uint32",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "calculateCost",
+    inputs: [
+      {
+        name: "tokensToBuy",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "calculateRequiredEthForUsd",
+    inputs: [
+      {
+        name: "usdAmount",
+        type: "uint32",
+        internalType: "uint32",
+      },
+    ],
+    outputs: [
+      {
+        name: "requiredEth",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "communityCoinDeets",
+    inputs: [],
     outputs: [
       {
         name: "name",
@@ -122,97 +192,6 @@ export const bondingCurveABI = [
       },
     ],
     stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "buyToken",
-    inputs: [
-      {
-        name: "tokenAddress",
-        type: "address",
-        internalType: "address",
-      },
-      {
-        name: "tokenQty",
-        type: "uint256",
-        internalType: "uint256",
-      },
-    ],
-    outputs: [
-      {
-        name: "",
-        type: "uint256",
-        internalType: "uint256",
-      },
-    ],
-    stateMutability: "payable",
-  },
-  {
-    type: "function",
-    name: "calculateCoinAmountOnUSDAmt",
-    inputs: [
-      {
-        name: "purchaseAmountInUsd",
-        type: "uint32",
-        internalType: "uint32",
-      },
-    ],
-    outputs: [
-      {
-        name: "",
-        type: "uint256",
-        internalType: "uint256",
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "calculateCost",
-    inputs: [
-      {
-        name: "_activeSupply",
-        type: "uint256",
-        internalType: "uint256",
-      },
-      {
-        name: "tokensToBuy",
-        type: "uint256",
-        internalType: "uint256",
-      },
-    ],
-    outputs: [
-      {
-        name: "",
-        type: "uint256",
-        internalType: "uint256",
-      },
-    ],
-    stateMutability: "pure",
-  },
-  {
-    type: "function",
-    name: "calculateTokensForEth",
-    inputs: [
-      {
-        name: "_activeSupply",
-        type: "uint256",
-        internalType: "uint256",
-      },
-      {
-        name: "ethAmount",
-        type: "uint256",
-        internalType: "uint256",
-      },
-    ],
-    outputs: [
-      {
-        name: "tokenQuantity",
-        type: "uint256",
-        internalType: "uint256",
-      },
-    ],
-    stateMutability: "pure",
   },
   {
     type: "function",
@@ -278,6 +257,73 @@ export const bondingCurveABI = [
   },
   {
     type: "function",
+    name: "onERC721Received",
+    inputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "",
+        type: "bytes",
+        internalType: "bytes",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "bytes4",
+        internalType: "bytes4",
+      },
+    ],
+    stateMutability: "pure",
+  },
+  {
+    type: "function",
+    name: "owner",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "renounceOwnership",
+    inputs: [],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "transferOwnership",
+    inputs: [
+      {
+        name: "newOwner",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
     name: "v3Interface",
     inputs: [],
     outputs: [
@@ -288,6 +334,25 @@ export const bondingCurveABI = [
       },
     ],
     stateMutability: "view",
+  },
+  {
+    type: "event",
+    name: "OwnershipTransferred",
+    inputs: [
+      {
+        name: "previousOwner",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+      {
+        name: "newOwner",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+    ],
+    anonymous: false,
   },
   {
     type: "event",
@@ -342,6 +407,24 @@ export const bondingCurveABI = [
         indexed: false,
         internalType: "uint256",
       },
+      {
+        name: "currentTokenPrice",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+      {
+        name: "currentTokenSupply",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+      {
+        name: "fundingRaised",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
     ],
     anonymous: false,
   },
@@ -367,11 +450,6 @@ export const bondingCurveABI = [
   },
   {
     type: "error",
-    name: "CBP__InvalidPoolConfiguration",
-    inputs: [],
-  },
-  {
-    type: "error",
     name: "CBP__InvalidTokenAddress",
     inputs: [],
   },
@@ -379,6 +457,28 @@ export const bondingCurveABI = [
     type: "error",
     name: "CBP__SupplyCapExceededAlready",
     inputs: [],
+  },
+  {
+    type: "error",
+    name: "OwnableInvalidOwner",
+    inputs: [
+      {
+        name: "owner",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+  },
+  {
+    type: "error",
+    name: "OwnableUnauthorizedAccount",
+    inputs: [
+      {
+        name: "account",
+        type: "address",
+        internalType: "address",
+      },
+    ],
   },
   {
     type: "error",
@@ -451,5 +551,3 @@ export const bondingCurveABI = [
     ],
   },
 ];
-
-const bondingCurveAddress = ""

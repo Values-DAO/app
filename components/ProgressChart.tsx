@@ -1,96 +1,61 @@
-"use client";
-import { Line, LineChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import React from "react";
+import { ComposedChart, Bar, XAxis, YAxis, Scatter, CartesianGrid, ResponsiveContainer, Line } from "recharts";
 
 const data = [
-  { day: "M", submissions: 6, purchase: 500 },
-  { day: "T", submissions: 4, purchase: 800 },
-  { day: "W", submissions: 4, purchase: 1000 },
-  { day: "T", submissions: 8, purchase: 1400 },
-  { day: "F", submissions: 10, purchase: 1600 },
-  { day: "S", submissions: 7, purchase: 1700 },
-  { day: "S", submissions: 7, purchase: 1900 },
+  { day: "M", submissions: 6, low: 2, high: 4, open: 2, close: 4, value: [2, 4] },
+  { day: "T", submissions: 5, low: 4, high: 8, open: 4, close: 7, value: [4, 7] },
+  { day: "W", submissions: 4, low: 5, high: 10, open: 5, close: 9, value: [5, 9] },
+  { day: "T", submissions: 7, low: 7, high: 13, open: 7, close: 12, value: [7, 12] },
+  { day: "F", submissions: 10, low: 8, high: 15, open: 8, close: 14, value: [8, 14] },
+  { day: "S", submissions: 6, low: 9, high: 17, open: 9, close: 16, value: [9, 16] },
+  { day: "S", submissions: 6, low: 10, high: 19, open: 10, close: 18, value: [10, 18] },
 ];
 
-export function ProgressChart() {
+const CustomBar = (props) => {
+  const { x, y, width, height, fill } = props;
+
+  return <rect x={x - width / 2} y={y} width={width} height={Math.max(height, 0)} fill={fill} />;
+};
+
+const CandlestickChart = () => {
   return (
-    <div className="h-[300px] w-full">
+    <div className="w-full h-96 bg-white p-4 rounded-lg shadow-sm">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart
-          data={data}
-          margin={{
-            top: 20,
-            right: 40, // Increased right margin for better spacing
-            left: 20, // Increased left margin
-            bottom: 20, // Increased bottom margin
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" vertical={false} horizontal={true} />
-
-          <XAxis
-            dataKey="day"
-            axisLine={false}
-            tickLine={false}
-            tick={{ fill: "#666" }}
-            padding={{ left: 20, right: 20 }} // Added padding to prevent cutting off labels
-          />
-
-          <YAxis
-            yAxisId="left"
-            width={60} // Explicit width to prevent overlapping
-            domain={[0, "auto"]}
-            axisLine={false}
-            tickLine={false}
-            tick={{ fill: "#666" }}
-            label={{
-              value: "Submissions",
-              angle: -90,
-              position: "insideLeft",
-              offset: 10, // Added offset to prevent overlapping
-              style: { textAnchor: "middle" },
-            }}
-          />
-
+        <ComposedChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" vertical={false} />
+          <XAxis dataKey="day" scale="point" padding={{ left: 10, right: 10 }} />
+          <YAxis yAxisId="left" orientation="left" domain={[0, 20]} tickCount={5} />
           <YAxis
             yAxisId="right"
             orientation="right"
-            width={70} // Explicit width to prevent overlapping
-            domain={[0, "auto"]}
+            domain={[0, 1000]}
             tickFormatter={(value) => `$${value}`}
-            axisLine={false}
-            tickLine={false}
-            tick={{ fill: "#666" }}
-            label={{
-              value: "Purchase",
-              angle: 90,
-              position: "insideRight",
-              offset: 10, // Added offset to prevent overlapping
-              style: { textAnchor: "middle" },
-            }}
+            tickCount={5}
           />
 
-          <Tooltip />
+          {/* Candlestick body */}
+          {data.map((entry, index) => (
+            <Bar
+              key={`bar-${index}`}
+              yAxisId="left"
+              dataKey="value"
+              shape={<CustomBar />}
+              fill="#22c55e"
+              stroke="#22c55e"
+              barSize={10}
+            />
+          ))}
 
-          <Legend
-            verticalAlign="bottom"
-            content={({ payload }) => (
-              <div className="flex gap-4 justify-center mt-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-black" />
-                  <span>Submissions</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-emerald-400" />
-                  <span>Purchase</span>
-                </div>
-              </div>
-            )}
-          />
+          {/* High-low lines */}
+          <Line yAxisId="left" dataKey="high" stroke="#22c55e" dot={false} isAnimationActive={false} />
+          <Line yAxisId="left" dataKey="low" stroke="#22c55e" dot={false} isAnimationActive={false} />
 
-          <Line yAxisId="left" dataKey="submissions" stroke="#000" strokeWidth={2} dot={true} />
-
-          <Line yAxisId="right" dataKey="purchase" stroke="#10B981" strokeWidth={2} dot={true} />
-        </LineChart>
+          {/* Scatter plot for submissions */}
+          <Scatter yAxisId="left" dataKey="submissions" fill="#000000" radius={6} />
+        </ComposedChart>
       </ResponsiveContainer>
     </div>
   );
-}
+};
+
+export default CandlestickChart;

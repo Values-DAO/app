@@ -44,7 +44,7 @@ export default function CultureBook() {
   
   if (isError) {
     return (
-      <div className="flex flex-col items-center justify-center h-full">
+      <div className="flex flex-col items-center justify-center h-full p-4">
         <div className="flex flex-col items-center gap-4">
           <h1 className="text-2xl font-bold">ERROR 404: Trust Pool not found!</h1>
           <p className="text-center ">
@@ -72,7 +72,7 @@ export default function CultureBook() {
           </>
         )}
         {!isLoading && posts.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full">
+          <div className="flex flex-col items-center justify-center h-full p-4">
             <div className="flex flex-col items-center gap-4">
               <h1 className="text-2xl font-bold">No posts yet</h1>
               <p className="text-center ">
