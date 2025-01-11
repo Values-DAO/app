@@ -55,7 +55,12 @@ export function TokenHistory({ userTokenData, isLoading }: { userTokenData: User
     <div>
       <h3 className="text-2xl font-semibold tracking-wide mb-3">History</h3>
       <div className="space-y-4">
-        {userTokenData?.transactionHistory.map((entry, index) => (
+        {userTokenData?.transactionHistory.length === 0 && (
+          <div className="bg-white rounded-2xl p-4 flex items-center gap-3 shadow-md">
+            <p className="text-lg font-medium">No transactions yet!</p>
+          </div>
+        )}
+        {userTokenData?.transactionHistory.reverse().map((entry, index) => (
           <HistoryItem key={index} entry={entry} />
         ))}
       </div>

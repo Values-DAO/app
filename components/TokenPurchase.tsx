@@ -5,7 +5,7 @@ import { Button } from "./ui/button";
 import { encodeBuyTokenData, encodeValueData, getProvider } from "@/lib/contractUtils";
 import { buyToken, fetchETHValue } from "@/lib/services/blockchain";
 import { formatSupply } from "@/lib/utils";
-import { getNewTokenPriceAndMarketCap, updateTokenPriceAndMarketCap, updateUserTransactionHistory } from "@/lib/actions/token.actions";
+import { getNewTokenPriceAndMarketCap, updateChartPrices, updateTokenPriceAndMarketCap, updateUserTransactionHistory } from "@/lib/actions/token.actions";
 import { useQueryClient } from "@tanstack/react-query";
 
 export function TokenPurchase({ tokenData, embeddedWallet, userInfo, setPrice, setMarketCap, isLoading }: { tokenData: any; embeddedWallet: any; userInfo: any; setPrice: any; setMarketCap: any; isLoading: boolean }) {
@@ -21,13 +21,20 @@ export function TokenPurchase({ tokenData, embeddedWallet, userInfo, setPrice, s
       const formattedValue = formatSupply(rawValue);
       const encodedBuyData = encodeBuyTokenData(amount!);
       const { result, decodedLogs } = await buyToken(provider, encodedBuyData, tokenData, Number(formattedValue));
+      
       console.log("Transaction Hash:", result);
       console.log("Decoded Logs:", decodedLogs);
+      
       const { newTokenPriceInETH, newMarketCapInETH } = await getNewTokenPriceAndMarketCap(decodedLogs);
+      
       setPrice(newTokenPriceInETH);
-      setMarketCap(newMarketCapInETH); // @ts-ignore
+      setMarketCap(newMarketCapInETH); 
+      
+      // @ts-ignore
       await updateTokenPriceAndMarketCap(newTokenPriceInETH, newMarketCapInETH, decodedLogs?.args?.token); // @ts-ignore
-      await updateUserTransactionHistory(userInfo?.userId!, decodedLogs?.args?.token, amount, decodedLogs?.args?.amount);
+      await updateUserTransactionHistory(userInfo?.userId!, decodedLogs?.args?.token, amount, decodedLogs?.args?.amount); // @ts-ignore
+      await updateChartPrices(newTokenPriceInETH, newMarketCapInETH, decodedLogs?.args?.token);
+      
       await queryClient.invalidateQueries({ queryKey: ["userData", userInfo?.userId] });
     } catch (error) {
       console.error("Error buying tokens:", error);

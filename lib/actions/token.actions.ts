@@ -41,6 +41,18 @@ export const updateUserTransactionHistory = async (userId: string, tokenAddress:
   }
 }
 
+export const updateChartPrices = async (tokenPrice: number, marketCap: number, tokenAddress: string) => {
+  const response = await axios.post(`${API_BASE_URL}/cultureToken/updateChartPrices`, {
+    tokenPrice,
+    marketCap,
+    tokenAddress,
+  })
+  
+  if (response.status !== 200) {
+    throw new Error("Failed to update chart prices.");
+  }
+}
+
 export const fetchTokenData = async ({ trustPoolId }: { trustPoolId: string }): Promise<TokenData> => {
   const response = await fetch(`${API_BASE_URL}/cultureToken/tokenData?trustPoolId=${trustPoolId}`);
   const result = await response.json();
