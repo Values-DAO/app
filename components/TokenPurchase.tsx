@@ -8,7 +8,7 @@ import { formatSupply } from "@/lib/utils";
 import { getNewTokenPriceAndMarketCap, updateChartPrices, updateTokenPriceAndMarketCap, updateUserTransactionHistory } from "@/lib/actions/token.actions";
 import { useQueryClient } from "@tanstack/react-query";
 
-export function TokenPurchase({ tokenData, embeddedWallet, userInfo, setPrice, setMarketCap, isLoading }: { tokenData: any; embeddedWallet: any; userInfo: any; setPrice: any; setMarketCap: any; isLoading: boolean }) {
+export function TokenPurchase({ tokenData, embeddedWallet, userInfo, setPrice, setMarketCap, isLoading, trustPoolId }: { tokenData: any; embeddedWallet: any; userInfo: any; setPrice: any; setMarketCap: any; isLoading: boolean, trustPoolId: string }) {
   const [amount, setAmount] = useState<number>();
   const queryClient = useQueryClient();
   const amountOptions = ["20", "500", "1000"];
@@ -36,7 +36,7 @@ export function TokenPurchase({ tokenData, embeddedWallet, userInfo, setPrice, s
       await updateChartPrices(newTokenPriceInETH, newMarketCapInETH, decodedLogs?.args?.token);
       
       await queryClient.invalidateQueries({ queryKey: ["userData", userInfo?.userId] }); // @ts-ignore
-      await queryClient.invalidateQueries({ queryKey: ["chartData", decodedLogs?.args?.token] });
+      await queryClient.invalidateQueries({ queryKey: ["chartData", trustPoolId] });
     } catch (error) {
       console.error("Error buying tokens:", error);
     }

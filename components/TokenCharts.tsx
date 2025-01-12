@@ -94,6 +94,7 @@ export function TokenCharts({ trustPoolId }: { trustPoolId: string }) {
         setPrice={setPrice}
         setMarketCap={setMarketCap}
         isLoading={isTokenDataLoading}
+        trustPoolId={trustPoolId}
       />
 
       <TokenInfo tokenData={tokenData} isLoading={isTokenDataLoading} />
