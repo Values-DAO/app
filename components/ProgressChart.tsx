@@ -57,7 +57,7 @@ export function ProgressChart({ isLoading, data }: { isLoading: Boolean, data: C
               />
               <YAxis
                 tickFormatter={(value) => (activeMetric === "marketCap" ? value : value)}
-                tickMargin={12}
+                tickMargin={8}
                 padding={{ top: 10, bottom: 10 }}
               />
               <Tooltip
