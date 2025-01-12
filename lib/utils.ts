@@ -2,7 +2,6 @@ import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import {IUser} from "@/types";
 import { z } from "zod";
-import { gql, useQuery } from "@apollo/client";
 import { encodeAbiParameters, keccak256, parseAbiParameters } from "viem";
 import { ethers } from "ethers";
 

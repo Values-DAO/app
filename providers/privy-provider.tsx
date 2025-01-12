@@ -5,10 +5,8 @@ import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {createConfig, WagmiProvider} from "@privy-io/wagmi";
 import {mainnet, base, baseSepolia, polygon, optimism, sepolia} from "viem/chains";
 import {http} from "wagmi";
-import { ApolloClient, ApolloProvider, InMemoryCache, createHttpLink } from "@apollo/client";
 
 import {createPublicClient, createWalletClient} from "viem";
-import {privateKeyToAccount} from "viem/accounts";
 
 export const viemPublicClient = createPublicClient({
   chain: baseSepolia,
