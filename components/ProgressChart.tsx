@@ -53,7 +53,7 @@ export function ProgressChart({ isLoading, data }: { isLoading: Boolean, data: C
                     day: "numeric",
                   });
                 }}
-                padding={{ left: 30, right: 30 }}
+                padding={{ left: 10, right: 10 }}
               />
               <YAxis
                 tickFormatter={(value) => (activeMetric === "marketCap" ? value : value)}
