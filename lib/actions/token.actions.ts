@@ -64,6 +64,17 @@ export const fetchTokenData = async ({ trustPoolId }: { trustPoolId: string }): 
   throw new Error("Failed to fetch token data");
 };
 
+export const fetchChartData = async ({ trustPoolId }: { trustPoolId: string }) => {
+  const response = await fetch(`${API_BASE_URL}/cultureToken/chartData?trustPoolId=${trustPoolId}`);
+  const result = await response.json();
+  
+  if (result.status === 200 && result.data) {
+    return result.data.finalData;
+  }
+  
+  throw new Error("Failed to fetch chart data");
+}
+
 export const fetchUserTokenData = async ({
   userId,
   walletAddress,

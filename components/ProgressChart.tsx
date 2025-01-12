@@ -1,61 +1,84 @@
-import React from "react";
-import { ComposedChart, Bar, XAxis, YAxis, Scatter, CartesianGrid, ResponsiveContainer, Line } from "recharts";
+"use client";
 
-const data = [
-  { day: "M", submissions: 6, low: 2, high: 4, open: 2, close: 4, value: [2, 4] },
-  { day: "T", submissions: 5, low: 4, high: 8, open: 4, close: 7, value: [4, 7] },
-  { day: "W", submissions: 4, low: 5, high: 10, open: 5, close: 9, value: [5, 9] },
-  { day: "T", submissions: 7, low: 7, high: 13, open: 7, close: 12, value: [7, 12] },
-  { day: "F", submissions: 10, low: 8, high: 15, open: 8, close: 14, value: [8, 14] },
-  { day: "S", submissions: 6, low: 9, high: 17, open: 9, close: 16, value: [9, 16] },
-  { day: "S", submissions: 6, low: 10, high: 19, open: 10, close: 18, value: [10, 18] },
-];
+import { CartesianGrid, Line, LineChart, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "./ui/skeleton";
+import { useState } from "react";
 
-const CustomBar = (props) => {
-  const { x, y, width, height, fill } = props;
+interface ChartData {
+  date: string;
+  price: number;
+  marketCap: number;
+}
 
-  return <rect x={x - width / 2} y={y} width={width} height={Math.max(height, 0)} fill={fill} />;
-};
+export function ProgressChart({ isLoading, data }: { isLoading: Boolean, data: ChartData[] }) {
+  if (isLoading) {
+    return <Skeleton className="h-64 w-full" />;
+  }
+  
+  const [activeMetric, setActiveMetric] = useState<"price" | "marketCap">("price");
 
-const CandlestickChart = () => {
   return (
-    <div className="w-full h-96 bg-white p-4 rounded-lg shadow-sm">
-      <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} />
-          <XAxis dataKey="day" scale="point" padding={{ left: 10, right: 10 }} />
-          <YAxis yAxisId="left" orientation="left" domain={[0, 20]} tickCount={5} />
-          <YAxis
-            yAxisId="right"
-            orientation="right"
-            domain={[0, 1000]}
-            tickFormatter={(value) => `$${value}`}
-            tickCount={5}
-          />
-
-          {/* Candlestick body */}
-          {data.map((entry, index) => (
-            <Bar
-              key={`bar-${index}`}
-              yAxisId="left"
-              dataKey="value"
-              shape={<CustomBar />}
-              fill="#22c55e"
-              stroke="#22c55e"
-              barSize={10}
-            />
-          ))}
-
-          {/* High-low lines */}
-          <Line yAxisId="left" dataKey="high" stroke="#22c55e" dot={false} isAnimationActive={false} />
-          <Line yAxisId="left" dataKey="low" stroke="#22c55e" dot={false} isAnimationActive={false} />
-
-          {/* Scatter plot for submissions */}
-          <Scatter yAxisId="left" dataKey="submissions" fill="#000000" radius={6} />
-        </ComposedChart>
-      </ResponsiveContainer>
-    </div>
+    <Card>
+      <div className="flex border-b">
+        <button
+          onClick={() => setActiveMetric("price")}
+          className={`flex-1 px-4 py-3 text-sm font-medium ${
+            activeMetric === "price" ? "bg-slate-100 dark:bg-slate-800" : ""
+          }`}
+        >
+          Price in ETH
+        </button>
+        <button
+          onClick={() => setActiveMetric("marketCap")}
+          className={`flex-1 px-4 py-3 text-sm font-medium ${
+            activeMetric === "marketCap" ? "bg-slate-100 dark:bg-slate-800" : ""
+          }`}
+        >
+          Market Cap in ETH
+        </button>
+      </div>
+      <CardContent className="p-6">
+        <div className="h-[300px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <XAxis
+                dataKey="date"
+                tickMargin={12}
+                tickFormatter={(value) => {
+                  const date = new Date(value);
+                  return date.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  });
+                }}
+                padding={{ left: 30, right: 30 }}
+              />
+              <YAxis
+                tickFormatter={(value) => (activeMetric === "marketCap" ? value : value)}
+                tickMargin={12}
+                padding={{ top: 10, bottom: 10 }}
+              />
+              <Tooltip
+                labelFormatter={(label) => {
+                  const date = new Date(label);
+                  return date.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  });
+                }}
+                formatter={(value: number) => [
+                  activeMetric === "marketCap" ? value : value,
+                  activeMetric === "marketCap" ? "Market Cap" : "Price",
+                ]}
+              />
+              <Line type="monotone" dataKey={activeMetric} stroke="#FACC14" strokeWidth={2} dot={true} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </CardContent>
+    </Card>
   );
-};
-
-export default CandlestickChart;
+}

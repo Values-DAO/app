@@ -12,7 +12,8 @@ import { TokenInfo } from "./TokenInfo";
 import { TokenProgress } from "./TokenProgress";
 import { TokenHistory } from "./TokenHistory";
 import type { TokenData, UserTokenData } from "@/types";
-import { fetchTokenData, fetchUserTokenData } from "@/lib/actions/token.actions";
+import { fetchChartData, fetchTokenData, fetchUserTokenData } from "@/lib/actions/token.actions";
+import {ProgressChart} from "./ProgressChart";
 
 export function TokenCharts({ trustPoolId }: { trustPoolId: string }) {
   const { userInfo } = useUserContext();
@@ -21,15 +22,24 @@ export function TokenCharts({ trustPoolId }: { trustPoolId: string }) {
   const [price, setPrice] = useState(0); // in eth
   const [marketCap, setMarketCap] = useState(0); // in eth
 
-  // First fetch token data
+  // First fetch token data and charts data
   const {
     data: tokenData,
-    isLoading: isTokenDataLoading,
+    isLoading: isTokenDataLoading, 
     isError: isTokenDataError,
   } = useQuery<TokenData>({
     queryKey: ["tokenData", trustPoolId],
     queryFn: () => fetchTokenData({ trustPoolId }),
   });
+  
+  const {
+    data: chartData,
+    isLoading: isChartDataLoading,
+    isError: isChartDataError,
+  } = useQuery({
+    queryKey: ["chartData", trustPoolId],
+    queryFn: () => fetchChartData({ trustPoolId }),
+  })
 
   // Then fetch user data once prerequisites are ready
   const {
@@ -74,6 +84,8 @@ export function TokenCharts({ trustPoolId }: { trustPoolId: string }) {
       />
 
       <TokenPrice tokenData={tokenData} price={price} isLoading={isTokenDataLoading} />
+
+      <ProgressChart isLoading={isChartDataLoading} data={chartData}/>
 
       <TokenPurchase
         tokenData={tokenData}

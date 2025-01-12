@@ -41,7 +41,7 @@
     "react-dom": "^18",
     "react-hook-form": "^7.53.1",
     "react-wordcloud": "^1.2.7",
-    "recharts": "^2.14.1",
+    "recharts": "^2.15.0",
     "sharp": "^0.33.5",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",

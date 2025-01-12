@@ -1,4 +1,3 @@
-import CandlestickChart from "./ProgressChart";
 import { Skeleton } from "./ui/skeleton";
 
 export function TokenPrice({ tokenData, price, isLoading }: { tokenData: any; price: number; isLoading: boolean }) {
@@ -9,7 +8,6 @@ export function TokenPrice({ tokenData, price, isLoading }: { tokenData: any; pr
           <Skeleton className="h-8 w-32" />
           <Skeleton className="h-8 w-24 rounded-full" />
         </div>
-        <Skeleton className="h-64 w-full" />
       </div>
     );
   }
@@ -22,7 +20,6 @@ export function TokenPrice({ tokenData, price, isLoading }: { tokenData: any; pr
           {price.toFixed(15)} ETH
         </div>
       </div>
-      <CandlestickChart />
     </div>
   );
 }

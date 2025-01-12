@@ -35,7 +35,8 @@ export function TokenPurchase({ tokenData, embeddedWallet, userInfo, setPrice, s
       await updateUserTransactionHistory(userInfo?.userId!, decodedLogs?.args?.token, amount, decodedLogs?.args?.amount); // @ts-ignore
       await updateChartPrices(newTokenPriceInETH, newMarketCapInETH, decodedLogs?.args?.token);
       
-      await queryClient.invalidateQueries({ queryKey: ["userData", userInfo?.userId] });
+      await queryClient.invalidateQueries({ queryKey: ["userData", userInfo?.userId] }); // @ts-ignore
+      await queryClient.invalidateQueries({ queryKey: ["chartData", decodedLogs?.args?.token] });
     } catch (error) {
       console.error("Error buying tokens:", error);
     }
