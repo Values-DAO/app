@@ -18,17 +18,17 @@ export const bondingCurveABI = [
         internalType: "string",
       },
       {
-        name: "fundingRaised",
-        type: "uint96",
-        internalType: "uint96",
-      },
-      {
         name: "tokenAddress",
         type: "address",
         internalType: "address",
       },
       {
         name: "creatorAddress",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "_adminAddress",
         type: "address",
         internalType: "address",
       },
@@ -44,6 +44,19 @@ export const bondingCurveABI = [
         name: "",
         type: "uint256",
         internalType: "uint256",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "DEFAULT_ADMIN_ROLE",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32",
       },
     ],
     stateMutability: "view",
@@ -152,6 +165,39 @@ export const bondingCurveABI = [
   },
   {
     type: "function",
+    name: "claimRewards",
+    inputs: [
+      {
+        name: "index",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "amount",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "toAddress",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "proof",
+        type: "bytes32[]",
+        internalType: "bytes32[]",
+      },
+      {
+        name: "merkleRoot",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
     name: "communityCoinDeets",
     inputs: [],
     outputs: [
@@ -257,6 +303,67 @@ export const bondingCurveABI = [
   },
   {
     type: "function",
+    name: "getRoleAdmin",
+    inputs: [
+      {
+        name: "role",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "grantRole",
+    inputs: [
+      {
+        name: "role",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+      {
+        name: "account",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "hasRole",
+    inputs: [
+      {
+        name: "role",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+      {
+        name: "account",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "bool",
+        internalType: "bool",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "onERC721Received",
     inputs: [
       {
@@ -291,30 +398,65 @@ export const bondingCurveABI = [
   },
   {
     type: "function",
-    name: "owner",
-    inputs: [],
+    name: "renounceRole",
+    inputs: [
+      {
+        name: "role",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+      {
+        name: "callerConfirmation",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "revokeRole",
+    inputs: [
+      {
+        name: "role",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+      {
+        name: "account",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "supportsInterface",
+    inputs: [
+      {
+        name: "interfaceId",
+        type: "bytes4",
+        internalType: "bytes4",
+      },
+    ],
     outputs: [
       {
         name: "",
-        type: "address",
-        internalType: "address",
+        type: "bool",
+        internalType: "bool",
       },
     ],
     stateMutability: "view",
   },
   {
     type: "function",
-    name: "renounceOwnership",
-    inputs: [],
-    outputs: [],
-    stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
-    name: "transferOwnership",
+    name: "updateAdmin",
     inputs: [
       {
-        name: "newOwner",
+        name: "_adminAddress",
         type: "address",
         internalType: "address",
       },
@@ -337,25 +479,6 @@ export const bondingCurveABI = [
   },
   {
     type: "event",
-    name: "OwnershipTransferred",
-    inputs: [
-      {
-        name: "previousOwner",
-        type: "address",
-        indexed: true,
-        internalType: "address",
-      },
-      {
-        name: "newOwner",
-        type: "address",
-        indexed: true,
-        internalType: "address",
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
     name: "PoolConfigured",
     inputs: [
       {
@@ -375,6 +498,106 @@ export const bondingCurveABI = [
         type: "uint256",
         indexed: false,
         internalType: "uint256",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "RewardClaimed",
+    inputs: [
+      {
+        name: "claimant",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+      {
+        name: "index",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+      {
+        name: "amount",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "RoleAdminChanged",
+    inputs: [
+      {
+        name: "role",
+        type: "bytes32",
+        indexed: true,
+        internalType: "bytes32",
+      },
+      {
+        name: "previousAdminRole",
+        type: "bytes32",
+        indexed: true,
+        internalType: "bytes32",
+      },
+      {
+        name: "newAdminRole",
+        type: "bytes32",
+        indexed: true,
+        internalType: "bytes32",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "RoleGranted",
+    inputs: [
+      {
+        name: "role",
+        type: "bytes32",
+        indexed: true,
+        internalType: "bytes32",
+      },
+      {
+        name: "account",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+      {
+        name: "sender",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "RoleRevoked",
+    inputs: [
+      {
+        name: "role",
+        type: "bytes32",
+        indexed: true,
+        internalType: "bytes32",
+      },
+      {
+        name: "account",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+      {
+        name: "sender",
+        type: "address",
+        indexed: true,
+        internalType: "address",
       },
     ],
     anonymous: false,
@@ -430,7 +653,33 @@ export const bondingCurveABI = [
   },
   {
     type: "error",
+    name: "AccessControlBadConfirmation",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "AccessControlUnauthorizedAccount",
+    inputs: [
+      {
+        name: "account",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "neededRole",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
+  },
+  {
+    type: "error",
     name: "CBP__BondingCurveAlreadyGraduated",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "CBP__BondingCurveYetToGraduate",
     inputs: [],
   },
   {
@@ -460,25 +709,8 @@ export const bondingCurveABI = [
   },
   {
     type: "error",
-    name: "OwnableInvalidOwner",
-    inputs: [
-      {
-        name: "owner",
-        type: "address",
-        internalType: "address",
-      },
-    ],
-  },
-  {
-    type: "error",
-    name: "OwnableUnauthorizedAccount",
-    inputs: [
-      {
-        name: "account",
-        type: "address",
-        internalType: "address",
-      },
-    ],
+    name: "CBR__RewardAlreadyClaimed",
+    inputs: [],
   },
   {
     type: "error",

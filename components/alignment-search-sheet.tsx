@@ -37,7 +37,7 @@ export function AlignmentSearchSheet({
     }
 
     window.location.replace(
-      `${process.env.NEXT_PUBLIC_HOST}/user-alignment?viewer=${user.username}&target=${targetUser.username}`
+      `/user-alignment?viewer=${user.username}&target=${targetUser.username}`
     );
   };
   return (

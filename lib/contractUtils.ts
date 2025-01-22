@@ -39,6 +39,7 @@ export const encodeCreateTokenData = async ({
   description: string;
   curatorTreasuryAllocation: string;
 }) => {
+  console.log(process.env.NEXT_PUBLIC_ADMIN_AUTHORITY_PUBLIC_KEY!);
   return encodeFunctionData({
     abi: factoryABI,
     functionName: "initialiseToken",
@@ -46,6 +47,7 @@ export const encodeCreateTokenData = async ({
       tokenName,
       tokenSymbol,
       description,
+      process.env.NEXT_PUBLIC_ADMIN_AUTHORITY_PUBLIC_KEY!,
       [
         curatorTreasuryAllocation,
         "0x78db1057A9A1102C3E831E5086B75E9a58e7730c",

@@ -16,10 +16,25 @@ export const factoryABI = [
     type: "event",
   },
   {
+    inputs: [],
+    name: "DECIMALS",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "MAX_SUPPLY",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       { internalType: "string", name: "name", type: "string" },
       { internalType: "string", name: "symbol", type: "string" },
       { internalType: "string", name: "description", type: "string" },
+      { internalType: "address", name: "adminAddress", type: "address" },
       { internalType: "address[]", name: "allocationAddys", type: "address[]" },
       { internalType: "uint256[]", name: "allocationAmount", type: "uint256[]" },
     ],
@@ -33,4 +48,4 @@ export const factoryABI = [
   },
 ];
 
-export const factoryContractAddress = "0x9e3b27C397948b56E93878b05C6106CB22144677";
+export const factoryContractAddress = "0xDfc278D125CD27f275198EDb073e290bDEBD29b0";

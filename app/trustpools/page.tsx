@@ -154,7 +154,7 @@ export default function Home() {
     } catch (error) {
       console.error("Error creating trust pool:", error);
     }
-  } 
+  }
 
   const handleRedirect = (id: string) => {
     router.push(`/trustpools/${id}`);
