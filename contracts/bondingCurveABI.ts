@@ -165,36 +165,16 @@ export const bondingCurveABI = [
   },
   {
     type: "function",
-    name: "claimRewards",
-    inputs: [
+    name: "checkRewardTokenBalance",
+    inputs: [],
+    outputs: [
       {
-        name: "index",
+        name: "",
         type: "uint256",
         internalType: "uint256",
-      },
-      {
-        name: "amount",
-        type: "uint256",
-        internalType: "uint256",
-      },
-      {
-        name: "toAddress",
-        type: "address",
-        internalType: "address",
-      },
-      {
-        name: "proof",
-        type: "bytes32[]",
-        internalType: "bytes32[]",
-      },
-      {
-        name: "merkleRoot",
-        type: "bytes32",
-        internalType: "bytes32",
       },
     ],
-    outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "view",
   },
   {
     type: "function",
@@ -290,6 +270,34 @@ export const bondingCurveABI = [
   },
   {
     type: "function",
+    name: "distributeRewards",
+    inputs: [
+      {
+        name: "amount",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "toAddress",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "proof",
+        type: "bytes32[]",
+        internalType: "bytes32[]",
+      },
+      {
+        name: "merkleRoot",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
     name: "getCurrentPrice",
     inputs: [],
     outputs: [
@@ -358,6 +366,19 @@ export const bondingCurveABI = [
         name: "",
         type: "bool",
         internalType: "bool",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "lastRewardCampaignTimestamp",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
       },
     ],
     stateMutability: "view",
@@ -478,6 +499,30 @@ export const bondingCurveABI = [
     stateMutability: "view",
   },
   {
+    type: "function",
+    name: "weeklyRewardClaimed",
+    inputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "bool",
+        internalType: "bool",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
     type: "event",
     name: "PoolConfigured",
     inputs: [
@@ -504,19 +549,13 @@ export const bondingCurveABI = [
   },
   {
     type: "event",
-    name: "RewardClaimed",
+    name: "RewardDistributed",
     inputs: [
       {
         name: "claimant",
         type: "address",
         indexed: true,
         internalType: "address",
-      },
-      {
-        name: "index",
-        type: "uint256",
-        indexed: false,
-        internalType: "uint256",
       },
       {
         name: "amount",
@@ -644,6 +683,25 @@ export const bondingCurveABI = [
       },
       {
         name: "fundingRaised",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "WeeklyRootUpdated",
+    inputs: [
+      {
+        name: "newRoot",
+        type: "bytes32",
+        indexed: false,
+        internalType: "bytes32",
+      },
+      {
+        name: "timestamp",
         type: "uint256",
         indexed: false,
         internalType: "uint256",
