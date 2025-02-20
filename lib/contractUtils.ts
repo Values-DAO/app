@@ -50,7 +50,7 @@ export const encodeCreateTokenData = async ({
       process.env.NEXT_PUBLIC_ADMIN_AUTHORITY_PUBLIC_KEY!,
       [
         curatorTreasuryAllocation,
-        "0x78db1057A9A1102C3E831E5086B75E9a58e7730c",
+        "0x57cb6f115BC64187Bf8c77681dD89768F8863c5b",
         "0x78db1057A9A1102C3E831E5086B75E9a58e7730c",
       ],
       [5000000000, 4000000000, 1000000000], // 5B, 4B, 1B
